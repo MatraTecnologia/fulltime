@@ -1,0 +1,14 @@
+{
+  "name": "fulltime",
+  "private": true,
+  "packageManager": "pnpm@11.9.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "db:push": "turbo run db:push"
+  },
+  "devDependencies": {
+    "turbo": "2.10.0"
+  }
+}
