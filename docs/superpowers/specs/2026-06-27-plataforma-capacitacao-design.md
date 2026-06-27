@@ -22,6 +22,7 @@ Núcleo do MVP = o LMS. Pagamentos ficam fora do MVP (cursos gratuitos).
 | Roles | Globais: `admin`, `instrutor`, `profissional` (sem workspaces) |
 | Vídeo | Abstração de provider: upload próprio (Cloudflare Stream/Mux, fluxo presign) **e** embed de YouTube/Vimeo por link |
 | Docs API | Swagger + Scalar em `/docs` |
+| Design System | `packages/ui` — tokens extraídos do logo Full Time, Tailwind + Nunito/Inter |
 | Pagamentos | Fora do MVP (cursos gratuitos) |
 
 ## Estrutura do monorepo
@@ -139,6 +140,39 @@ apps/web/src/app/
 - **Embed YouTube/Vimeo:** guarda só o ID; player escolhido no front pelo `videoSource`.
 - Começa com embed (zero infra) e troca pro provider real sem refazer o front.
 
+## Identidade visual & Design System (`packages/ui`)
+
+Paleta extraída dos pixels do logo `logo.jpeg` (Full Time — *Acolher · Desenvolver · Incluir*). As 4 cores do quebra-cabeça mapeiam nos pilares do slogan + o amber de energia.
+
+| Papel na marca | Hex | Origem no logo |
+|---|---|---|
+| **Navy** (primária) | `#003060` | letra "F", aros, "full", texto |
+| **Amber** (energia/destaque) | `#F5B500` | arco superior + "t" de *time* |
+| **Green** (desenvolver) | `#6CB23A` | arco direito + folha |
+| **Blue** (incluir) | `#119BD8` | arco inferior + "m" |
+| **Purple** (acolher) | `#834BA8` | arco esquerdo + "e" |
+
+**Filosofia:** público final são profissionais, mas a marca é de inclusão. UI **calma e acessível** — navy + neutros como base (~90% das superfícies); cores vibrantes só como **acento** (categorias, progresso, estados). Sem grandes blocos saturados que cansam visualmente.
+
+**Tokens (CSS variables + tema Tailwind):**
+```
+--brand-navy:   #003060   (primary / texto forte / headers)
+--brand-amber:  #F5B500   (accent / CTAs de destaque / warning)
+--brand-green:  #6CB23A   (Desenvolver · sucesso · progresso/conclusão)
+--brand-blue:   #119BD8   (Incluir · info · links)
+--brand-purple: #834BA8   (Acolher · categorias)
+
+surface:  #F7F9FB  bg-page   |  #FFFFFF cards
+neutral:  escala slate (texto, bordas, muted)
+```
+Cada cor de marca recebe escala 50→900 (tints/shades) gerada a partir do hex base.
+
+**Mapa semântico:** `primary`→navy · `accent`→amber · `success`→green · `info`→blue. Categorias de curso podem usar as 4 cores do quebra-cabeça como rótulo visual. Progresso/certificado → green.
+
+**Tipografia:** sans arredondada pra casar com o logo — `Nunito` (display/headings) + `Inter` (corpo). Alternativa acessível de corpo: `Atkinson Hyperlegible`.
+
+**Acessibilidade (critério do projeto, não enfeite):** contraste mínimo AA, foco visível forte, `prefers-reduced-motion` respeitado, espaçamento generoso, alvos de toque ≥44px.
+
 ## Autorização (RBAC simples)
 
 | Ação | Role exigida |
@@ -152,14 +186,15 @@ apps/web/src/app/
 
 ## Ordem de build (incremental)
 
-1. Scaffold Turborepo (pnpm) + `apps/web` (Next) + `apps/api` (Fastify) + `packages/config-ts`, `packages/config-eslint`, `packages/ui`.
-2. `apps/api`: Prisma + schema base + `lib/prisma|auth|session|mail` + rotas `health` e `auth`.
-3. LMS core na API: `courses` → `modules` → `lessons` → `enrollments` (progresso/certificado).
-4. `apps/web`: auth (login/cadastro/verificação de e-mail) + middleware de proteção.
-5. `apps/web`: site público + catálogo + player de aula com progresso.
-6. `apps/web`: painel admin/instrutor (CRUD de cursos).
-7. Módulo `children` (API + web) — fase plugável.
-8. `lib/video.ts` com provider real (Mux/Cloudflare) — quando sair do embed.
+1. Scaffold Turborepo (pnpm) + `apps/web` (Next) + `apps/api` (Fastify) + `packages/config-ts`, `packages/config-eslint`.
+2. **`packages/ui` (design system):** tokens da marca (paleta do logo, escalas 50→900), tema Tailwind, fontes (Nunito/Inter), primitivos acessíveis (Button, Card, Input, Badge de categoria). Consumido por `apps/web`.
+3. `apps/api`: Prisma + schema base + `lib/prisma|auth|session|mail` + rotas `health` e `auth`.
+4. LMS core na API: `courses` → `modules` → `lessons` → `enrollments` (progresso/certificado).
+5. `apps/web`: auth (login/cadastro/verificação de e-mail) + middleware de proteção, já sobre o design system.
+6. `apps/web`: site público + catálogo + player de aula com progresso.
+7. `apps/web`: painel admin/instrutor (CRUD de cursos).
+8. Módulo `children` (API + web) — fase plugável.
+9. `lib/video.ts` com provider real (Mux/Cloudflare) — quando sair do embed.
 
 ## Fora de escopo (MVP)
 
@@ -168,4 +203,4 @@ apps/web/src/app/
 - Provider de vídeo próprio na largada (começa com embed YT/Vimeo).
 - Login social (trivial de adicionar com better-auth depois).
 
-> Criado em 2026-06-27 12:08 (-03) · Última modificação: 2026-06-27 12:08 (-03)
+> Criado em 2026-06-27 12:08 (-03) · Última modificação: 2026-06-27 12:16 (-03)
