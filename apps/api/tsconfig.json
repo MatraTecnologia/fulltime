@@ -1,0 +1,4 @@
+{
+  "extends": "@fulltime/config-ts/node.json",
+  "include": ["src", "prisma.config.ts"]
+}
