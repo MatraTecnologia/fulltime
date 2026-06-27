@@ -1,0 +1,4 @@
+{
+  "extends": "@fulltime/config-ts/nextjs.json",
+  "include": ["src"]
+}
