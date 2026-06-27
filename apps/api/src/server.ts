@@ -31,7 +31,7 @@ await app.register(fastifySwagger, {
 
 await app.register(ScalarApiReference, { routePrefix: '/docs' })
 
-await app.register(autoload, { dir: join(__dirname, 'routes') })
+await app.register(autoload, { dir: join(__dirname, 'routes'), dirNameRoutePrefix: false })
 
 const port = Number(process.env.PORT) || 3333
 await app.listen({ port, host: '0.0.0.0' })
