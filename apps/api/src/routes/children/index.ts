@@ -45,15 +45,22 @@ export default async function childrenRoutes(app: FastifyInstance) {
       diagnosis?: string
     }
 
-    const child = await prisma.child.create({
-      data: {
-        ownerProfId: request.session.user.id,
-        name,
-        birthDate: birthDate ? new Date(birthDate) : undefined,
-        diagnosis,
-      },
-    })
-    return reply.status(201).send(child)
+    try {
+      const child = await prisma.child.create({
+        data: {
+          ownerProfId: request.session.user.id,
+          name,
+          birthDate: birthDate ? new Date(birthDate) : undefined,
+          diagnosis,
+        },
+      })
+      return reply.status(201).send(child)
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+        return reply.status(404).send({ error: 'Profissional não encontrado.' })
+      }
+      throw error
+    }
   })
 
   app.get('/children/:id', {
@@ -112,15 +119,22 @@ export default async function childrenRoutes(app: FastifyInstance) {
     const child = await findOwnedChild(id, request.session.user.id)
     if (!child) return reply.status(404).send({ error: 'Criança não encontrada.' })
 
-    const updated = await prisma.child.update({
-      where: { id },
-      data: {
-        name,
-        birthDate: birthDate !== undefined ? new Date(birthDate) : undefined,
-        diagnosis,
-      },
-    })
-    return updated
+    try {
+      const updated = await prisma.child.update({
+        where: { id },
+        data: {
+          name,
+          birthDate: birthDate !== undefined ? new Date(birthDate) : undefined,
+          diagnosis,
+        },
+      })
+      return updated
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        return reply.status(404).send({ error: 'Criança não encontrada.' })
+      }
+      throw error
+    }
   })
 
   app.delete('/children/:id', {
@@ -140,8 +154,15 @@ export default async function childrenRoutes(app: FastifyInstance) {
     const child = await findOwnedChild(id, request.session.user.id)
     if (!child) return reply.status(404).send({ error: 'Criança não encontrada.' })
 
-    await prisma.child.delete({ where: { id } })
-    return reply.status(204).send()
+    try {
+      await prisma.child.delete({ where: { id } })
+      return reply.status(204).send()
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        return reply.status(404).send({ error: 'Criança não encontrada.' })
+      }
+      throw error
+    }
   })
 
   app.post('/children/:childId/records', {
@@ -175,16 +196,23 @@ export default async function childrenRoutes(app: FastifyInstance) {
     const child = await findOwnedChild(childId, request.session.user.id)
     if (!child) return reply.status(404).send({ error: 'Criança não encontrada.' })
 
-    const record = await prisma.childRecord.create({
-      data: {
-        childId,
-        authorId: request.session.user.id,
-        type,
-        content,
-        date: date ? new Date(date) : undefined,
-      },
-    })
-    return reply.status(201).send(record)
+    try {
+      const record = await prisma.childRecord.create({
+        data: {
+          childId,
+          authorId: request.session.user.id,
+          type,
+          content,
+          date: date ? new Date(date) : undefined,
+        },
+      })
+      return reply.status(201).send(record)
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+        return reply.status(404).send({ error: 'Criança não encontrada.' })
+      }
+      throw error
+    }
   })
 
   app.get('/children/:childId/records', {
@@ -229,7 +257,14 @@ export default async function childrenRoutes(app: FastifyInstance) {
       return reply.status(404).send({ error: 'Registro não encontrado.' })
     }
 
-    await prisma.childRecord.delete({ where: { id } })
-    return reply.status(204).send()
+    try {
+      await prisma.childRecord.delete({ where: { id } })
+      return reply.status(204).send()
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        return reply.status(404).send({ error: 'Registro não encontrado.' })
+      }
+      throw error
+    }
   })
 }
