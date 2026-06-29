@@ -6,17 +6,46 @@ datasource db {
   provider = "postgresql"
 }
 
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum VideoSource {
+  MUX
+  YOUTUBE
+  VIMEO
+  NONE
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum ChildRecordType {
+  EVOLUCAO
+  SESSAO
+  PEI
+}
+
 model User {
-  id            String    @id @default(cuid())
+  id            String       @id @default(cuid())
   name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
+  email         String       @unique
+  emailVerified Boolean      @default(false)
   image         String?
-  role          String?   @default("profissional")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  role          String?      @default("profissional")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
   sessions      Session[]
   accounts      Account[]
+  profile       ProfileProf?
+  courses       Course[]     @relation("CourseInstructor")
+  enrollments   Enrollment[]
+  children      Child[]      @relation("ChildOwner")
+  records       ChildRecord[] @relation("RecordAuthor")
 
   @@map("users")
 }
@@ -63,4 +92,155 @@ model Verification {
   updatedAt  DateTime @updatedAt
 
   @@map("verifications")
+}
+
+model ProfileProf {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  area      String?
+  registro  String?
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profile_profs")
+}
+
+model Course {
+  id           String       @id @default(cuid())
+  slug         String       @unique
+  title        String
+  description  String?
+  coverImage   String?
+  status       CourseStatus @default(DRAFT)
+  instructorId String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  instructor   User         @relation("CourseInstructor", fields: [instructorId], references: [id])
+  modules      Module[]
+  enrollments  Enrollment[]
+
+  @@map("courses")
+}
+
+model Module {
+  id        String   @id @default(cuid())
+  courseId  String
+  title     String
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons   Lesson[]
+
+  @@index([courseId])
+  @@map("modules")
+}
+
+model Lesson {
+  id          String           @id @default(cuid())
+  moduleId    String
+  title       String
+  order       Int
+  content     String?
+  videoSource VideoSource      @default(NONE)
+  videoRef    String?
+  durationSec Int?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  attachments Attachment[]
+  progress    LessonProgress[]
+
+  @@index([moduleId])
+  @@map("lessons")
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  lessonId  String
+  name      String
+  url       String
+  type      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@map("attachments")
+}
+
+model Enrollment {
+  id          String           @id @default(cuid())
+  userId      String
+  courseId    String
+  status      EnrollmentStatus @default(ACTIVE)
+  enrolledAt  DateTime         @default(now())
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course      Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress    LessonProgress[]
+  certificate Certificate?
+
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+model LessonProgress {
+  id           String     @id @default(cuid())
+  enrollmentId String
+  lessonId     String
+  completedAt  DateTime   @default(now())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  lesson       Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([enrollmentId, lessonId])
+  @@map("lesson_progress")
+}
+
+model Certificate {
+  id           String     @id @default(cuid())
+  enrollmentId String     @unique
+  code         String     @unique
+  issuedAt     DateTime   @default(now())
+  url          String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+
+  @@map("certificates")
+}
+
+model Child {
+  id          String        @id @default(cuid())
+  ownerProfId String
+  name        String
+  birthDate   DateTime?
+  diagnosis   String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  owner       User          @relation("ChildOwner", fields: [ownerProfId], references: [id], onDelete: Cascade)
+  records     ChildRecord[]
+
+  @@index([ownerProfId])
+  @@map("children")
+}
+
+model ChildRecord {
+  id        String          @id @default(cuid())
+  childId   String
+  authorId  String
+  type      ChildRecordType
+  content   String
+  date      DateTime        @default(now())
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  child     Child           @relation(fields: [childId], references: [id], onDelete: Cascade)
+  author    User            @relation("RecordAuthor", fields: [authorId], references: [id])
+
+  @@index([childId])
+  @@map("child_records")
 }
