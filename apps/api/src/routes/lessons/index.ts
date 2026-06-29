@@ -21,7 +21,7 @@ export default async function lessonRoutes(app: FastifyInstance) {
         properties: {
           title: { type: 'string' },
           content: { type: 'string' },
-          videoSource: { type: 'string', enum: ['MUX', 'YOUTUBE', 'VIMEO', 'NONE'] },
+          videoSource: { type: 'string', enum: ['MUX', 'YOUTUBE', 'VIMEO', 'NONE'], default: 'NONE' },
           videoRef: { type: 'string' },
           durationSec: { type: 'integer', minimum: 0 },
           order: { type: 'integer', minimum: 1 },
@@ -100,7 +100,7 @@ export default async function lessonRoutes(app: FastifyInstance) {
         properties: {
           title: { type: 'string' },
           content: { type: 'string' },
-          videoSource: { type: 'string', enum: ['MUX', 'YOUTUBE', 'VIMEO', 'NONE'] },
+          videoSource: { type: 'string', enum: ['MUX', 'YOUTUBE', 'VIMEO', 'NONE'], default: 'NONE' },
           videoRef: { type: 'string' },
           durationSec: { type: 'integer', minimum: 0 },
           order: { type: 'integer', minimum: 1 },
