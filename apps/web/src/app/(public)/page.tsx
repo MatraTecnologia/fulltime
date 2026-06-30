@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { apiServer } from '@/lib/api'
 import type { CourseListItem } from '@/lib/types'
 import { LandingHero } from '@/components/landing/hero'
@@ -11,6 +12,15 @@ import { LandingFooter } from '@/components/landing/footer'
 export const dynamic = 'force-dynamic'
 
 const HomePage = async () => {
+  let logged = false
+  try {
+    await apiServer('/users/me')
+    logged = true
+  } catch {
+    logged = false
+  }
+  if (logged) redirect('/dashboard')
+
   const courses = await apiServer<CourseListItem[]>('/courses')
   const featured = courses.slice(0, 6)
 
