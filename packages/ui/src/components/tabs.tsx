@@ -25,7 +25,6 @@ export const Tabs = ({ tabs, active, onChange }: TabsProps) => {
           id={`${uid}tab-${tab.id}`}
           role="tab"
           aria-selected={tab.id === active}
-          aria-controls={`${uid}panel-${tab.id}`}
           onClick={() => onChange(tab.id)}
           className={cn(
             'px-4 py-2 text-sm font-medium transition-colors',

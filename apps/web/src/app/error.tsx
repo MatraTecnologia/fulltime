@@ -1,6 +1,6 @@
 'use client'
 
-const Error = ({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) => (
+const ErrorPage = ({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) => (
   <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 text-center">
     <p className="font-display text-sm font-semibold uppercase tracking-widest text-brand-amber">
       Full Time
@@ -17,4 +17,4 @@ const Error = ({ error, reset }: { error: Error & { digest?: string }; reset: ()
   </main>
 )
 
-export default Error
+export default ErrorPage
