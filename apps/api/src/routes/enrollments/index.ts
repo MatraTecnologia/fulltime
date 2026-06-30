@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify'
-import { Prisma, CourseStatus, EnrollmentStatus } from '@prisma/client'
+import { Prisma, CourseStatus, EnrollmentStatus } from '../../generated/prisma/client.js'
 import { prisma } from '../../lib/prisma.js'
 import { requireAuth } from '../../lib/session.js'
 import { generateCertificateCode } from '../../lib/certificate.js'

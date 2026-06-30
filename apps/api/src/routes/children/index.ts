@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify'
-import { Prisma, ChildRecordType } from '@prisma/client'
+import { Prisma, ChildRecordType } from '../../generated/prisma/client.js'
 import { prisma } from '../../lib/prisma.js'
 import { requireAuth } from '../../lib/session.js'
 

@@ -1,4 +1,4 @@
-import { VideoSource } from '@prisma/client'
+import { VideoSource } from '../generated/prisma/client.js'
 
 export const resolveVideo = (
   source: VideoSource,

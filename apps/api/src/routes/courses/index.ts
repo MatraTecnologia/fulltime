@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify'
-import { Prisma, CourseStatus } from '@prisma/client'
+import { Prisma, CourseStatus } from '../../generated/prisma/client.js'
 import { fromNodeHeaders } from 'better-auth/node'
 import { auth } from '../../lib/auth.js'
 import { prisma } from '../../lib/prisma.js'

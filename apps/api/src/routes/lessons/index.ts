@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify'
-import { Prisma, VideoSource } from '@prisma/client'
+import { Prisma, VideoSource } from '../../generated/prisma/client.js'
 import { prisma } from '../../lib/prisma.js'
 import { requireAuth, requireRole } from '../../lib/session.js'
 import { resolveVideo } from '../../lib/video.js'
