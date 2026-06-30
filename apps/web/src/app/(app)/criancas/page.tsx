@@ -5,7 +5,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { Child } from '@/lib/types'
-import { Button, Card, CardContent, CardTitle, Dialog, EmptyState, Spinner } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
+import { Spinner } from '@/components/ui/spinner'
 import ChildForm from '@/components/child-form'
 
 const formatDate = (value: string | null) => {
@@ -40,7 +44,7 @@ const CriancasPage = () => {
   if (!children && !error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Spinner />
+        <Spinner className="size-8" />
       </div>
     )
   }
@@ -48,7 +52,7 @@ const CriancasPage = () => {
   if (error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-red-600" role="alert">{error}</p>
+        <p className="text-sm text-destructive" role="alert">{error}</p>
       </div>
     )
   }
@@ -61,11 +65,12 @@ const CriancasPage = () => {
       </div>
 
       {children!.length === 0 ? (
-        <EmptyState
-          title="Nenhuma criança cadastrada"
-          description="Adicione uma criança para começar."
-          className="mt-8"
-        />
+        <Empty className="mt-8">
+          <EmptyHeader>
+            <EmptyTitle>Nenhuma criança cadastrada</EmptyTitle>
+            <EmptyDescription>Adicione uma criança para começar.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {children!.map((child) => (
@@ -88,8 +93,13 @@ const CriancasPage = () => {
         </div>
       )}
 
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} title="Nova criança">
-        <ChildForm onCreated={handleCreated} />
+      <Dialog open={dialogOpen} onOpenChange={(o) => { if (!o) setDialogOpen(false) }}>
+        <DialogContent aria-describedby={undefined}>
+          <DialogHeader>
+            <DialogTitle>Nova criança</DialogTitle>
+          </DialogHeader>
+          <ChildForm onCreated={handleCreated} />
+        </DialogContent>
       </Dialog>
     </div>
   )

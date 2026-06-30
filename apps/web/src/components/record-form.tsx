@@ -3,7 +3,11 @@
 import { useState } from 'react'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { ChildRecord, ChildRecordType } from '@/lib/types'
-import { Button, Field, Input, Select, Textarea } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 
 interface RecordFormProps {
   childId: string
@@ -46,18 +50,21 @@ const RecordForm = ({ childId, onCreated }: RecordFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <Field label="Tipo" htmlFor="record-type">
-        <Select
-          id="record-type"
-          value={type}
-          onChange={(e) => setType(e.target.value as ChildRecordType)}
-        >
-          {(Object.entries(TYPE_LABELS) as [ChildRecordType, string][]).map(([value, label]) => (
-            <option key={value} value={value}>{label}</option>
-          ))}
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="record-type">Tipo</Label>
+        <Select value={type} onValueChange={(v) => setType(v as ChildRecordType)}>
+          <SelectTrigger id="record-type" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {(Object.entries(TYPE_LABELS) as [ChildRecordType, string][]).map(([value, label]) => (
+              <SelectItem key={value} value={value}>{label}</SelectItem>
+            ))}
+          </SelectContent>
         </Select>
-      </Field>
-      <Field label="Conteúdo" htmlFor="record-content">
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="record-content">Conteúdo</Label>
         <Textarea
           id="record-content"
           value={content}
@@ -65,16 +72,17 @@ const RecordForm = ({ childId, onCreated }: RecordFormProps) => {
           required
           placeholder="Descrição do registro"
         />
-      </Field>
-      <Field label="Data" htmlFor="record-date">
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="record-date">Data</Label>
         <Input
           id="record-date"
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
         />
-      </Field>
-      {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
+      </div>
+      {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
       <Button type="submit" disabled={loading}>
         {loading ? 'Salvando...' : 'Criar registro'}
       </Button>

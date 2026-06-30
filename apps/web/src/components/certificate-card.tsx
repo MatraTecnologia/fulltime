@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { Certificate, EnrollmentListItem } from '@/lib/types'
-import { Button, Card, CardContent, CardTitle, Spinner } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardTitle } from '@/components/ui/card'
+import { Spinner } from '@/components/ui/spinner'
 
 interface Props {
   enrollment: EnrollmentListItem
@@ -86,7 +88,7 @@ export const CertificateCard = ({ enrollment }: Props) => {
         ) : (
           <div className="mt-4">
             {error && (
-              <p className="mb-3 text-sm text-red-600" role="alert">{error}</p>
+              <p className="mb-3 text-sm text-destructive" role="alert">{error}</p>
             )}
             <Button onClick={handleIssue} disabled={issuing}>
               {issuing ? 'Emitindo…' : 'Emitir certificado'}

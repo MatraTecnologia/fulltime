@@ -3,7 +3,11 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { apiFetch, ApiError } from '@/lib/api'
-import { Card, CardContent, CardTitle, Field, Input, Button, Spinner } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Spinner } from '@/components/ui/spinner'
 
 type Config = { resendKeySet: boolean; mailFrom: string | null }
 type SendResult = { ok: boolean; id?: string | null; error?: string }
@@ -60,7 +64,7 @@ const DebugEmailPage = () => {
             </div>
           )}
           {configError && (
-            <p className="text-sm text-red-600" role="alert">
+            <p className="text-sm text-destructive" role="alert">
               {configError}
             </p>
           )}
@@ -94,7 +98,8 @@ const DebugEmailPage = () => {
         <CardContent>
           <CardTitle className="mb-4">Enviar e-mail de teste</CardTitle>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Field label="Destinatário" htmlFor="to">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="to">Destinatário</Label>
               <Input
                 id="to"
                 type="email"
@@ -103,9 +108,9 @@ const DebugEmailPage = () => {
                 onChange={(e) => setTo(e.target.value)}
                 required
               />
-            </Field>
+            </div>
             {sendError && (
-              <p className="text-sm text-red-600" role="alert">
+              <p className="text-sm text-destructive" role="alert">
                 {sendError}
               </p>
             )}

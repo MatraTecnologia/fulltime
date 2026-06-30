@@ -5,7 +5,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { EnrollmentListItem } from '@/lib/types'
-import { Card, CardContent, CardTitle, EmptyState, ProgressBar, Spinner } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardTitle } from '@/components/ui/card'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
+import { Progress } from '@/components/ui/progress'
+import { Spinner } from '@/components/ui/spinner'
 import { CertificateCard } from '@/components/certificate-card'
 
 const isComplete = (e: EnrollmentListItem) =>
@@ -31,7 +35,7 @@ const CertificadosPage = () => {
   if (!enrollments && !error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Spinner />
+        <Spinner className="size-8" />
       </div>
     )
   }
@@ -39,25 +43,24 @@ const CertificadosPage = () => {
   if (error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-red-600" role="alert">{error}</p>
+        <p className="text-sm text-destructive" role="alert">{error}</p>
       </div>
     )
   }
 
   if (enrollments!.length === 0) {
     return (
-      <EmptyState
-        title="Nenhum curso matriculado"
-        description="Conclua um curso para emitir seu certificado."
-        action={
-          <Link
-            href="/cursos"
-            className="inline-flex items-center justify-center rounded-lg font-display font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 bg-brand-navy text-white hover:bg-brand-navy-600 h-11 px-5 text-base"
-          >
-            Ver cursos
-          </Link>
-        }
-      />
+      <Empty>
+        <EmptyHeader>
+          <EmptyTitle>Nenhum curso matriculado</EmptyTitle>
+          <EmptyDescription>Conclua um curso para emitir seu certificado.</EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <Button asChild>
+            <Link href="/cursos">Ver cursos</Link>
+          </Button>
+        </EmptyContent>
+      </Empty>
     )
   }
 
@@ -88,12 +91,13 @@ const CertificadosPage = () => {
           <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {incomplete.map((item) => {
               const remaining = item.totalLessons - item.progressCount
+              const pct = Math.round((item.progressCount / (item.totalLessons || 1)) * 100)
               return (
                 <Card key={item.id} className="opacity-70">
                   <CardContent>
                     <CardTitle>{item.course.title}</CardTitle>
                     <div className="mt-3">
-                      <ProgressBar value={item.progressCount} max={item.totalLessons || 1} />
+                      <Progress value={pct} />
                       <p className="mt-1 text-xs text-brand-navy/60">
                         {item.progressCount} de {item.totalLessons} aulas concluídas
                       </p>

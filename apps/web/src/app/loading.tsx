@@ -1,8 +1,8 @@
-import { Spinner } from '@fulltime/ui'
+import { Spinner } from '@/components/ui/spinner'
 
 const Loading = () => (
   <div className="flex min-h-screen items-center justify-center">
-    <Spinner />
+    <Spinner className="size-8" />
   </div>
 )
 

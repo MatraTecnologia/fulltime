@@ -4,7 +4,12 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { ChildDetail, ChildRecord, ChildRecordType } from '@/lib/types'
-import { Button, Card, CardContent, CategoryBadge, Dialog, EmptyState, Spinner } from '@fulltime/ui'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
+import { Spinner } from '@/components/ui/spinner'
 import RecordForm from '@/components/record-form'
 
 const TYPE_LABELS: Record<ChildRecordType, string> = {
@@ -13,10 +18,10 @@ const TYPE_LABELS: Record<ChildRecordType, string> = {
   PEI: 'PEI',
 }
 
-const TYPE_COLORS: Record<ChildRecordType, 'blue' | 'green' | 'purple'> = {
-  EVOLUCAO: 'blue',
-  SESSAO: 'green',
-  PEI: 'purple',
+const TYPE_CLASSES: Record<ChildRecordType, string> = {
+  EVOLUCAO: 'bg-blue-100 text-blue-700 border-blue-200',
+  SESSAO: 'bg-green-100 text-green-700 border-green-200',
+  PEI: 'bg-purple-100 text-purple-700 border-purple-200',
 }
 
 const formatDate = (value: string | null) => {
@@ -75,22 +80,24 @@ const CriancaDetalhePage = () => {
 
   if (notFound) {
     return (
-      <EmptyState
-        title="Criança não encontrada"
-        description="Esta criança não existe ou você não tem acesso."
-        action={
+      <Empty>
+        <EmptyHeader>
+          <EmptyTitle>Criança não encontrada</EmptyTitle>
+          <EmptyDescription>Esta criança não existe ou você não tem acesso.</EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
           <Button variant="outline" onClick={() => router.push('/criancas')}>
             Voltar
           </Button>
-        }
-      />
+        </EmptyContent>
+      </Empty>
     )
   }
 
   if (!child && !error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Spinner />
+        <Spinner className="size-8" />
       </div>
     )
   }
@@ -98,14 +105,14 @@ const CriancaDetalhePage = () => {
   if (error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-red-600" role="alert">{error}</p>
+        <p className="text-sm text-destructive" role="alert">{error}</p>
       </div>
     )
   }
 
   return (
     <div>
-      {actionError && <p role="alert" className="mb-4 text-sm text-red-600">{actionError}</p>}
+      {actionError && <p role="alert" className="mb-4 text-sm text-destructive">{actionError}</p>}
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold text-brand-navy">{child!.name}</h1>
@@ -130,11 +137,12 @@ const CriancaDetalhePage = () => {
         </div>
 
         {child!.records.length === 0 ? (
-          <EmptyState
-            title="Nenhum registro"
-            description="Adicione o primeiro registro desta criança."
-            className="mt-4"
-          />
+          <Empty className="mt-4">
+            <EmptyHeader>
+              <EmptyTitle>Nenhum registro</EmptyTitle>
+              <EmptyDescription>Adicione o primeiro registro desta criança.</EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <div className="mt-4 flex flex-col gap-3">
             {child!.records.map((record) => (
@@ -142,9 +150,9 @@ const CriancaDetalhePage = () => {
                 <CardContent>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2">
-                      <CategoryBadge color={TYPE_COLORS[record.type]}>
+                      <Badge variant="outline" className={TYPE_CLASSES[record.type]}>
                         {TYPE_LABELS[record.type]}
-                      </CategoryBadge>
+                      </Badge>
                       <span className="text-xs text-brand-navy/50">
                         {formatDate(record.date)}
                       </span>
@@ -165,8 +173,13 @@ const CriancaDetalhePage = () => {
         )}
       </div>
 
-      <Dialog open={recordDialogOpen} onClose={() => setRecordDialogOpen(false)} title="Novo registro">
-        <RecordForm childId={id} onCreated={handleRecordCreated} />
+      <Dialog open={recordDialogOpen} onOpenChange={(o) => { if (!o) setRecordDialogOpen(false) }}>
+        <DialogContent aria-describedby={undefined}>
+          <DialogHeader>
+            <DialogTitle>Novo registro</DialogTitle>
+          </DialogHeader>
+          <RecordForm childId={id} onCreated={handleRecordCreated} />
+        </DialogContent>
       </Dialog>
     </div>
   )
