@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from '@/lib/auth-client'
 import { apiFetch, ApiError } from '@/lib/api'
+import type { EnrollmentListItem } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 
 export const EnrollButton = ({ courseId, slug }: { courseId: string; slug: string }) => {
@@ -12,6 +13,26 @@ export const EnrollButton = ({ courseId, slug }: { courseId: string; slug: strin
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [enrolled, setEnrolled] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    if (isPending) return
+    if (!data?.user) {
+      setEnrolled(false)
+      return
+    }
+    let active = true
+    apiFetch<EnrollmentListItem[]>('/enrollments')
+      .then((list) => {
+        if (active) setEnrolled(list.some((e) => e.courseId === courseId))
+      })
+      .catch(() => {
+        if (active) setEnrolled(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [isPending, data, courseId])
 
   if (isPending) return null
 
@@ -19,6 +40,22 @@ export const EnrollButton = ({ courseId, slug }: { courseId: string; slug: strin
     return (
       <Button asChild size="lg" className="mt-6">
         <Link href={`/login?next=/cursos/${slug}`}>Entrar para se matricular</Link>
+      </Button>
+    )
+  }
+
+  if (enrolled === null) {
+    return (
+      <Button size="lg" className="mt-6" disabled>
+        Carregando…
+      </Button>
+    )
+  }
+
+  if (enrolled) {
+    return (
+      <Button asChild size="lg" className="mt-6">
+        <Link href={`/aprender/${slug}`}>Continuar curso</Link>
       </Button>
     )
   }
