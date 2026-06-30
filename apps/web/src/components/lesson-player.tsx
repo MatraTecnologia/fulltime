@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { Lesson } from '@/lib/types'
-import { VideoEmbed, Button, Spinner } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
+import { VideoEmbed } from '@/components/video-embed'
 
 interface LessonPlayerProps {
   lessonId: string
@@ -63,7 +65,7 @@ export const LessonPlayer = ({ lessonId, enrollmentId, completed, onCompleted }:
   if (loading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <Spinner />
+        <Spinner className="size-8" />
       </div>
     )
   }
@@ -108,7 +110,7 @@ export const LessonPlayer = ({ lessonId, enrollmentId, completed, onCompleted }:
 
       <div className="flex items-center gap-3">
         <Button
-          variant={completed ? 'outline' : 'accent'}
+          variant={completed ? 'outline' : 'default'}
           onClick={handleComplete}
           disabled={completed || completing}
           aria-pressed={completed}

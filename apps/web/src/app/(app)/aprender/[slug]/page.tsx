@@ -4,7 +4,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { CourseDetail, EnrollmentDetail, EnrollmentListItem } from '@/lib/types'
-import { Button, EmptyState, Spinner } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
 import { CurriculumNav } from '@/components/curriculum-nav'
 import { LessonPlayer } from '@/components/lesson-player'
 
@@ -86,7 +88,7 @@ const AprenderPage = () => {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Spinner />
+        <Spinner className="size-8" />
       </div>
     )
   }
@@ -101,27 +103,31 @@ const AprenderPage = () => {
 
   if (!enrollmentId) {
     return (
-      <EmptyState
-        title="Você não está matriculado neste curso"
-        description={courseDetail?.title ?? undefined}
-        action={
+      <Empty className="min-h-[60vh]">
+        <EmptyHeader>
+          <EmptyTitle>Você não está matriculado neste curso</EmptyTitle>
+          {courseDetail?.title && <EmptyDescription>{courseDetail.title}</EmptyDescription>}
+        </EmptyHeader>
+        <EmptyContent>
           <div className="flex flex-col items-center gap-2">
             <Button onClick={handleEnroll} disabled={enrolling}>
               {enrolling ? 'Matriculando…' : 'Matricular-se gratuitamente'}
             </Button>
             {enrollError && <p className="text-sm text-red-600" role="alert">{enrollError}</p>}
           </div>
-        }
-      />
+        </EmptyContent>
+      </Empty>
     )
   }
 
   if (!courseDetail || !activeId) {
     return (
-      <EmptyState
-        title="Este curso não tem aulas ainda"
-        description="Volte em breve."
-      />
+      <Empty className="min-h-[60vh]">
+        <EmptyHeader>
+          <EmptyTitle>Este curso não tem aulas ainda</EmptyTitle>
+          <EmptyDescription>Volte em breve.</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     )
   }
 
@@ -129,14 +135,6 @@ const AprenderPage = () => {
     <div>
       <h1 className="mb-6 font-display text-2xl font-bold text-brand-navy">{courseDetail.title}</h1>
       <div className="flex flex-col gap-6 lg:flex-row">
-        <aside className="lg:w-72 lg:shrink-0">
-          <CurriculumNav
-            modules={courseDetail.modules}
-            completedLessonIds={completedLessonIds}
-            activeId={activeId}
-            onSelect={setActiveId}
-          />
-        </aside>
         <div className="min-w-0 flex-1">
           <LessonPlayer
             lessonId={activeId}
@@ -145,6 +143,14 @@ const AprenderPage = () => {
             onCompleted={handleCompleted}
           />
         </div>
+        <aside className="lg:w-72 lg:shrink-0">
+          <CurriculumNav
+            modules={courseDetail.modules}
+            completedLessonIds={completedLessonIds}
+            activeId={activeId}
+            onSelect={setActiveId}
+          />
+        </aside>
       </div>
     </div>
   )

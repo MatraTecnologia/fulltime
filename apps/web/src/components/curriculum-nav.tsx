@@ -1,7 +1,8 @@
 'use client'
 
+import { Check } from 'lucide-react'
 import type { ModuleWithLessons } from '@/lib/types'
-import { ProgressBar } from '@fulltime/ui'
+import { Progress } from '@/components/ui/progress'
 
 interface CurriculumNavProps {
   modules: ModuleWithLessons[]
@@ -18,7 +19,7 @@ export const CurriculumNav = ({ modules, completedLessonIds, activeId, onSelect 
   return (
     <nav aria-label="Currículo do curso">
       <div className="mb-4">
-        <ProgressBar value={completed} max={total || 1} />
+        <Progress value={Math.round((completed / (total || 1)) * 100)} />
         <p className="mt-1 text-xs text-brand-navy/60">
           {completed} de {total} aulas concluídas
         </p>
@@ -48,16 +49,11 @@ export const CurriculumNav = ({ modules, completedLessonIds, activeId, onSelect 
                       ].join(' ')}
                     >
                       {isDone ? (
-                        <svg
+                        <Check
                           className={['h-4 w-4 shrink-0', isActive ? 'text-brand-amber' : 'text-green-500'].join(' ')}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
                           strokeWidth={2.5}
                           aria-hidden="true"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                        />
                       ) : (
                         <span className="h-4 w-4 shrink-0" aria-hidden="true" />
                       )}
