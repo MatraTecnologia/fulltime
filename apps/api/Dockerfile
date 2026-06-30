@@ -32,7 +32,12 @@ RUN pnpm --filter @fulltime/api db:generate
 
 # Compila TypeScript → apps/api/dist/
 RUN pnpm --filter @fulltime/api build && ls -R ./apps/api
-
+RUN echo "=== APPS/API ==="
+RUN ls -lah ./apps/api
+RUN echo "=== DIST ==="
+RUN ls -lah ./apps/api/dist || true
+RUN echo "=== FIND ==="
+RUN find ./apps/api -type d | sort
 # Garante que public/ exista para o fastifyStatic não falhar na inicialização
 RUN mkdir -p ./apps/api/public
 
