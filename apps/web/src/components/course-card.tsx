@@ -6,7 +6,7 @@ import type { CourseListItem } from '@/lib/types'
 
 export const CourseCard = ({ course }: { course: CourseListItem }) => (
   <Link href={`/cursos/${course.slug}`} className="group block h-full">
-    <Card className="h-full gap-0 overflow-hidden py-0 transition-shadow group-hover:shadow-md">
+    <Card className="h-full gap-0 overflow-hidden border-border/50 py-0 shadow-sm transition-shadow group-hover:shadow-md">
       {course.coverImage ? (
         <div className="aspect-video overflow-hidden">
           <img
@@ -30,7 +30,7 @@ export const CourseCard = ({ course }: { course: CourseListItem }) => (
           </p>
         )}
       </CardContent>
-      <CardFooter className="border-t border-border px-5 py-3">
+      <CardFooter className="border-t border-border/50 px-5 py-3">
         <div className="flex w-full items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
             <User className="size-3.5 shrink-0" />

@@ -18,11 +18,7 @@ export const LandingFeaturedCourses = ({ courses }: { courses: CourseListItem[] 
               Os mais procurados pelos profissionais da área
             </p>
           </div>
-          <Button
-            asChild
-            variant="outline"
-            className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-          >
+          <Button asChild variant="inverse">
             <Link href="/cursos">Ver todos os cursos</Link>
           </Button>
         </div>

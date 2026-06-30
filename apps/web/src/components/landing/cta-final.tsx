@@ -23,7 +23,7 @@ export const LandingCtaFinal = () => (
           asChild
           size="lg"
           variant="outline"
-          className="border-accent-foreground/30 px-8 text-base text-accent-foreground hover:bg-accent-foreground/5 hover:text-accent-foreground"
+          className="border-accent-foreground/40 bg-transparent px-8 text-base text-accent-foreground hover:bg-accent-foreground/10 hover:text-accent-foreground"
         >
           <Link href="/cursos">Explorar cursos</Link>
         </Button>

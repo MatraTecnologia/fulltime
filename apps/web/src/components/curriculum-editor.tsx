@@ -55,7 +55,7 @@ const CurriculumEditor = ({ course, onChange }: CurriculumEditorProps) => {
         </Button>
       </div>
 
-      {course.modules.length === 0 ? (
+      {(course.modules ?? []).length === 0 ? (
         <Empty>
           <EmptyHeader>
             <EmptyTitle>Nenhum módulo ainda</EmptyTitle>
@@ -64,7 +64,7 @@ const CurriculumEditor = ({ course, onChange }: CurriculumEditorProps) => {
         </Empty>
       ) : (
         <div className="flex flex-col gap-4">
-          {course.modules.map((m) => (
+          {(course.modules ?? []).map((m) => (
             <ModuleEditor key={m.id} module={m} onChange={onChange} />
           ))}
         </div>

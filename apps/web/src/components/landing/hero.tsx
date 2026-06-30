@@ -39,12 +39,7 @@ export const LandingHero = () => (
         >
           <Link href="/cursos">Explorar cursos</Link>
         </Button>
-        <Button
-          asChild
-          size="lg"
-          variant="outline"
-          className="border-primary-foreground/30 px-8 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-        >
+        <Button asChild size="lg" variant="inverse" className="px-8 text-base">
           <Link href="/cadastro">Criar conta grátis</Link>
         </Button>
       </div>

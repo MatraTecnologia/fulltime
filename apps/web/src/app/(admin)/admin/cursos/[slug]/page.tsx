@@ -39,8 +39,12 @@ const CursoDetalhePage = () => {
       })
   }, [slug, router])
 
-  const handleSaved = (updated: CourseDetail) => {
-    setCourse(updated)
+  const handleSaved = async (updated: CourseDetail) => {
+    if (updated.slug !== slug) {
+      router.replace(`/admin/cursos/${updated.slug}`)
+      return
+    }
+    await reload()
   }
 
   const handlePublish = async () => {
