@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from '@/lib/auth-client'
 import { apiFetch, ApiError } from '@/lib/api'
-import { Button } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
 
 export const EnrollButton = ({ courseId, slug }: { courseId: string; slug: string }) => {
   const { data, isPending } = useSession()
@@ -16,12 +17,9 @@ export const EnrollButton = ({ courseId, slug }: { courseId: string; slug: strin
 
   if (!data?.user) {
     return (
-      <a
-        href={`/login?next=/cursos/${slug}`}
-        className="mt-6 inline-flex items-center justify-center rounded-lg font-display font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 bg-brand-navy text-white hover:bg-brand-navy-600 h-11 px-5 text-base"
-      >
-        Entrar para se matricular
-      </a>
+      <Button asChild size="lg" className="mt-6">
+        <Link href={`/login?next=/cursos/${slug}`}>Entrar para se matricular</Link>
+      </Button>
     )
   }
 
@@ -43,10 +41,14 @@ export const EnrollButton = ({ courseId, slug }: { courseId: string; slug: strin
 
   return (
     <div className="mt-6">
-      <Button onClick={handleEnroll} disabled={loading}>
+      <Button size="lg" onClick={handleEnroll} disabled={loading}>
         {loading ? 'Matriculando…' : 'Matricular-se'}
       </Button>
-      {error && <p className="mt-2 text-sm text-red-600" role="alert">{error}</p>}
+      {error && (
+        <p className="mt-2 text-sm text-destructive" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   )
 }
