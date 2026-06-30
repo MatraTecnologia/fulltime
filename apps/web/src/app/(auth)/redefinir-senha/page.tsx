@@ -22,6 +22,20 @@ const RedefinirSenhaForm = () => {
     router.push('/login')
   }
 
+  if (!token) {
+    return (
+      <Card>
+        <CardContent>
+          <CardTitle>Redefinir senha</CardTitle>
+          <p className="mt-4 text-sm text-red-600" role="alert">Link inválido ou expirado.</p>
+          <div className="mt-6 text-sm text-brand-navy/70">
+            <a href="/recuperar-senha" className="hover:underline">Solicitar novo link</a>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <CardContent>

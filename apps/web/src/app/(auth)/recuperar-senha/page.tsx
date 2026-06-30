@@ -12,7 +12,7 @@ const RecuperarSenhaPage = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true); setError('')
-    const { error } = await authClient.requestPasswordReset({ email, redirectTo: '/redefinir-senha' })
+    const { error } = await authClient.requestPasswordReset({ email, redirectTo: `${window.location.origin}/redefinir-senha` })
     setLoading(false)
     if (error) return setError(error.message ?? 'Erro ao solicitar redefinição.')
     setSuccess(true)

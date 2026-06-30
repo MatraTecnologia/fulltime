@@ -46,7 +46,7 @@ export const EnrollButton = ({ courseId, slug }: { courseId: string; slug: strin
       <Button onClick={handleEnroll} disabled={loading}>
         {loading ? 'Matriculando…' : 'Matricular-se'}
       </Button>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-600" role="alert">{error}</p>}
     </div>
   )
 }

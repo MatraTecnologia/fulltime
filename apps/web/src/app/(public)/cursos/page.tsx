@@ -1,9 +1,9 @@
-export const dynamic = 'force-dynamic'
-
 import { apiServer } from '@/lib/api'
 import type { CourseListItem } from '@/lib/types'
 import { CourseCard } from '@/components/course-card'
 import { EmptyState } from '@fulltime/ui'
+
+export const dynamic = 'force-dynamic'
 
 const CatalogPage = async () => {
   const courses = await apiServer<CourseListItem[]>('/courses')

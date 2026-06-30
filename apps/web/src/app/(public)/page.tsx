@@ -1,8 +1,8 @@
-export const dynamic = 'force-dynamic'
-
 import { apiServer } from '@/lib/api'
 import type { CourseListItem } from '@/lib/types'
 import { CourseCard } from '@/components/course-card'
+
+export const dynamic = 'force-dynamic'
 
 const btnPrimary =
   'inline-flex items-center justify-center rounded-lg font-display font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 bg-brand-navy text-white hover:bg-brand-navy-600 h-11 px-5 text-base'

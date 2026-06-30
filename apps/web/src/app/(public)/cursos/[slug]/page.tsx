@@ -1,9 +1,9 @@
-export const dynamic = 'force-dynamic'
-
 import { notFound } from 'next/navigation'
 import { apiServer, ApiError } from '@/lib/api'
 import type { CourseDetail } from '@/lib/types'
 import { EnrollButton } from '@/components/enroll-button'
+
+export const dynamic = 'force-dynamic'
 
 const CoursePage = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params
