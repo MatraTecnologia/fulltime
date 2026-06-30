@@ -36,6 +36,7 @@ const LessonEditor = ({ lesson, onChange }: LessonEditorProps) => {
   const [attUrl, setAttUrl] = useState('')
   const [addingAtt, setAddingAtt] = useState(false)
   const [attError, setAttError] = useState<string | null>(null)
+  const [deletingAttId, setDeletingAttId] = useState<string | null>(null)
 
   const openDialog = async () => {
     setOpen(true)
@@ -96,8 +97,8 @@ const LessonEditor = ({ lesson, onChange }: LessonEditorProps) => {
     setDeleting(true)
     try {
       await apiFetch(`/lessons/${lesson.id}`, { method: 'DELETE' })
-      closeDialog()
       await onChange()
+      closeDialog()
     } catch (err) {
       setSaveError(err instanceof ApiError ? err.message : 'Não foi possível excluir a aula.')
       setDeleting(false)
@@ -105,8 +106,12 @@ const LessonEditor = ({ lesson, onChange }: LessonEditorProps) => {
   }
 
   const refetchFull = async () => {
-    const data = await apiFetch<Lesson>(`/lessons/${lesson.id}`)
-    setFull(data)
+    try {
+      const data = await apiFetch<Lesson>(`/lessons/${lesson.id}`)
+      setFull(data)
+    } catch {
+      setAttError('Anexo atualizado, mas não foi possível recarregar a lista.')
+    }
   }
 
   const handleAddAttachment = async (e: React.FormEvent) => {
@@ -130,11 +135,14 @@ const LessonEditor = ({ lesson, onChange }: LessonEditorProps) => {
 
   const handleDeleteAttachment = async (attId: string) => {
     setAttError(null)
+    setDeletingAttId(attId)
     try {
       await apiFetch(`/attachments/${attId}`, { method: 'DELETE' })
       await refetchFull()
     } catch (err) {
       setAttError(err instanceof ApiError ? err.message : 'Não foi possível excluir o anexo.')
+    } finally {
+      setDeletingAttId(null)
     }
   }
 
@@ -256,6 +264,7 @@ const LessonEditor = ({ lesson, onChange }: LessonEditorProps) => {
                         size="sm"
                         variant="ghost"
                         onClick={() => handleDeleteAttachment(att.id)}
+                        disabled={deletingAttId === att.id}
                       >
                         Remover
                       </Button>

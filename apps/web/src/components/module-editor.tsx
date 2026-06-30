@@ -32,8 +32,8 @@ const ModuleEditor = ({ module, onChange }: ModuleEditorProps) => {
         method: 'PATCH',
         body: JSON.stringify({ title }),
       })
-      setEditing(false)
       await onChange()
+      setEditing(false)
     } catch (err) {
       setEditError(err instanceof ApiError ? err.message : 'Não foi possível salvar o módulo.')
     } finally {
@@ -74,8 +74,8 @@ const ModuleEditor = ({ module, onChange }: ModuleEditorProps) => {
         method: 'POST',
         body: JSON.stringify({ title: lessonTitle }),
       })
-      handleCloseAdd()
       await onChange()
+      handleCloseAdd()
     } catch (err) {
       setAddError(err instanceof ApiError ? err.message : 'Não foi possível criar a aula.')
     } finally {
