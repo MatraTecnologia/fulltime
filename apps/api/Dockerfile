@@ -31,7 +31,7 @@ COPY apps/api/ ./apps/api/
 RUN pnpm --filter @fulltime/api db:generate
 
 # Compila TypeScript → apps/api/dist/
-RUN pnpm --filter @fulltime/api build
+RUN pnpm --filter @fulltime/api build && ls -R ./apps/api
 
 # Garante que public/ exista para o fastifyStatic não falhar na inicialização
 RUN mkdir -p ./apps/api/public

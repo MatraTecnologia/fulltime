@@ -1,9 +1,20 @@
 {
-  "extends": "@fulltime/config-ts/nextjs.json",
+  "extends": "@fulltime/config-ts/base.json",
   "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
     "baseUrl": ".",
-    "paths": { "@/*": ["./src/*"] }
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
-  "include": ["next-env.d.ts", "src", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
