@@ -1,12 +1,13 @@
 'use client'
-import { Suspense, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import { authClient, signIn } from '@/lib/auth-client'
+import { authClient, signIn, useSession } from '@/lib/auth-client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Spinner } from '@/components/ui/spinner'
 
 const safeNext = (value: string | null) => {
   if (!value || !value.startsWith('/')) return '/dashboard'
@@ -17,12 +18,17 @@ const safeNext = (value: string | null) => {
 const LoginForm = () => {
   const router = useRouter()
   const next = safeNext(useSearchParams().get('next'))
+  const { data: session, isPending } = useSession()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [unverified, setUnverified] = useState(false)
   const [resendLoading, setResendLoading] = useState(false)
+
+  useEffect(() => {
+    if (!isPending && session) router.replace(next)
+  }, [isPending, session, next, router])
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,6 +56,14 @@ const LoginForm = () => {
     } else {
       toast.success('E-mail de verificação reenviado. Confira sua caixa de entrada (e o spam).')
     }
+  }
+
+  if (isPending || session) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <Spinner className="size-7 text-primary" />
+      </div>
+    )
   }
 
   return (
