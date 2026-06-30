@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useSession } from '@/lib/auth-client'
@@ -65,6 +65,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter()
   const pathname = usePathname()
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const closeBtnRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (!isPending && !data) router.replace('/login')
@@ -77,6 +78,10 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
+  }, [drawerOpen])
+
+  useEffect(() => {
+    if (drawerOpen) closeBtnRef.current?.focus()
   }, [drawerOpen])
 
   if (isPending || !data) {
@@ -113,12 +118,14 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
           drawerOpen ? 'translate-x-0' : '-translate-x-full',
         ].join(' ')}
         aria-label="Menu principal"
+        inert={!drawerOpen ? true : undefined}
       >
         <div className="flex h-14 items-center justify-between px-4">
           <Link href="/dashboard" className="font-display text-lg font-bold text-brand-navy" onClick={() => setDrawerOpen(false)}>
             Full Time
           </Link>
           <button
+            ref={closeBtnRef}
             type="button"
             aria-label="Fechar menu"
             onClick={() => setDrawerOpen(false)}

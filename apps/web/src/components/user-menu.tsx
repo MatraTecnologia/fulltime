@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { signOut } from '@/lib/auth-client'
 import type { Role } from '@/lib/types'
@@ -11,7 +12,6 @@ type MenuUser = { name: string; email: string; image?: string | null; role?: Rol
 export const UserMenu = ({ user }: { user: MenuUser }) => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
 
   const handleSignOut = async () => {
     setOpen(false)
@@ -20,7 +20,7 @@ export const UserMenu = ({ user }: { user: MenuUser }) => {
   }
 
   return (
-    <div ref={ref} className="relative">
+    <div className="relative">
       <button
         type="button"
         aria-label="Menu do usuário"
@@ -40,13 +40,13 @@ export const UserMenu = ({ user }: { user: MenuUser }) => {
             aria-hidden="true"
           />
           <div className="absolute right-0 z-20 mt-2 w-44 rounded-lg bg-white py-1 shadow-md ring-1 ring-black/5">
-            <a
+            <Link
               href="/perfil"
               onClick={() => setOpen(false)}
               className="block px-4 py-2 text-sm text-brand-navy hover:bg-brand-navy/5"
             >
               Perfil
-            </a>
+            </Link>
             <button
               type="button"
               onClick={handleSignOut}
