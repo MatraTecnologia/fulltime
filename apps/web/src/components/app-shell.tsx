@@ -59,12 +59,16 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
       <Sidebar variant="floating" collapsible="icon">
-        <SidebarHeader className="border-b border-sidebar-border px-3 py-3">
-          <Link href="/dashboard" className="flex items-center gap-2.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0">
-            <Image src="/logo.svg" alt="" width={30} height={30} priority className="shrink-0" />
-            <span className="text-base font-semibold text-sidebar-foreground tracking-tight group-data-[collapsible=icon]:hidden">
-              Full Time
-            </span>
+        <SidebarHeader className="border-b border-sidebar-border px-3 py-3 group-data-[collapsible=icon]:px-1">
+          <Link href="/dashboard" className="flex items-center justify-center">
+            <Image
+              src="/logo.svg"
+              alt="Full Time"
+              width={48}
+              height={48}
+              priority
+              className="size-12 group-data-[collapsible=icon]:size-8"
+            />
           </Link>
         </SidebarHeader>
 
