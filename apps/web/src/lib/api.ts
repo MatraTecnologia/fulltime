@@ -32,7 +32,7 @@ export const apiServer = async <T>(path: string, init?: RequestInit): Promise<T>
   const cookie = (await cookies()).toString()
   const res = await fetch(`${BASE}${path}`, {
     ...init,
-    headers: { 'Content-Type': 'application/json', cookie, ...init?.headers },
+    headers: { 'Content-Type': 'application/json', ...init?.headers, cookie },
     cache: 'no-store',
   })
   const body = await parse(res)

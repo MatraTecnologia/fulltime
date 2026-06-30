@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useId, type ReactNode } from 'react'
 import { cn } from '../lib/cn.js'
 
 interface DialogProps {
@@ -11,6 +11,8 @@ interface DialogProps {
 }
 
 export const Dialog = ({ open, onClose, title, children }: DialogProps) => {
+  const titleId = useId()
+
   useEffect(() => {
     if (!open) return
     const handler = (e: KeyboardEvent) => {
@@ -28,11 +30,11 @@ export const Dialog = ({ open, onClose, title, children }: DialogProps) => {
       <div
         role="dialog"
         aria-modal="true"
-        aria-labelledby={title ? 'dialog-title' : undefined}
+        aria-labelledby={title ? titleId : undefined}
         className={cn('relative z-10 w-full max-w-md rounded-card bg-white p-6 shadow-xl')}
       >
         {title && (
-          <h2 id="dialog-title" className="mb-4 font-display text-lg font-bold text-brand-navy">
+          <h2 id={titleId} className="mb-4 font-display text-lg font-bold text-brand-navy">
             {title}
           </h2>
         )}

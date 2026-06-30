@@ -37,7 +37,7 @@ export type EnrollmentListItem = Enrollment & {
   course: { id: string; slug: string; title: string; coverImage: string | null }
   progressCount: number; totalLessons: number
 }
-export type LessonProgress = { id: string; lessonId: string; completedAt: string }
+export type LessonProgress = { id: string; lessonId: string; completedAt: string; lesson: { id: string; title: string; order: number } }
 export type Certificate = { id: string; enrollmentId: string; code: string; issuedAt: string; url: string | null }
 export type EnrollmentDetail = Enrollment & {
   progress: LessonProgress[]; certificate: Certificate | null
