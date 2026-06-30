@@ -34,6 +34,9 @@ const NAV_LINKS = [
 const ADMIN_LINK = { href: '/admin/cursos', label: 'Admin', Icon: Shield }
 const ADMIN_ROLES: Role[] = ['admin', 'instrutor']
 
+const ACTIVE_CLS =
+  'data-[active=true]:bg-sidebar-primary data-[active=true]:text-sidebar-primary-foreground data-[active=true]:hover:bg-sidebar-primary data-[active=true]:hover:text-sidebar-primary-foreground'
+
 export const AppShell = ({ children }: { children: React.ReactNode }) => {
   const { data, isPending } = useSession()
   const router = useRouter()
@@ -55,11 +58,11 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="offcanvas">
-        <SidebarHeader className="border-b border-sidebar-border px-4 py-3">
-          <Link href="/dashboard" className="flex items-center gap-2.5">
-            <Image src="/logo.svg" alt="" width={30} height={30} priority />
-            <span className="text-base font-semibold text-sidebar-foreground tracking-tight">
+      <Sidebar variant="floating" collapsible="icon">
+        <SidebarHeader className="border-b border-sidebar-border px-3 py-3">
+          <Link href="/dashboard" className="flex items-center gap-2.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0">
+            <Image src="/logo.svg" alt="" width={30} height={30} priority className="shrink-0" />
+            <span className="text-base font-semibold text-sidebar-foreground tracking-tight group-data-[collapsible=icon]:hidden">
               Full Time
             </span>
           </Link>
@@ -74,7 +77,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
                     pathname === href || pathname.startsWith(`${href}/`)
                   return (
                     <SidebarMenuItem key={href}>
-                      <SidebarMenuButton asChild isActive={active}>
+                      <SidebarMenuButton asChild isActive={active} tooltip={label} className={ACTIVE_CLS}>
                         <Link href={href} aria-current={active ? 'page' : undefined}>
                           <Icon />
                           <span>{label}</span>
@@ -88,6 +91,8 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
                     <SidebarMenuButton
                       asChild
                       isActive={pathname.startsWith('/admin')}
+                      tooltip={ADMIN_LINK.label}
+                      className={ACTIVE_CLS}
                     >
                       <Link
                         href={ADMIN_LINK.href}
