@@ -27,6 +27,9 @@ RUN pnpm --filter @fulltime/api db:generate
 RUN pnpm --filter @fulltime/api build
 RUN mkdir -p ./apps/api/public
 
+# Cria um node_modules de produção sem symlinks quebrados
+RUN pnpm --filter @fulltime/api deploy --legacy /app/deploy
+
 # ---- runner ----
 FROM node:22-slim AS runner
 
@@ -35,8 +38,8 @@ RUN apt-get update && apt-get install -y openssl
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Copia o node_modules completo para preservar o Prisma Client gerado
-COPY --from=build /build/node_modules ./node_modules
+# Dependências de produção
+COPY --from=build /app/deploy/node_modules ./node_modules
 
 # Código compilado
 COPY --from=build /build/apps/api/dist ./dist
