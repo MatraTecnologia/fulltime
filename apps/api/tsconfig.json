@@ -1,4 +1,20 @@
 {
-  "extends": "@fulltime/config-ts/node.json",
-  "include": ["src", "prisma.config.ts"]
+  "extends": "@fulltime/config-ts/base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
