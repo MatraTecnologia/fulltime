@@ -4,8 +4,11 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from '@/lib/auth-client'
 import { Button, Card, CardContent, CardTitle, Field, Input } from '@fulltime/ui'
 
-const safeNext = (value: string | null) =>
-  value && value.startsWith('/') && !value.startsWith('//') ? value : '/dashboard'
+const safeNext = (value: string | null) => {
+  if (!value || !value.startsWith('/')) return '/dashboard'
+  if (value.startsWith('//') || value.includes('\\')) return '/dashboard'
+  return value
+}
 
 const LoginForm = () => {
   const router = useRouter()
