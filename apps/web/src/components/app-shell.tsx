@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useSession } from '@/lib/auth-client'
@@ -97,8 +98,9 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
       {/* Sidebar desktop */}
       <aside className="hidden w-56 flex-col border-r border-black/5 bg-white lg:flex">
         <div className="flex h-14 items-center px-4">
-          <Link href="/dashboard" className="font-display text-lg font-bold text-brand-navy">
-            Full Time
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <Image src="/logo.svg" alt="" width={36} height={36} priority />
+            <span className="font-display text-lg font-bold text-brand-navy">Full Time</span>
           </Link>
         </div>
         <SidebarContent pathname={pathname} />
@@ -121,8 +123,9 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
         inert={!drawerOpen ? true : undefined}
       >
         <div className="flex h-14 items-center justify-between px-4">
-          <Link href="/dashboard" className="font-display text-lg font-bold text-brand-navy" onClick={() => setDrawerOpen(false)}>
-            Full Time
+          <Link href="/dashboard" className="flex items-center gap-2" onClick={() => setDrawerOpen(false)}>
+            <Image src="/logo.svg" alt="" width={36} height={36} />
+            <span className="font-display text-lg font-bold text-brand-navy">Full Time</span>
           </Link>
           <button
             ref={closeBtnRef}

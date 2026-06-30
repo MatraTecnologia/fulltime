@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { apiServer } from '@/lib/api'
 import type { CourseListItem } from '@/lib/types'
 import { CourseCard } from '@/components/course-card'
@@ -16,6 +17,7 @@ const HomePage = async () => {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-20">
+      <Image src="/logo.svg" alt="Full Time" width={96} height={96} priority className="mb-8" />
       <h1 className="font-[family-name:var(--font-display)] text-4xl font-extrabold text-brand-navy">
         Acolher · Desenvolver · Incluir
       </h1>
