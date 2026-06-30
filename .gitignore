@@ -1,6 +1,7 @@
 node_modules/
 .next/
 dist/
+**/src/generated/
 .turbo/
 *.tsbuildinfo
 .env
