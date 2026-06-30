@@ -1,7 +1,10 @@
 'use client'
 import { useState } from 'react'
 import { authClient } from '@/lib/auth-client'
-import { Button, Card, CardContent, CardTitle, Field, Input } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 const RecuperarSenhaPage = () => {
   const [email, setEmail] = useState('')
@@ -21,13 +24,15 @@ const RecuperarSenhaPage = () => {
   if (success) {
     return (
       <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">Verifique seu e-mail</CardTitle>
+        </CardHeader>
         <CardContent>
-          <CardTitle>Verifique seu e-mail</CardTitle>
-          <p className="mt-4 text-sm text-brand-navy/70">
+          <p className="text-sm text-muted-foreground">
             Se o e-mail existir em nossa base, enviamos um link para redefinição de senha.
           </p>
-          <div className="mt-6 text-sm text-brand-navy/70">
-            <a href="/login" className="hover:underline">Voltar para o login</a>
+          <div className="mt-6 text-sm text-muted-foreground">
+            <a href="/login" className="hover:text-foreground hover:underline">Voltar para o login</a>
           </div>
         </CardContent>
       </Card>
@@ -36,17 +41,22 @@ const RecuperarSenhaPage = () => {
 
   return (
     <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">Recuperar senha</CardTitle>
+      </CardHeader>
       <CardContent>
-        <CardTitle>Recuperar senha</CardTitle>
-        <form onSubmit={onSubmit} className="mt-6 space-y-4">
-          <Field label="E-mail" htmlFor="email">
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">E-mail</Label>
             <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          </Field>
-          {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
-          <Button type="submit" disabled={loading} className="w-full">{loading ? 'Enviando…' : 'Enviar link'}</Button>
+          </div>
+          {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? 'Enviando…' : 'Enviar link'}
+          </Button>
         </form>
-        <div className="mt-4 text-sm text-brand-navy/70">
-          <a href="/login" className="hover:underline">Voltar para o login</a>
+        <div className="mt-4 text-sm text-muted-foreground">
+          <a href="/login" className="hover:text-foreground hover:underline">Voltar para o login</a>
         </div>
       </CardContent>
     </Card>

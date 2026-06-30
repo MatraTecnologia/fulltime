@@ -2,7 +2,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { signUp } from '@/lib/auth-client'
-import { Button, Card, CardContent, CardTitle, Field, Input } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 const CadastroPage = () => {
   const router = useRouter()
@@ -23,23 +26,30 @@ const CadastroPage = () => {
 
   return (
     <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">Criar conta</CardTitle>
+      </CardHeader>
       <CardContent>
-        <CardTitle>Criar conta</CardTitle>
-        <form onSubmit={onSubmit} className="mt-6 space-y-4">
-          <Field label="Nome" htmlFor="name">
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Nome</Label>
             <Input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} required />
-          </Field>
-          <Field label="E-mail" htmlFor="email">
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">E-mail</Label>
             <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          </Field>
-          <Field label="Senha" htmlFor="password">
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Senha</Label>
             <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          </Field>
-          {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
-          <Button type="submit" disabled={loading} className="w-full">{loading ? 'Criando conta…' : 'Criar conta'}</Button>
+          </div>
+          {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? 'Criando conta…' : 'Criar conta'}
+          </Button>
         </form>
-        <div className="mt-4 text-center text-sm text-brand-navy/70">
-          <a href="/login" className="hover:underline">Já tenho conta</a>
+        <div className="mt-4 text-center text-sm text-muted-foreground">
+          <a href="/login" className="hover:text-foreground hover:underline">Já tenho conta</a>
         </div>
       </CardContent>
     </Card>

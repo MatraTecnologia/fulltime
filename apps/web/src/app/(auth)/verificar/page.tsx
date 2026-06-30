@@ -1,14 +1,17 @@
-import { Card, CardContent, CardTitle } from '@fulltime/ui'
+import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const VerificarPage = () => (
   <Card>
+    <CardHeader>
+      <CardTitle className="text-xl">Verifique seu e-mail</CardTitle>
+    </CardHeader>
     <CardContent>
-      <CardTitle>Verifique seu e-mail</CardTitle>
-      <p className="mt-4 text-sm text-brand-navy/70">
+      <p className="text-sm text-muted-foreground">
         Enviamos um link de verificação para o seu endereço de e-mail. Acesse sua caixa de entrada e clique no link para ativar sua conta.
       </p>
-      <div className="mt-6 text-sm text-brand-navy/70">
-        <a href="/login" className="hover:underline">Voltar para o login</a>
+      <div className="mt-6 text-sm text-muted-foreground">
+        <Link href="/login" className="hover:text-foreground hover:underline">Voltar para o login</Link>
       </div>
     </CardContent>
   </Card>

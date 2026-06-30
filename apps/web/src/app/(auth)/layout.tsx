@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => (
-  <main className="flex min-h-screen items-center justify-center px-4 py-12">
+  <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-background to-secondary px-4 py-12">
     <div className="w-full max-w-md">
       <div className="mb-8 flex justify-center">
         <Link href="/">

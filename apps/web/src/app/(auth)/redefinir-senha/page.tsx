@@ -2,7 +2,10 @@
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
-import { Button, Card, CardContent, CardTitle, Field, Input } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 const RedefinirSenhaForm = () => {
   const router = useRouter()
@@ -25,11 +28,13 @@ const RedefinirSenhaForm = () => {
   if (!token) {
     return (
       <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">Redefinir senha</CardTitle>
+        </CardHeader>
         <CardContent>
-          <CardTitle>Redefinir senha</CardTitle>
-          <p className="mt-4 text-sm text-red-600" role="alert">Link inválido ou expirado.</p>
-          <div className="mt-6 text-sm text-brand-navy/70">
-            <a href="/recuperar-senha" className="hover:underline">Solicitar novo link</a>
+          <p className="text-sm text-destructive" role="alert">Link inválido ou expirado.</p>
+          <div className="mt-6 text-sm text-muted-foreground">
+            <a href="/recuperar-senha" className="hover:text-foreground hover:underline">Solicitar novo link</a>
           </div>
         </CardContent>
       </Card>
@@ -38,17 +43,23 @@ const RedefinirSenhaForm = () => {
 
   return (
     <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">Redefinir senha</CardTitle>
+      </CardHeader>
       <CardContent>
-        <CardTitle>Redefinir senha</CardTitle>
-        <form onSubmit={onSubmit} className="mt-6 space-y-4">
-          <Field label="Nova senha" htmlFor="newPassword">
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="newPassword">Nova senha</Label>
             <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
-          </Field>
-          <Field label="Confirmar senha" htmlFor="confirm">
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm">Confirmar senha</Label>
             <Input id="confirm" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
-          </Field>
-          {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
-          <Button type="submit" disabled={loading} className="w-full">{loading ? 'Salvando…' : 'Salvar nova senha'}</Button>
+          </div>
+          {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? 'Salvando…' : 'Salvar nova senha'}
+          </Button>
         </form>
       </CardContent>
     </Card>

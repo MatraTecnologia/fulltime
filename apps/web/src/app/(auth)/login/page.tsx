@@ -3,7 +3,10 @@ import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { authClient, signIn } from '@/lib/auth-client'
-import { Button, Card, CardContent, CardTitle, Field, Input } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 const safeNext = (value: string | null) => {
   if (!value || !value.startsWith('/')) return '/dashboard'
@@ -51,35 +54,43 @@ const LoginForm = () => {
 
   return (
     <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">Entrar</CardTitle>
+      </CardHeader>
       <CardContent>
-        <CardTitle>Entrar</CardTitle>
-        <form onSubmit={onSubmit} className="mt-6 space-y-4">
-          <Field label="E-mail" htmlFor="email">
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">E-mail</Label>
             <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          </Field>
-          <Field label="Senha" htmlFor="password">
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Senha</Label>
             <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          </Field>
+          </div>
           {error && (
-            <div role="alert" className="space-y-2">
-              <p className="text-sm text-red-600">{error}</p>
+            <div role="alert" className="space-y-1">
+              <p className="text-sm text-destructive">{error}</p>
               {unverified && (
-                <button
+                <Button
                   type="button"
+                  variant="link"
+                  size="sm"
                   onClick={onResend}
                   disabled={resendLoading}
-                  className="text-sm font-medium text-brand-navy underline underline-offset-2 disabled:opacity-50"
+                  className="h-auto p-0"
                 >
                   {resendLoading ? 'Reenviando…' : 'Reenviar e-mail de verificação'}
-                </button>
+                </Button>
               )}
             </div>
           )}
-          <Button type="submit" disabled={loading} className="w-full">{loading ? 'Entrando…' : 'Entrar'}</Button>
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? 'Entrando…' : 'Entrar'}
+          </Button>
         </form>
-        <div className="mt-4 flex justify-between text-sm text-brand-navy/70">
-          <a href="/cadastro" className="hover:underline">Criar conta</a>
-          <a href="/recuperar-senha" className="hover:underline">Esqueci a senha</a>
+        <div className="mt-4 flex justify-between text-sm text-muted-foreground">
+          <a href="/cadastro" className="hover:text-foreground hover:underline">Criar conta</a>
+          <a href="/recuperar-senha" className="hover:text-foreground hover:underline">Esqueci a senha</a>
         </div>
       </CardContent>
     </Card>
