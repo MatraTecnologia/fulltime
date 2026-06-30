@@ -39,7 +39,7 @@ RUN mkdir -p ./apps/api/public
 # Cria bundle de produção com deps sem devDependencies.
 # pnpm deploy copia do virtual store (com o Prisma Client já gerado) para um
 # node_modules flat em /app/deploy — sem precisar de COPY extra do .prisma/
-RUN pnpm --filter @fulltime/api deploy /app/deploy
+RUN pnpm --filter @fulltime/api deploy --legacy /app/deploy
 
 # ---- runner ----
 FROM node:22-slim AS runner
