@@ -8,9 +8,15 @@ interface DialogProps {
   onClose: () => void
   title?: string
   children: ReactNode
+  size?: 'md' | 'lg'
 }
 
-export const Dialog = ({ open, onClose, title, children }: DialogProps) => {
+const sizes = {
+  md: 'max-w-md',
+  lg: 'max-w-2xl',
+}
+
+export const Dialog = ({ open, onClose, title, children, size = 'md' }: DialogProps) => {
   const titleId = useId()
 
   useEffect(() => {
@@ -31,7 +37,11 @@ export const Dialog = ({ open, onClose, title, children }: DialogProps) => {
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
-        className={cn('relative z-10 w-full max-w-md rounded-card bg-white p-6 shadow-xl')}
+        className={cn(
+          'relative z-10 w-full rounded-card bg-white p-6 shadow-xl',
+          'max-h-[85vh] overflow-y-auto',
+          sizes[size],
+        )}
       >
         {title && (
           <h2 id={titleId} className="mb-4 font-display text-lg font-bold text-brand-navy">

@@ -57,7 +57,7 @@ export const CertificateCard = ({ enrollment }: Props) => {
         {cert ? (
           <div className="mt-4">
             <div
-              className="rounded-xl border-4 border-brand-navy bg-white p-8 text-center"
+              className="print-certificate rounded-xl border-4 border-brand-navy bg-white p-8 text-center"
               role="region"
               aria-label="Certificado de conclusão"
             >

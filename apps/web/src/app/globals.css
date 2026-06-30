@@ -7,3 +7,17 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
   color: var(--color-brand-navy);
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-certificate,
+  .print-certificate * {
+    visibility: visible;
+  }
+  .print-certificate {
+    position: absolute;
+    inset: 0;
+  }
+}
