@@ -81,10 +81,9 @@ export const LessonPlayer = ({ lessonId, enrollmentId, completed, onCompleted }:
       <VideoEmbed url={lesson.video.embedUrl} title={lesson.title} />
 
       {lesson.content && (
-        <div
-          className="text-sm leading-relaxed text-brand-navy/80"
-          dangerouslySetInnerHTML={{ __html: lesson.content }}
-        />
+        <div className="whitespace-pre-wrap text-sm leading-relaxed text-brand-navy/80">
+          {lesson.content}
+        </div>
       )}
 
       {lesson.attachments.length > 0 && (
