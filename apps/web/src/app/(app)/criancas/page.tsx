@@ -8,6 +8,12 @@ import type { Child } from '@/lib/types'
 import { Button, Card, CardContent, CardTitle, Dialog, EmptyState, Spinner } from '@fulltime/ui'
 import ChildForm from '@/components/child-form'
 
+const formatDate = (value: string | null) => {
+  if (!value) return ''
+  const [y, m, d] = value.slice(0, 10).split('-')
+  return new Date(Number(y), Number(m) - 1, Number(d)).toLocaleDateString('pt-BR')
+}
+
 const CriancasPage = () => {
   const router = useRouter()
   const [children, setChildren] = useState<Child[] | null>(null)
@@ -69,7 +75,7 @@ const CriancasPage = () => {
                   <CardTitle>{child.name}</CardTitle>
                   {child.birthDate && (
                     <p className="mt-1 text-sm text-brand-navy/60">
-                      {new Date(child.birthDate).toLocaleDateString('pt-BR')}
+                      {formatDate(child.birthDate)}
                     </p>
                   )}
                   {child.diagnosis && (

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { EnrollmentListItem } from '@/lib/types'
@@ -49,12 +50,12 @@ const CertificadosPage = () => {
         title="Nenhum curso matriculado"
         description="Conclua um curso para emitir seu certificado."
         action={
-          <a
+          <Link
             href="/cursos"
             className="inline-flex items-center justify-center rounded-lg font-display font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 bg-brand-navy text-white hover:bg-brand-navy-600 h-11 px-5 text-base"
           >
             Ver cursos
-          </a>
+          </Link>
         }
       />
     )

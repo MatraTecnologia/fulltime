@@ -19,11 +19,18 @@ const TYPE_COLORS: Record<ChildRecordType, 'blue' | 'green' | 'purple'> = {
   PEI: 'purple',
 }
 
+const formatDate = (value: string | null) => {
+  if (!value) return ''
+  const [y, m, d] = value.slice(0, 10).split('-')
+  return new Date(Number(y), Number(m) - 1, Number(d)).toLocaleDateString('pt-BR')
+}
+
 const CriancaDetalhePage = () => {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
   const [child, setChild] = useState<ChildDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState('')
   const [notFound, setNotFound] = useState(false)
   const [recordDialogOpen, setRecordDialogOpen] = useState(false)
 
@@ -52,7 +59,7 @@ const CriancaDetalhePage = () => {
       await apiFetch(`/records/${recordId}`, { method: 'DELETE' })
       setChild((prev) => prev ? { ...prev, records: prev.records.filter((r) => r.id !== recordId) } : prev)
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Não foi possível excluir o registro.')
+      setActionError(e instanceof ApiError ? e.message : 'Não foi possível excluir o registro.')
     }
   }
 
@@ -62,7 +69,7 @@ const CriancaDetalhePage = () => {
       await apiFetch(`/children/${id}`, { method: 'DELETE' })
       router.push('/criancas')
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Não foi possível excluir a criança.')
+      setActionError(e instanceof ApiError ? e.message : 'Não foi possível excluir a criança.')
     }
   }
 
@@ -98,12 +105,13 @@ const CriancaDetalhePage = () => {
 
   return (
     <div>
+      {actionError && <p role="alert" className="mb-4 text-sm text-red-600">{actionError}</p>}
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold text-brand-navy">{child!.name}</h1>
           {child!.birthDate && (
             <p className="mt-1 text-sm text-brand-navy/60">
-              Nascimento: {new Date(child!.birthDate).toLocaleDateString('pt-BR')}
+              Nascimento: {formatDate(child!.birthDate)}
             </p>
           )}
           {child!.diagnosis && (
@@ -138,7 +146,7 @@ const CriancaDetalhePage = () => {
                         {TYPE_LABELS[record.type]}
                       </CategoryBadge>
                       <span className="text-xs text-brand-navy/50">
-                        {new Date(record.date).toLocaleDateString('pt-BR')}
+                        {formatDate(record.date)}
                       </span>
                     </div>
                     <button
