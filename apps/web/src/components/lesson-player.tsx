@@ -80,7 +80,12 @@ export const LessonPlayer = ({ lessonId, enrollmentId, completed, onCompleted }:
 
   return (
     <article className="space-y-6">
-      <VideoEmbed url={lesson.video.embedUrl} title={lesson.title} />
+      <VideoEmbed
+        url={lesson.video.embedUrl}
+        title={lesson.title}
+        source={lesson.videoSource}
+        playbackId={lesson.videoRef}
+      />
 
       {lesson.content && (
         <div className="whitespace-pre-wrap text-sm leading-relaxed text-brand-navy/80">
