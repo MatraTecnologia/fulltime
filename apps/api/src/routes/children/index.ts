@@ -33,7 +33,7 @@ export default async function childrenRoutes(app: FastifyInstance) {
         required: ['name'],
         properties: {
           name: { type: 'string' },
-          birthDate: { type: 'string', format: 'date-time' },
+          birthDate: { type: 'string', format: 'date' },
           diagnosis: { type: 'string' },
         },
       },
@@ -103,7 +103,7 @@ export default async function childrenRoutes(app: FastifyInstance) {
         type: 'object',
         properties: {
           name: { type: 'string' },
-          birthDate: { type: 'string', format: 'date-time' },
+          birthDate: { type: 'string', format: 'date' },
           diagnosis: { type: 'string' },
         },
       },
@@ -181,7 +181,7 @@ export default async function childrenRoutes(app: FastifyInstance) {
         properties: {
           type: { type: 'string', enum: ['EVOLUCAO', 'SESSAO', 'PEI'] },
           content: { type: 'string' },
-          date: { type: 'string', format: 'date-time' },
+          date: { type: 'string', format: 'date' },
         },
       },
     },
