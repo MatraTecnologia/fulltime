@@ -25,6 +25,8 @@ const CursosAdminPage = () => {
   const router = useRouter()
   const [courses, setCourses] = useState<CourseListItem[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState('')
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -43,11 +45,15 @@ const CursosAdminPage = () => {
 
   const handleDelete = async (id: string, title: string) => {
     if (!window.confirm(`Excluir "${title}"? Esta ação não pode ser desfeita.`)) return
+    setDeleting(true)
+    setDeleteError('')
     try {
       await apiFetch(`/courses/${id}`, { method: 'DELETE' })
       setCourses((prev) => prev?.filter((c) => c.id !== id) ?? null)
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Não foi possível excluir o curso.')
+      setDeleteError(e instanceof ApiError ? e.message : 'Não foi possível excluir o curso.')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -77,6 +83,12 @@ const CursosAdminPage = () => {
           <Button size="sm">Novo curso</Button>
         </Link>
       </div>
+
+      {deleteError && (
+        <p className="mt-4 text-sm text-red-600" role="alert">
+          {deleteError}
+        </p>
+      )}
 
       {courses!.length === 0 ? (
         <EmptyState
@@ -115,7 +127,8 @@ const CursosAdminPage = () => {
                       </Link>
                       <button
                         onClick={() => handleDelete(course.id, course.title)}
-                        className="text-sm text-red-400 hover:text-red-600"
+                        disabled={deleting}
+                        className="text-sm text-red-400 hover:text-red-600 disabled:opacity-50"
                       >
                         Excluir
                       </button>

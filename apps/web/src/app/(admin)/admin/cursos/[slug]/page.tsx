@@ -14,7 +14,13 @@ const CursoDetalhePage = () => {
   const [error, setError] = useState<string | null>(null)
   const [notFound, setNotFound] = useState(false)
   const [publishing, setPublishing] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
+
+  const reload = async () => {
+    const data = await apiFetch<CourseDetail>(`/courses/${slug}`)
+    setCourse(data)
+  }
 
   useEffect(() => {
     apiFetch<CourseDetail>(`/courses/${slug}`)
@@ -39,8 +45,8 @@ const CursoDetalhePage = () => {
     setActionError(null)
     setPublishing(true)
     try {
-      const updated = await apiFetch<CourseDetail>(`/courses/${course.id}/publish`, { method: 'POST' })
-      setCourse(updated)
+      await apiFetch(`/courses/${course.id}/publish`, { method: 'POST' })
+      await reload()
     } catch (e) {
       setActionError(e instanceof ApiError ? e.message : 'Não foi possível publicar o curso.')
     } finally {
@@ -51,11 +57,14 @@ const CursoDetalhePage = () => {
   const handleDelete = async () => {
     if (!course) return
     if (!window.confirm(`Excluir "${course.title}"? Esta ação não pode ser desfeita.`)) return
+    setDeleting(true)
     try {
       await apiFetch(`/courses/${course.id}`, { method: 'DELETE' })
       router.push('/admin/cursos')
     } catch (e) {
       setActionError(e instanceof ApiError ? e.message : 'Não foi possível excluir o curso.')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -101,8 +110,8 @@ const CursoDetalhePage = () => {
               {publishing ? 'Publicando...' : 'Publicar'}
             </Button>
           )}
-          <Button size="sm" variant="outline" onClick={handleDelete}>
-            Excluir
+          <Button size="sm" variant="outline" onClick={handleDelete} disabled={deleting}>
+            {deleting ? 'Excluindo...' : 'Excluir'}
           </Button>
         </div>
       </div>
