@@ -25,7 +25,7 @@ import { UserMenu } from './user-menu'
 
 const NAV_LINKS = [
   { href: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
-  { href: '/cursos', label: 'Cursos', Icon: BookOpen },
+  { href: '/catalogo', label: 'Cursos', Icon: BookOpen },
   { href: '/certificados', label: 'Certificados', Icon: Award },
   { href: '/criancas', label: 'Crianças', Icon: Baby },
   { href: '/perfil', label: 'Perfil', Icon: User },

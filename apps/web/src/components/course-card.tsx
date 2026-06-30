@@ -4,8 +4,8 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import type { CourseListItem } from '@/lib/types'
 
-export const CourseCard = ({ course }: { course: CourseListItem }) => (
-  <Link href={`/cursos/${course.slug}`} className="group block h-full">
+export const CourseCard = ({ course, basePath = '/cursos' }: { course: CourseListItem; basePath?: string }) => (
+  <Link href={`${basePath}/${course.slug}`} className="group block h-full">
     <Card className="h-full gap-0 overflow-hidden border-border/50 py-0 shadow-sm transition-shadow group-hover:shadow-md">
       {course.coverImage ? (
         <div className="aspect-video overflow-hidden">
