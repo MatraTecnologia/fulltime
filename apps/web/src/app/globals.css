@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "@fulltime/ui/theme.css";
+
+@custom-variant dark (&:is(.dark *));
 @source "../../../../packages/ui/src";
 
 body {
@@ -20,4 +22,111 @@ body {
     position: absolute;
     inset: 0;
   }
+}
+
+:root {
+  --background: hsl(210 25% 97%);
+  --foreground: hsl(210 100% 19%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(210 100% 19%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(210 100% 19%);
+  --primary: hsl(210 100% 19%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(210 20% 94%);
+  --secondary-foreground: hsl(210 100% 19%);
+  --muted: hsl(210 20% 95%);
+  --muted-foreground: hsl(210 25% 45%);
+  --accent: hsl(44 100% 48%);
+  --accent-foreground: hsl(210 100% 19%);
+  --destructive: hsl(0 84% 60%);
+  --border: hsl(215 21% 90%);
+  --input: hsl(215 21% 90%);
+  --ring: hsl(44 100% 48%);
+  --radius: 0.75rem;
+  --chart-1: hsl(44 100% 48%);
+  --chart-2: hsl(95 51% 46%);
+  --chart-3: hsl(198 85% 46%);
+  --chart-4: hsl(276 38% 48%);
+  --chart-5: hsl(210 100% 19%);
+  --sidebar: hsl(210 100% 10%);
+  --sidebar-foreground: hsl(0 0% 98%);
+  --sidebar-primary: hsl(44 100% 48%);
+  --sidebar-primary-foreground: hsl(210 100% 10%);
+  --sidebar-accent: hsl(210 100% 15%);
+  --sidebar-accent-foreground: hsl(0 0% 98%);
+  --sidebar-border: hsl(210 80% 22%);
+  --sidebar-ring: hsl(44 100% 48%);
+}
+
+.dark {
+  --background: hsl(210 100% 7%);
+  --foreground: hsl(210 25% 95%);
+  --card: hsl(210 100% 10%);
+  --card-foreground: hsl(210 25% 95%);
+  --popover: hsl(210 100% 10%);
+  --popover-foreground: hsl(210 25% 95%);
+  --primary: hsl(44 100% 48%);
+  --primary-foreground: hsl(210 100% 10%);
+  --secondary: hsl(210 80% 20%);
+  --secondary-foreground: hsl(210 25% 95%);
+  --muted: hsl(210 80% 15%);
+  --muted-foreground: hsl(210 25% 65%);
+  --accent: hsl(44 100% 48%);
+  --accent-foreground: hsl(210 100% 10%);
+  --destructive: hsl(0 70% 55%);
+  --border: hsl(210 80% 20%);
+  --input: hsl(210 80% 20%);
+  --ring: hsl(44 100% 48%);
+  --chart-1: hsl(44 100% 48%);
+  --chart-2: hsl(95 51% 55%);
+  --chart-3: hsl(198 85% 55%);
+  --chart-4: hsl(276 38% 60%);
+  --chart-5: hsl(210 60% 60%);
+  --sidebar: hsl(210 100% 7%);
+  --sidebar-foreground: hsl(210 25% 95%);
+  --sidebar-primary: hsl(44 100% 48%);
+  --sidebar-primary-foreground: hsl(210 100% 10%);
+  --sidebar-accent: hsl(210 100% 12%);
+  --sidebar-accent-foreground: hsl(210 25% 95%);
+  --sidebar-border: hsl(210 80% 15%);
+  --sidebar-ring: hsl(44 100% 48%);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
