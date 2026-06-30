@@ -835,7 +835,7 @@ git commit -m "feat(web): modulo de criancas + records"
 - Create: `apps/web/src/app/(admin)/layout.tsx`
 - Create: `apps/web/src/app/(admin)/admin/cursos/page.tsx`
 - Create: `apps/web/src/app/(admin)/admin/cursos/novo/page.tsx`
-- Create: `apps/web/src/app/(admin)/admin/cursos/[id]/page.tsx`
+- Create: `apps/web/src/app/(admin)/admin/cursos/[slug]/page.tsx` (segmento por **slug** — a API expõe `GET /courses/:slug`)
 - Create: `apps/web/src/components/course-form.tsx`
 
 **Interfaces:**
