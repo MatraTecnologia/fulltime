@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "@fulltime/ui/theme.css";
+@source "../../../../packages/ui/src";
+
+body {
+  background: var(--color-surface);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  color: var(--color-brand-navy);
+}
