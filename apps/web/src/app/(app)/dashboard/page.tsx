@@ -3,13 +3,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Award, BookOpen, ChevronRight, CheckCircle, PlayCircle } from 'lucide-react'
+import { BookOpen, ChevronRight, CheckCircle, PlayCircle, TrendingUp } from 'lucide-react'
 import { useSession } from '@/lib/auth-client'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { EnrollmentListItem } from '@/lib/types'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Empty,
   EmptyContent,
@@ -94,17 +95,24 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-8">
-      {/* Saudação */}
-      <div className="flex items-center gap-4">
-        <Avatar className="size-14">
-          <AvatarFallback className="bg-primary text-primary-foreground text-lg font-semibold">
-            {getInitials(userName)}
-          </AvatarFallback>
-        </Avatar>
-        <div>
-          <p className="text-sm text-muted-foreground">{getGreeting()},</p>
-          <h1 className="text-2xl font-bold text-foreground">{userName || 'bem-vindo'}</h1>
+      {/* Banner de saudação */}
+      <div className="rounded-2xl bg-primary px-6 py-8 sm:px-10">
+        <div className="flex items-center gap-4">
+          <Avatar className="size-16 ring-2 ring-accent ring-offset-2 ring-offset-primary">
+            <AvatarFallback className="bg-white/10 text-primary-foreground text-xl font-bold">
+              {userName ? getInitials(userName) : '?'}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="text-sm font-medium text-primary-foreground/70">{getGreeting()},</p>
+            <h1 className="text-2xl font-bold text-primary-foreground">
+              {userName || 'bem-vindo'}
+            </h1>
+          </div>
         </div>
+        <p className="mt-4 text-sm text-primary-foreground/60">
+          Continue sua jornada de capacitação em educação inclusiva.
+        </p>
       </div>
 
       {enrollments!.length === 0 ? (
@@ -124,39 +132,47 @@ const DashboardPage = () => {
         </Empty>
       ) : (
         <>
-          {/* Resumo */}
+          {/* Cards de resumo */}
           <div className="grid gap-4 sm:grid-cols-3">
             <Card>
-              <CardHeader className="pb-0">
-                <CardDescription className="flex items-center gap-1.5">
-                  <PlayCircle className="size-4" />
-                  Em andamento
-                </CardDescription>
+              <CardHeader>
+                <CardDescription>Em andamento</CardDescription>
                 <CardTitle className="text-3xl font-bold text-primary">
                   {stats.active}
                 </CardTitle>
+                <CardAction>
+                  <div className="flex size-9 items-center justify-center rounded-md bg-primary/10">
+                    <PlayCircle className="size-4 text-primary" />
+                  </div>
+                </CardAction>
               </CardHeader>
             </Card>
+
             <Card>
-              <CardHeader className="pb-0">
-                <CardDescription className="flex items-center gap-1.5">
-                  <CheckCircle className="size-4" />
-                  Concluídos
-                </CardDescription>
-                <CardTitle className="text-3xl font-bold text-primary">
+              <CardHeader>
+                <CardDescription>Concluídos</CardDescription>
+                <CardTitle className="text-3xl font-bold text-foreground">
                   {stats.completed}
                 </CardTitle>
+                <CardAction>
+                  <div className="flex size-9 items-center justify-center rounded-md bg-accent/20">
+                    <CheckCircle className="size-4 text-accent-foreground" />
+                  </div>
+                </CardAction>
               </CardHeader>
             </Card>
+
             <Card>
-              <CardHeader className="pb-0">
-                <CardDescription className="flex items-center gap-1.5">
-                  <Award className="size-4" />
-                  Aulas concluídas
-                </CardDescription>
+              <CardHeader>
+                <CardDescription>Aulas concluídas</CardDescription>
                 <CardTitle className="text-3xl font-bold text-accent">
                   {stats.lessonsCompleted}
                 </CardTitle>
+                <CardAction>
+                  <div className="flex size-9 items-center justify-center rounded-md bg-accent text-accent-foreground">
+                    <TrendingUp className="size-4" />
+                  </div>
+                </CardAction>
               </CardHeader>
             </Card>
           </div>
@@ -167,28 +183,35 @@ const DashboardPage = () => {
               <h2 className="mb-3 text-lg font-semibold text-foreground">
                 Continuar de onde parou
               </h2>
-              <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
+              <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
                 <div className="flex flex-col sm:flex-row">
                   {continueEnrollment.course.coverImage ? (
                     <img
                       src={continueEnrollment.course.coverImage}
                       alt={continueEnrollment.course.title}
-                      className="h-44 w-full object-cover sm:h-auto sm:w-60 shrink-0"
+                      className="h-44 w-full object-cover sm:h-auto sm:w-64 shrink-0"
                     />
                   ) : (
-                    <div className="flex h-44 w-full shrink-0 items-center justify-center bg-primary/10 sm:h-auto sm:w-60">
-                      <BookOpen className="size-10 text-primary/30" />
+                    <div className="flex h-44 w-full shrink-0 items-center justify-center bg-primary/5 sm:h-auto sm:w-64">
+                      <BookOpen className="size-12 text-primary/20" />
                     </div>
                   )}
                   <div className="flex flex-1 flex-col justify-between p-6">
                     <div>
-                      <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                      <Badge className="mb-2 bg-accent/15 text-accent-foreground uppercase tracking-wider text-[10px]">
                         Em andamento
-                      </p>
-                      <h3 className="text-xl font-semibold text-foreground">
+                      </Badge>
+                      <h3 className="mt-2 text-xl font-semibold text-foreground">
                         {continueEnrollment.course.title}
                       </h3>
                       <div className="mt-4 space-y-1.5">
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>Progresso</span>
+                          <span>
+                            {continueEnrollment.progressCount} /{' '}
+                            {continueEnrollment.totalLessons} aulas
+                          </span>
+                        </div>
                         <Progress
                           value={
                             continueEnrollment.totalLessons
@@ -198,10 +221,6 @@ const DashboardPage = () => {
                               : 0
                           }
                         />
-                        <p className="text-xs text-muted-foreground">
-                          {continueEnrollment.progressCount} de{' '}
-                          {continueEnrollment.totalLessons} aulas concluídas
-                        </p>
                       </div>
                     </div>
                     <div className="mt-6">
@@ -210,7 +229,7 @@ const DashboardPage = () => {
                         className="bg-accent text-accent-foreground hover:bg-accent/90"
                       >
                         <Link href={`/aprender/${continueEnrollment.course.slug}`}>
-                          Continuar
+                          Continuar aula
                           <ChevronRight className="size-4" />
                         </Link>
                       </Button>
@@ -239,14 +258,21 @@ const DashboardPage = () => {
                         className="h-36 w-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-36 w-full items-center justify-center bg-primary/10">
-                        <BookOpen className="size-8 text-primary/30" />
+                      <div className="flex h-36 w-full items-center justify-center bg-primary/5">
+                        <BookOpen className="size-8 text-primary/20" />
                       </div>
                     )}
                     <div className="flex flex-1 flex-col p-4">
-                      <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
-                        {item.course.title}
-                      </h3>
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="line-clamp-2 flex-1 text-sm font-semibold leading-snug text-foreground">
+                          {item.course.title}
+                        </h3>
+                        {item.status === 'COMPLETED' && (
+                          <Badge className="shrink-0 bg-accent text-accent-foreground text-[10px]">
+                            Concluído
+                          </Badge>
+                        )}
+                      </div>
                       <div className="mt-auto pt-3 space-y-1">
                         <Progress
                           value={

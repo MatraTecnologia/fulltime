@@ -56,7 +56,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
       <Sidebar collapsible="offcanvas">
-        <SidebarHeader className="px-4 py-3">
+        <SidebarHeader className="border-b border-sidebar-border px-4 py-3">
           <Link href="/dashboard" className="flex items-center gap-2.5">
             <Image src="/logo.svg" alt="" width={30} height={30} priority />
             <span className="text-base font-semibold text-sidebar-foreground tracking-tight">

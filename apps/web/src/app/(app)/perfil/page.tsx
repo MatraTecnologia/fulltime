@@ -65,26 +65,24 @@ const PerfilPage = () => {
       <h1 className="text-2xl font-bold text-foreground">Meu Perfil</h1>
       <Card>
         <CardContent className="p-0">
-          {/* Cabeçalho do perfil */}
-          <div className="flex flex-col items-center gap-4 bg-primary/5 p-8 sm:flex-row sm:items-center rounded-t-xl">
-            <Avatar className="size-20">
+          <div className="flex flex-col items-center gap-4 rounded-t-xl bg-primary p-8 sm:flex-row sm:items-center">
+            <Avatar className="size-20 ring-2 ring-accent ring-offset-2 ring-offset-primary">
               {user!.image && (
                 <AvatarImage src={user!.image} alt={user!.name} />
               )}
-              <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-semibold">
+              <AvatarFallback className="bg-white/10 text-primary-foreground text-2xl font-bold">
                 {getInitials(user!.name)}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h2 className="text-xl font-semibold text-foreground">{user!.name}</h2>
-              <p className="mt-0.5 text-sm text-muted-foreground">
+              <h2 className="text-xl font-semibold text-primary-foreground">{user!.name}</h2>
+              <p className="mt-0.5 text-sm text-primary-foreground/70">
                 {ROLE_LABEL[user!.role] ?? user!.role}
               </p>
             </div>
           </div>
 
-          {/* Dados do perfil */}
-          <div className="p-6 space-y-4">
+          <div className="space-y-4 p-6">
             <div className="flex items-center gap-3 text-sm">
               <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted">
                 <Mail className="size-4 text-muted-foreground" />

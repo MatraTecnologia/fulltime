@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { LogOut, User } from 'lucide-react'
 import { signOut } from '@/lib/auth-client'
@@ -52,9 +53,11 @@ export const UserMenu = ({ user }: { user: MenuUser }) => {
           <p className="text-xs text-muted-foreground truncate">{user.email}</p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => router.push('/perfil')}>
-          <User className="size-4" />
-          Perfil
+        <DropdownMenuItem asChild>
+          <Link href="/perfil">
+            <User className="size-4" />
+            Perfil
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onSelect={handleSignOut}>
