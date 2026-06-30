@@ -6,6 +6,7 @@ import { apiFetch, ApiError } from '@/lib/api'
 import type { CourseDetail } from '@/lib/types'
 import { Button, EmptyState, Spinner } from '@fulltime/ui'
 import CourseForm from '@/components/course-form'
+import CurriculumEditor from '@/components/curriculum-editor'
 
 const CursoDetalhePage = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -124,7 +125,7 @@ const CursoDetalhePage = () => {
 
       <CourseForm initial={course!} onSaved={handleSaved} />
 
-      {/* editor de currículo: Task 10 */}
+      <CurriculumEditor course={course!} onChange={reload} />
     </div>
   )
 }
