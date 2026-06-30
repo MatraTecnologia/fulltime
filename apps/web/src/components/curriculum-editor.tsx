@@ -3,7 +3,11 @@
 import { useState } from 'react'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { CourseDetail } from '@/lib/types'
-import { Button, Dialog, EmptyState, Field, Input } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import ModuleEditor from './module-editor'
 
 interface CurriculumEditorProps {
@@ -52,10 +56,12 @@ const CurriculumEditor = ({ course, onChange }: CurriculumEditorProps) => {
       </div>
 
       {course.modules.length === 0 ? (
-        <EmptyState
-          title="Nenhum módulo ainda"
-          description="Adicione módulos para organizar as aulas do curso."
-        />
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>Nenhum módulo ainda</EmptyTitle>
+            <EmptyDescription>Adicione módulos para organizar as aulas do curso.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className="flex flex-col gap-4">
           {course.modules.map((m) => (
@@ -64,32 +70,39 @@ const CurriculumEditor = ({ course, onChange }: CurriculumEditorProps) => {
         </div>
       )}
 
-      <Dialog open={dialogOpen} onClose={handleClose} title="Novo módulo">
-        <form onSubmit={handleAdd} className="flex flex-col gap-4">
-          <Field label="Título" htmlFor="new-module-title">
-            <Input
-              id="new-module-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              placeholder="Título do módulo"
-              autoFocus
-            />
-          </Field>
-          {error && (
-            <p className="text-sm text-red-600" role="alert">
-              {error}
-            </p>
-          )}
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={handleClose}>
-              Cancelar
-            </Button>
-            <Button type="submit" size="sm" disabled={loading}>
-              {loading ? 'Criando...' : 'Criar módulo'}
-            </Button>
-          </div>
-        </form>
+      <Dialog open={dialogOpen} onOpenChange={(o) => { if (!o) handleClose() }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Novo módulo</DialogTitle>
+            <DialogDescription>Preencha o título para criar um novo módulo no curso.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAdd} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="new-module-title">Título</Label>
+              <Input
+                id="new-module-title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                placeholder="Título do módulo"
+                autoFocus
+              />
+            </div>
+            {error && (
+              <p className="text-sm text-destructive" role="alert">
+                {error}
+              </p>
+            )}
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={handleClose}>
+                Cancelar
+              </Button>
+              <Button type="submit" size="sm" disabled={loading}>
+                {loading ? 'Criando...' : 'Criar módulo'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
       </Dialog>
     </div>
   )

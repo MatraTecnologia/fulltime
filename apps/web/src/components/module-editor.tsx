@@ -3,7 +3,12 @@
 import { useState } from 'react'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { ModuleWithLessons } from '@/lib/types'
-import { Button, Card, CardContent, CardHeader, CardTitle, Dialog, EmptyState, Field, Input } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
 import LessonEditor from './lesson-editor'
 
 interface ModuleEditorProps {
@@ -118,7 +123,7 @@ const ModuleEditor = ({ module, onChange }: ModuleEditorProps) => {
           )}
         </div>
         {editError && (
-          <p className="mt-2 text-sm text-red-600" role="alert">
+          <p className="mt-2 text-sm text-destructive" role="alert">
             {editError}
           </p>
         )}
@@ -126,7 +131,11 @@ const ModuleEditor = ({ module, onChange }: ModuleEditorProps) => {
 
       <CardContent>
         {module.lessons.length === 0 ? (
-          <EmptyState title="Nenhuma aula ainda" className="py-8" />
+          <Empty className="py-8">
+            <EmptyHeader>
+              <EmptyTitle>Nenhuma aula ainda</EmptyTitle>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <div className="mb-4 flex flex-col gap-2">
             {module.lessons.map((lesson) => (
@@ -139,32 +148,39 @@ const ModuleEditor = ({ module, onChange }: ModuleEditorProps) => {
         </Button>
       </CardContent>
 
-      <Dialog open={addOpen} onClose={handleCloseAdd} title="Nova aula">
-        <form onSubmit={handleAddLesson} className="flex flex-col gap-4">
-          <Field label="Título" htmlFor="new-lesson-title">
-            <Input
-              id="new-lesson-title"
-              value={lessonTitle}
-              onChange={(e) => setLessonTitle(e.target.value)}
-              required
-              placeholder="Título da aula"
-              autoFocus
-            />
-          </Field>
-          {addError && (
-            <p className="text-sm text-red-600" role="alert">
-              {addError}
-            </p>
-          )}
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={handleCloseAdd}>
-              Cancelar
-            </Button>
-            <Button type="submit" size="sm" disabled={addLoading}>
-              {addLoading ? 'Criando...' : 'Criar aula'}
-            </Button>
-          </div>
-        </form>
+      <Dialog open={addOpen} onOpenChange={(o) => { if (!o) handleCloseAdd() }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Nova aula</DialogTitle>
+            <DialogDescription>Preencha o título para criar uma nova aula neste módulo.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAddLesson} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="new-lesson-title">Título</Label>
+              <Input
+                id="new-lesson-title"
+                value={lessonTitle}
+                onChange={(e) => setLessonTitle(e.target.value)}
+                required
+                placeholder="Título da aula"
+                autoFocus
+              />
+            </div>
+            {addError && (
+              <p className="text-sm text-destructive" role="alert">
+                {addError}
+              </p>
+            )}
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={handleCloseAdd}>
+                Cancelar
+              </Button>
+              <Button type="submit" size="sm" disabled={addLoading}>
+                {addLoading ? 'Criando...' : 'Criar aula'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
       </Dialog>
     </Card>
   )

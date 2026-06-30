@@ -3,7 +3,10 @@
 import { useState } from 'react'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { CourseDetail } from '@/lib/types'
-import { Button, Field, Input, Textarea } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 
 interface CourseFormProps {
   initial?: CourseDetail
@@ -52,7 +55,8 @@ const CourseForm = ({ initial, onSaved }: CourseFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <Field label="Título" htmlFor="course-title">
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="course-title">Título</Label>
         <Input
           id="course-title"
           value={title}
@@ -60,8 +64,9 @@ const CourseForm = ({ initial, onSaved }: CourseFormProps) => {
           required
           placeholder="Título do curso"
         />
-      </Field>
-      <Field label="Descrição" htmlFor="course-description">
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="course-description">Descrição</Label>
         <Textarea
           id="course-description"
           value={description}
@@ -69,8 +74,9 @@ const CourseForm = ({ initial, onSaved }: CourseFormProps) => {
           placeholder="Descrição do curso (opcional)"
           rows={4}
         />
-      </Field>
-      <Field label="Imagem de capa (URL)" htmlFor="course-cover">
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="course-cover">Imagem de capa (URL)</Label>
         <Input
           id="course-cover"
           type="url"
@@ -78,17 +84,18 @@ const CourseForm = ({ initial, onSaved }: CourseFormProps) => {
           onChange={(e) => setCoverImage(e.target.value)}
           placeholder="https://..."
         />
-      </Field>
-      <Field label="Slug" htmlFor="course-slug">
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="course-slug">Slug</Label>
         <Input
           id="course-slug"
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
           placeholder="gerado do título"
         />
-      </Field>
+      </div>
       {error && (
-        <p className="text-sm text-red-600" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           {error}
         </p>
       )}

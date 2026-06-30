@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { CourseDetail } from '@/lib/types'
-import { Button, EmptyState, Spinner } from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
 import CourseForm from '@/components/course-form'
 import CurriculumEditor from '@/components/curriculum-editor'
 
@@ -71,22 +73,24 @@ const CursoDetalhePage = () => {
 
   if (notFound) {
     return (
-      <EmptyState
-        title="Curso não encontrado"
-        description="Este curso não existe ou foi removido."
-        action={
+      <Empty>
+        <EmptyHeader>
+          <EmptyTitle>Curso não encontrado</EmptyTitle>
+          <EmptyDescription>Este curso não existe ou foi removido.</EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
           <Button variant="outline" onClick={() => router.push('/admin/cursos')}>
             Voltar
           </Button>
-        }
-      />
+        </EmptyContent>
+      </Empty>
     )
   }
 
   if (!course && !error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Spinner />
+        <Spinner className="size-8" />
       </div>
     )
   }
@@ -94,7 +98,7 @@ const CursoDetalhePage = () => {
   if (error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-red-600" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           {error}
         </p>
       </div>
@@ -107,7 +111,12 @@ const CursoDetalhePage = () => {
         <h1 className="font-display text-2xl font-bold text-brand-navy">{course!.title}</h1>
         <div className="flex items-center gap-2">
           {course!.status === 'DRAFT' && (
-            <Button size="sm" variant="accent" onClick={handlePublish} disabled={publishing}>
+            <Button
+              size="sm"
+              className="bg-accent text-accent-foreground hover:bg-accent/90"
+              onClick={handlePublish}
+              disabled={publishing}
+            >
               {publishing ? 'Publicando...' : 'Publicar'}
             </Button>
           )}
@@ -118,7 +127,7 @@ const CursoDetalhePage = () => {
       </div>
 
       {actionError && (
-        <p className="mb-4 text-sm text-red-600" role="alert">
+        <p className="mb-4 text-sm text-destructive" role="alert">
           {actionError}
         </p>
       )}

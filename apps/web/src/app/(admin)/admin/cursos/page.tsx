@@ -5,21 +5,17 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { CourseListItem } from '@/lib/types'
-import {
-  Button,
-  CategoryBadge,
-  EmptyState,
-  Spinner,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from '@fulltime/ui'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Spinner } from '@/components/ui/spinner'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 
 const STATUS_LABELS = { DRAFT: 'Rascunho', PUBLISHED: 'Publicado' } as const
-const STATUS_COLORS = { DRAFT: 'amber', PUBLISHED: 'green' } as const
+const STATUS_BADGE_CLASSES = {
+  DRAFT: 'border-amber-500 bg-amber-50 text-amber-700',
+  PUBLISHED: 'border-green-500 bg-green-100 text-green-700',
+} as const
 
 const CursosAdminPage = () => {
   const router = useRouter()
@@ -60,7 +56,7 @@ const CursosAdminPage = () => {
   if (!courses && !error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Spinner />
+        <Spinner className="size-8" />
       </div>
     )
   }
@@ -68,7 +64,7 @@ const CursosAdminPage = () => {
   if (error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-red-600" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           {error}
         </p>
       </div>
@@ -85,39 +81,40 @@ const CursosAdminPage = () => {
       </div>
 
       {deleteError && (
-        <p className="mt-4 text-sm text-red-600" role="alert">
+        <p className="mt-4 text-sm text-destructive" role="alert">
           {deleteError}
         </p>
       )}
 
       {courses!.length === 0 ? (
-        <EmptyState
-          title="Nenhum curso cadastrado"
-          description="Crie o primeiro curso da plataforma."
-          className="mt-8"
-        />
+        <Empty className="mt-8">
+          <EmptyHeader>
+            <EmptyTitle>Nenhum curso cadastrado</EmptyTitle>
+            <EmptyDescription>Crie o primeiro curso da plataforma.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className="mt-6">
           <Table>
-            <Thead>
-              <Tr>
-                <Th>Título</Th>
-                <Th>Status</Th>
-                <Th>Módulos</Th>
-                <Th />
-              </Tr>
-            </Thead>
-            <Tbody>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Título</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Módulos</TableHead>
+                <TableHead />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {courses!.map((course) => (
-                <Tr key={course.id}>
-                  <Td className="font-medium">{course.title}</Td>
-                  <Td>
-                    <CategoryBadge color={STATUS_COLORS[course.status]}>
+                <TableRow key={course.id}>
+                  <TableCell className="font-medium">{course.title}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={STATUS_BADGE_CLASSES[course.status]}>
                       {STATUS_LABELS[course.status]}
-                    </CategoryBadge>
-                  </Td>
-                  <Td>{course._count.modules}</Td>
-                  <Td>
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{course._count.modules}</TableCell>
+                  <TableCell>
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/admin/cursos/${course.slug}`}
@@ -128,15 +125,15 @@ const CursosAdminPage = () => {
                       <button
                         onClick={() => handleDelete(course.id, course.title)}
                         disabled={deleting}
-                        className="text-sm text-red-400 hover:text-red-600 disabled:opacity-50"
+                        className="text-sm text-destructive/60 hover:text-destructive disabled:opacity-50"
                       >
                         Excluir
                       </button>
                     </div>
-                  </Td>
-                </Tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </Tbody>
+            </TableBody>
           </Table>
         </div>
       )}

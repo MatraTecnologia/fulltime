@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from '@/lib/auth-client'
 import { AppShell } from '@/components/app-shell'
-import { Spinner } from '@fulltime/ui'
+import { Spinner } from '@/components/ui/spinner'
 import type { Role } from '@/lib/types'
 
 const ALLOWED_ROLES: Role[] = ['admin', 'instrutor']
@@ -28,7 +28,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   if (isPending) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Spinner />
+        <Spinner className="size-8" />
       </div>
     )
   }

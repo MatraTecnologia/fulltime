@@ -1,62 +1,67 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { LogOut, User } from 'lucide-react'
 import { signOut } from '@/lib/auth-client'
 import type { Role } from '@/lib/types'
-import { Avatar } from '@fulltime/ui'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 type MenuUser = { name: string; email: string; image?: string | null; role?: Role }
 
+const getInitials = (name: string) =>
+  name
+    .split(' ')
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+
 export const UserMenu = ({ user }: { user: MenuUser }) => {
   const router = useRouter()
-  const [open, setOpen] = useState(false)
 
-  const handleSignOut = async () => {
-    setOpen(false)
-    await signOut()
-    router.push('/login')
+  const handleSignOut = () => {
+    signOut().then(() => router.push('/login'))
   }
 
   return (
-    <div className="relative">
-      <button
-        type="button"
-        aria-label="Menu do usuário"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-lg px-2 py-1 transition-colors hover:bg-brand-navy/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
-      >
-        <Avatar name={user.name} src={user.image} size="sm" />
-        <span className="hidden text-sm font-medium text-brand-navy sm:block">{user.name}</span>
-      </button>
-
-      {open && (
-        <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setOpen(false)}
-            aria-hidden="true"
-          />
-          <div className="absolute right-0 z-20 mt-2 w-44 rounded-lg bg-white py-1 shadow-md ring-1 ring-black/5">
-            <Link
-              href="/perfil"
-              onClick={() => setOpen(false)}
-              className="block px-4 py-2 text-sm text-brand-navy hover:bg-brand-navy/5"
-            >
-              Perfil
-            </Link>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
-            >
-              Sair
-            </button>
-          </div>
-        </>
-      )}
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          aria-label="Menu do usuário"
+          className="flex items-center gap-2 rounded-lg px-2 py-1 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Avatar size="sm">
+            {user.image && <AvatarImage src={user.image} alt={user.name} />}
+            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+          </Avatar>
+          <span className="hidden text-sm font-medium text-foreground sm:block">{user.name}</span>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-52">
+        <DropdownMenuLabel className="font-normal">
+          <p className="text-sm font-semibold text-foreground">{user.name}</p>
+          <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => router.push('/perfil')}>
+          <User className="size-4" />
+          Perfil
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive" onSelect={handleSignOut}>
+          <LogOut className="size-4" />
+          Sair
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
