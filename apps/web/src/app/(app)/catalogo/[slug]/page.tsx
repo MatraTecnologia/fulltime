@@ -1,4 +1,4 @@
-import { BookOpen, Clock, PlayCircle, User } from 'lucide-react'
+import { Award, BookOpen, Clock, FileText, PlayCircle, User, Video } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { apiServer, ApiError } from '@/lib/api'
 import type { CourseDetail } from '@/lib/types'
@@ -12,6 +12,19 @@ import {
 
 export const dynamic = 'force-dynamic'
 
+const formatTotalDuration = (sec: number) => {
+  const h = Math.floor(sec / 3600)
+  const min = Math.round((sec % 3600) / 60)
+  if (h > 0) return min > 0 ? `${h}h ${min}min` : `${h}h`
+  return `${min}min`
+}
+
+const formatLessonDuration = (sec: number) => {
+  const min = Math.floor(sec / 60)
+  const s = sec % 60
+  return `${min}:${String(s).padStart(2, '0')}`
+}
+
 const CatalogoDetalhePage = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params
   let course: CourseDetail
@@ -23,6 +36,10 @@ const CatalogoDetalhePage = async ({ params }: { params: Promise<{ slug: string 
   }
 
   const totalLessons = course.modules.reduce((acc, m) => acc + m.lessons.length, 0)
+  const totalDurationSec = course.modules.reduce(
+    (acc, m) => acc + m.lessons.reduce((s, l) => s + (l.durationSec ?? 0), 0),
+    0,
+  )
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -50,9 +67,15 @@ const CatalogoDetalhePage = async ({ params }: { params: Promise<{ slug: string 
                 {course.modules.length} módulo{course.modules.length !== 1 ? 's' : ''}
               </span>
               <span className="flex items-center gap-1.5">
-                <Clock className="size-4 text-brand-navy/40" />
+                <PlayCircle className="size-4 text-brand-navy/40" />
                 {totalLessons} aula{totalLessons !== 1 ? 's' : ''}
               </span>
+              {totalDurationSec > 0 && (
+                <span className="flex items-center gap-1.5">
+                  <Clock className="size-4 text-brand-navy/40" />
+                  {formatTotalDuration(totalDurationSec)}
+                </span>
+              )}
             </div>
           </div>
 
@@ -69,7 +92,12 @@ const CatalogoDetalhePage = async ({ params }: { params: Promise<{ slug: string 
                 {course.modules.map((m) => (
                   <AccordionItem key={m.id} value={m.id} className="border-hairline px-2">
                     <AccordionTrigger className="px-4 font-display font-bold text-brand-navy hover:no-underline">
-                      {m.title}
+                      <span className="flex flex-1 items-center justify-between gap-3">
+                        <span>{m.title}</span>
+                        <span className="text-xs font-medium text-muted-foreground">
+                          {m.lessons.length} aula{m.lessons.length !== 1 ? 's' : ''}
+                        </span>
+                      </span>
                     </AccordionTrigger>
                     <AccordionContent>
                       <ul className="space-y-2.5 px-4 pb-2">
@@ -78,10 +106,13 @@ const CatalogoDetalhePage = async ({ params }: { params: Promise<{ slug: string 
                             key={l.id}
                             className="flex items-center gap-3 text-sm text-brand-navy/70"
                           >
-                            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-navy-50 text-xs font-semibold text-brand-navy">
-                              {l.order}
-                            </span>
-                            {l.title}
+                            <PlayCircle className="size-4 shrink-0 text-brand-navy/30" />
+                            <span className="min-w-0 flex-1 truncate">{l.title}</span>
+                            {l.durationSec != null && (
+                              <span className="shrink-0 tabular-nums text-xs text-muted-foreground">
+                                {formatLessonDuration(l.durationSec)}
+                              </span>
+                            )}
                           </li>
                         ))}
                       </ul>
@@ -110,9 +141,20 @@ const CatalogoDetalhePage = async ({ params }: { params: Promise<{ slug: string 
               <p className="font-display text-sm font-bold text-brand-navy">
                 Acesso completo ao curso
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Aulas em vídeo, materiais e certificado de conclusão.
-              </p>
+              <ul className="mt-3 space-y-2 text-xs text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <Video className="size-4 shrink-0 text-brand-navy/40" />
+                  Aulas em vídeo sob demanda
+                </li>
+                <li className="flex items-center gap-2">
+                  <FileText className="size-4 shrink-0 text-brand-navy/40" />
+                  Materiais de apoio
+                </li>
+                <li className="flex items-center gap-2">
+                  <Award className="size-4 shrink-0 text-brand-navy/40" />
+                  Certificado de conclusão
+                </li>
+              </ul>
               <EnrollButton courseId={course.id} slug={course.slug} />
             </div>
           </div>

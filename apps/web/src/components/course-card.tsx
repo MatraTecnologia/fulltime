@@ -6,7 +6,7 @@ import type { CourseListItem } from '@/lib/types'
 
 export const CourseCard = ({ course, basePath = '/cursos' }: { course: CourseListItem; basePath?: string }) => (
   <Link href={`${basePath}/${course.slug}`} className="group block h-full">
-    <Card className="h-full gap-0 overflow-hidden border-border/50 py-0 shadow-sm transition-shadow group-hover:shadow-md">
+    <Card className="h-full gap-0 overflow-hidden rounded-card border-0 bg-white py-0 shadow-card ring-1 ring-brand-navy/[0.06] transition-shadow duration-200 group-hover:shadow-lifted">
       {course.coverImage ? (
         <div className="aspect-video overflow-hidden">
           <img
@@ -16,12 +16,12 @@ export const CourseCard = ({ course, basePath = '/cursos' }: { course: CourseLis
           />
         </div>
       ) : (
-        <div className="flex aspect-video items-center justify-center bg-muted">
-          <BookOpen className="size-12 text-muted-foreground/40" />
+        <div className="flex aspect-video items-center justify-center bg-brand-navy-50">
+          <BookOpen className="size-12 text-brand-navy/20" />
         </div>
       )}
       <CardContent className="flex-1 px-5 pt-4 pb-3">
-        <h3 className="line-clamp-2 font-semibold leading-snug text-foreground">
+        <h3 className="line-clamp-2 font-display font-bold leading-snug text-brand-navy">
           {course.title}
         </h3>
         {course.description && (
@@ -30,7 +30,7 @@ export const CourseCard = ({ course, basePath = '/cursos' }: { course: CourseLis
           </p>
         )}
       </CardContent>
-      <CardFooter className="border-t border-border/50 px-5 py-3">
+      <CardFooter className="border-t border-hairline px-5 py-3">
         <div className="flex w-full items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
             <User className="size-3.5 shrink-0" />
