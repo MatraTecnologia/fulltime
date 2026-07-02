@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Spinner } from '@/components/ui/spinner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { VideoUploader } from '@/app/(admin)/_components/video-uploader'
 
 interface LessonEditorProps {
   lesson: LessonSummary
@@ -223,6 +224,21 @@ const LessonEditor = ({ lesson, onChange }: LessonEditorProps) => {
                     onChange={(e) => setVideoRef(e.target.value)}
                     placeholder="ID ou URL do vídeo"
                   />
+                  {videoSource === 'MUX' && (
+                    <p className="text-xs text-muted-foreground">
+                      Preencha manualmente ou envie um arquivo abaixo.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {videoSource === 'MUX' && (
+                <div className="flex flex-col gap-2 rounded-lg border border-slate-200 p-4">
+                  <Label>Enviar vídeo</Label>
+                  <VideoUploader lessonId={lesson.id} />
+                  <p className="text-xs text-muted-foreground">
+                    Ao terminar o processamento, o vídeo é vinculado automaticamente a esta aula.
+                  </p>
                 </div>
               )}
               <div className="flex flex-col gap-1.5">

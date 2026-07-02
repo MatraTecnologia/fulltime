@@ -13,6 +13,7 @@ import {
   PieChart,
   User,
   Users,
+  Video,
 } from 'lucide-react'
 import { useSession } from '@/lib/auth-client'
 import type { Role } from '@/lib/types'
@@ -46,6 +47,7 @@ const NAV_LINKS: NavLink[] = [
 const ADMIN_LINKS: NavLink[] = [
   { href: '/admin', label: 'Visão geral', Icon: PieChart, roles: ['admin'] },
   { href: '/admin/cursos', label: 'Cursos', Icon: GraduationCap, roles: ['admin', 'instrutor'] },
+  { href: '/admin/videos', label: 'Vídeos', Icon: Video, roles: ['admin', 'instrutor'] },
   { href: '/admin/usuarios', label: 'Usuários', Icon: Users, roles: ['admin'] },
 ]
 
