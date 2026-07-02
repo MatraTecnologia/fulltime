@@ -161,6 +161,55 @@ export default async function lessonRoutes(app: FastifyInstance) {
     }
   })
 
+  app.post('/lessons/:id/video/link', {
+    preHandler: [requireAuth, requireRole('admin', 'instrutor')],
+    schema: {
+      tags: ['lessons'],
+      summary: 'Vincula vídeo processado à aula',
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string' } },
+      },
+      body: {
+        type: 'object',
+        required: ['videoAssetId'],
+        properties: {
+          videoAssetId: { type: 'string' },
+        },
+      },
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const { videoAssetId } = request.body as { videoAssetId: string }
+
+    const asset = await prisma.videoAsset.findUnique({ where: { id: videoAssetId } })
+    if (!asset) return reply.status(404).send({ error: 'Vídeo não encontrado.' })
+
+    if (asset.status !== 'READY' || !asset.playbackId) {
+      return reply.status(409).send({ error: 'Vídeo ainda não está pronto.' })
+    }
+    if (asset.lessonId !== null) {
+      return reply.status(409).send({ error: 'Vídeo já está vinculado a uma aula.' })
+    }
+
+    const lesson = await prisma.lesson.findUnique({ where: { id } })
+    if (!lesson) return reply.status(404).send({ error: 'Aula não encontrada.' })
+
+    const [updatedLesson] = await prisma.$transaction([
+      prisma.lesson.update({
+        where: { id },
+        data: { videoSource: 'MUX', videoRef: asset.playbackId, durationSec: asset.durationSec ?? undefined },
+      }),
+      prisma.videoAsset.update({
+        where: { id: videoAssetId },
+        data: { lessonId: id },
+      }),
+    ])
+
+    return updatedLesson
+  })
+
   app.post('/lessons/:lessonId/attachments', {
     preHandler: [requireAuth, requireRole('admin', 'instrutor')],
     schema: {

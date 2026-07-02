@@ -87,15 +87,17 @@ export default async function courseRoutes(app: FastifyInstance) {
           description: { type: 'string' },
           coverImage: { type: 'string' },
           slug: { type: 'string' },
+          instructorId: { type: 'string' },
         },
       },
     },
   }, async (request, reply) => {
-    const { title, description, coverImage, slug } = request.body as {
+    const { title, description, coverImage, slug, instructorId } = request.body as {
       title: string
       description?: string
       coverImage?: string
       slug?: string
+      instructorId?: string
     }
 
     const resolvedSlug = slug ?? title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
@@ -107,8 +109,9 @@ export default async function courseRoutes(app: FastifyInstance) {
           description,
           coverImage,
           slug: resolvedSlug,
-          instructorId: request.session.user.id,
+          instructorId: instructorId ?? request.session.user.id,
         },
+        include: { instructor: { select: { id: true, name: true } } },
       })
       return reply.status(201).send(course)
     } catch (error) {
@@ -137,23 +140,26 @@ export default async function courseRoutes(app: FastifyInstance) {
           coverImage: { type: 'string' },
           slug: { type: 'string' },
           status: { type: 'string', enum: ['DRAFT', 'PUBLISHED'] },
+          instructorId: { type: 'string' },
         },
       },
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string }
-    const { title, description, coverImage, slug, status } = request.body as {
+    const { title, description, coverImage, slug, status, instructorId } = request.body as {
       title?: string
       description?: string
       coverImage?: string
       slug?: string
       status?: CourseStatus
+      instructorId?: string
     }
 
     try {
       const course = await prisma.course.update({
         where: { id },
-        data: { title, description, coverImage, slug, status },
+        data: { title, description, coverImage, slug, status, instructorId },
+        include: { instructor: { select: { id: true, name: true } } },
       })
       return course
     } catch (error) {

@@ -11,10 +11,18 @@ import { Spinner } from '@/components/ui/spinner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { VideoUploader } from '@/app/(admin)/_components/video-uploader'
+import VideoLibraryPicker from './video-library-picker'
 
 interface LessonEditorProps {
   lesson: LessonSummary
   onChange: () => void | Promise<void>
+}
+
+const formatDuration = (sec: number | null) => {
+  if (!sec) return null
+  const m = Math.floor(sec / 60)
+  const s = Math.round(sec % 60)
+  return `${m}:${s.toString().padStart(2, '0')}`
 }
 
 const VIDEO_SOURCES: { value: VideoSource; label: string }[] = [
@@ -121,6 +129,20 @@ const LessonEditor = ({ lesson, onChange }: LessonEditorProps) => {
     }
   }
 
+  const handleVideoLinked = async () => {
+    setSaveError(null)
+    try {
+      const data = await apiFetch<Lesson>(`/lessons/${lesson.id}`)
+      setFull(data)
+      setVideoSource(data.videoSource)
+      setVideoRef(data.videoRef ?? '')
+      setDurationSec(data.durationSec?.toString() ?? '')
+    } catch {
+      setSaveError('Vídeo vinculado, mas não foi possível recarregar a aula.')
+    }
+    await onChange()
+  }
+
   const handleAddAttachment = async (e: React.FormEvent) => {
     e.preventDefault()
     setAttError(null)
@@ -154,9 +176,17 @@ const LessonEditor = ({ lesson, onChange }: LessonEditorProps) => {
   }
 
   return (
-    <div className="flex items-center justify-between rounded-lg border border-slate-200 px-4 py-3">
-      <span className="text-sm text-brand-navy">{lesson.title}</span>
-      <Button size="sm" variant="ghost" onClick={openDialog}>
+    <div className="flex items-center gap-3 rounded-xl border border-hairline bg-white px-3 py-2.5 transition-colors hover:border-brand-navy/20">
+      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-navy-50 text-xs font-semibold text-brand-navy">
+        {lesson.order}
+      </span>
+      <span className="min-w-0 flex-1 truncate text-sm text-brand-navy">{lesson.title}</span>
+      {formatDuration(lesson.durationSec) && (
+        <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+          {formatDuration(lesson.durationSec)}
+        </span>
+      )}
+      <Button size="sm" variant="ghost" onClick={openDialog} className="shrink-0">
         Editar
       </Button>
 
@@ -233,11 +263,14 @@ const LessonEditor = ({ lesson, onChange }: LessonEditorProps) => {
               )}
 
               {videoSource === 'MUX' && (
-                <div className="flex flex-col gap-2 rounded-lg border border-slate-200 p-4">
-                  <Label>Enviar vídeo</Label>
-                  <VideoUploader lessonId={lesson.id} />
+                <div className="flex flex-col gap-3 rounded-card border border-hairline bg-brand-navy-50/40 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <Label className="mb-0">Vídeo Mux</Label>
+                    <VideoLibraryPicker lessonId={lesson.id} onLinked={handleVideoLinked} />
+                  </div>
+                  <VideoUploader lessonId={lesson.id} onSuccess={() => { void handleVideoLinked() }} />
                   <p className="text-xs text-muted-foreground">
-                    Ao terminar o processamento, o vídeo é vinculado automaticamente a esta aula.
+                    Envie um novo arquivo ou escolha um vídeo já processado na biblioteca. Ao concluir, o vídeo é vinculado a esta aula.
                   </p>
                 </div>
               )}
@@ -279,7 +312,7 @@ const LessonEditor = ({ lesson, onChange }: LessonEditorProps) => {
                 </div>
               </div>
 
-              <hr className="border-slate-200" />
+              <hr className="border-hairline" />
 
               <div>
                 <h3 className="mb-3 font-display text-sm font-semibold text-brand-navy">Anexos</h3>
@@ -308,7 +341,7 @@ const LessonEditor = ({ lesson, onChange }: LessonEditorProps) => {
                     ))}
                   </ul>
                 ) : (
-                  <p className="mb-4 text-sm text-slate-500">Nenhum anexo ainda.</p>
+                  <p className="mb-4 text-sm text-muted-foreground">Nenhum anexo ainda.</p>
                 )}
                 <form onSubmit={handleAddAttachment} className="flex flex-col gap-2">
                   <div className="flex gap-2">

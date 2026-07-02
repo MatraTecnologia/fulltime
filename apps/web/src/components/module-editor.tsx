@@ -1,14 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { Plus } from 'lucide-react'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { ModuleWithLessons } from '@/lib/types'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
 import LessonEditor from './lesson-editor'
 
 interface ModuleEditorProps {
@@ -23,7 +20,7 @@ const ModuleEditor = ({ module, onChange }: ModuleEditorProps) => {
   const [deleting, setDeleting] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
 
-  const [addOpen, setAddOpen] = useState(false)
+  const [adding, setAdding] = useState(false)
   const [lessonTitle, setLessonTitle] = useState('')
   const [addLoading, setAddLoading] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
@@ -64,8 +61,8 @@ const ModuleEditor = ({ module, onChange }: ModuleEditorProps) => {
     setEditError(null)
   }
 
-  const handleCloseAdd = () => {
-    setAddOpen(false)
+  const handleCancelAdd = () => {
+    setAdding(false)
     setLessonTitle('')
     setAddError(null)
   }
@@ -80,7 +77,8 @@ const ModuleEditor = ({ module, onChange }: ModuleEditorProps) => {
         body: JSON.stringify({ title: lessonTitle }),
       })
       await onChange()
-      handleCloseAdd()
+      setLessonTitle('')
+      setAdding(false)
     } catch (err) {
       setAddError(err instanceof ApiError ? err.message : 'Não foi possível criar a aula.')
     } finally {
@@ -89,100 +87,107 @@ const ModuleEditor = ({ module, onChange }: ModuleEditorProps) => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between gap-4">
-          {editing ? (
-            <form onSubmit={handleSave} className="flex flex-1 items-center gap-2">
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-                autoFocus
-                className="flex-1"
-              />
-              <Button type="submit" size="sm" disabled={saving}>
-                {saving ? 'Salvando...' : 'Salvar'}
-              </Button>
-              <Button type="button" size="sm" variant="outline" onClick={handleCancelEdit}>
-                Cancelar
-              </Button>
-            </form>
-          ) : (
-            <>
-              <CardTitle>{module.title}</CardTitle>
-              <div className="flex shrink-0 items-center gap-2">
-                <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>
-                  Renomear
-                </Button>
-                <Button size="sm" variant="outline" onClick={handleDelete} disabled={deleting}>
-                  {deleting ? 'Excluindo...' : 'Excluir'}
-                </Button>
-              </div>
-            </>
-          )}
-        </div>
-        {editError && (
-          <p className="mt-2 text-sm text-destructive" role="alert">
-            {editError}
-          </p>
-        )}
-      </CardHeader>
-
-      <CardContent>
-        {module.lessons.length === 0 ? (
-          <Empty className="py-8">
-            <EmptyHeader>
-              <EmptyTitle>Nenhuma aula ainda</EmptyTitle>
-            </EmptyHeader>
-          </Empty>
+    <div className="rounded-card bg-white p-5 shadow-card ring-1 ring-brand-navy/[0.06]">
+      <div className="flex items-center justify-between gap-4">
+        {editing ? (
+          <form onSubmit={handleSave} className="flex flex-1 items-center gap-2">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              autoFocus
+              className="flex-1"
+            />
+            <Button type="submit" size="sm" disabled={saving}>
+              {saving ? 'Salvando...' : 'Salvar'}
+            </Button>
+            <Button type="button" size="sm" variant="outline" onClick={handleCancelEdit}>
+              Cancelar
+            </Button>
+          </form>
         ) : (
-          <div className="mb-4 flex flex-col gap-2">
+          <>
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-navy-50 text-xs font-bold text-brand-navy">
+                {module.order}
+              </span>
+              <div className="min-w-0">
+                <h3 className="truncate font-display font-bold text-brand-navy">{module.title}</h3>
+                <p className="text-xs text-muted-foreground">
+                  {module.lessons.length} aula{module.lessons.length !== 1 ? 's' : ''}
+                </p>
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center gap-1">
+              <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>
+                Renomear
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="text-muted-foreground hover:text-destructive"
+              >
+                {deleting ? 'Excluindo...' : 'Excluir'}
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+
+      {editError && (
+        <p className="mt-2 text-sm text-destructive" role="alert">
+          {editError}
+        </p>
+      )}
+
+      <div className="mt-4 border-t border-hairline pt-4">
+        {module.lessons.length > 0 && (
+          <div className="mb-3 flex flex-col gap-2">
             {module.lessons.map((lesson) => (
               <LessonEditor key={lesson.id} lesson={lesson} onChange={onChange} />
             ))}
           </div>
         )}
-        <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
-          Nova aula
-        </Button>
-      </CardContent>
 
-      <Dialog open={addOpen} onOpenChange={(o) => { if (!o) handleCloseAdd() }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Nova aula</DialogTitle>
-            <DialogDescription>Preencha o título para criar uma nova aula neste módulo.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleAddLesson} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="new-lesson-title">Título</Label>
+        {adding ? (
+          <form onSubmit={handleAddLesson} className="flex flex-col gap-2">
+            <div className="flex gap-2">
               <Input
-                id="new-lesson-title"
                 value={lessonTitle}
                 onChange={(e) => setLessonTitle(e.target.value)}
                 required
-                placeholder="Título da aula"
                 autoFocus
+                placeholder="Título da nova aula"
+                className="flex-1"
               />
+              <Button type="submit" size="sm" disabled={addLoading}>
+                {addLoading ? 'Criando...' : 'Adicionar'}
+              </Button>
+              <Button type="button" size="sm" variant="outline" onClick={handleCancelAdd} disabled={addLoading}>
+                Cancelar
+              </Button>
             </div>
             {addError && (
               <p className="text-sm text-destructive" role="alert">
                 {addError}
               </p>
             )}
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={handleCloseAdd}>
-                Cancelar
-              </Button>
-              <Button type="submit" size="sm" disabled={addLoading}>
-                {addLoading ? 'Criando...' : 'Criar aula'}
-              </Button>
-            </div>
           </form>
-        </DialogContent>
-      </Dialog>
-    </Card>
+        ) : (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setAdding(true)}
+            className="w-full border-dashed text-muted-foreground hover:text-brand-navy"
+          >
+            <Plus className="size-4" aria-hidden />
+            Nova aula
+          </Button>
+        )}
+      </div>
+    </div>
   )
 }
 

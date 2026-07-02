@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, BookOpen, ExternalLink, Trash2 } from 'lucide-react'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { CourseDetail } from '@/lib/types'
 import { Button } from '@/components/ui/button'
@@ -119,7 +119,7 @@ const CursoDetalhePage = () => {
   }
 
   return (
-    <div className="mx-auto max-w-xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6">
       <Link
         href="/admin/cursos"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-brand-navy"
@@ -128,35 +128,56 @@ const CursoDetalhePage = () => {
         Cursos
       </Link>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <h1 className="font-display text-2xl font-extrabold tracking-tight text-brand-navy sm:text-3xl">
-            {course!.title}
-          </h1>
-          <Badge className={STATUS_BADGE[course!.status]}>{STATUS_LABELS[course!.status]}</Badge>
-        </div>
-        <div className="flex items-center gap-2">
-          {course!.status === 'DRAFT' && (
+      <div className="rounded-card bg-white p-6 shadow-card ring-1 ring-brand-navy/[0.06]">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 space-y-2">
+            <Badge className={STATUS_BADGE[course!.status]}>{STATUS_LABELS[course!.status]}</Badge>
+            <h1 className="font-display text-2xl font-extrabold tracking-tight text-brand-navy sm:text-3xl">
+              {course!.title}
+            </h1>
+            <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <BookOpen className="size-4 shrink-0" />
+              {course!.modules.length} módulo{course!.modules.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            {course!.status === 'PUBLISHED' && (
+              <Button size="sm" variant="outline" asChild>
+                <Link href={`/catalogo/${course!.slug}`} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="size-4" />
+                  Visualizar
+                </Link>
+              </Button>
+            )}
+            {course!.status === 'DRAFT' && (
+              <Button
+                size="sm"
+                className="bg-accent text-accent-foreground hover:bg-accent/90"
+                onClick={handlePublish}
+                disabled={publishing}
+              >
+                {publishing ? 'Publicando...' : 'Publicar'}
+              </Button>
+            )}
             <Button
               size="sm"
-              className="bg-accent text-accent-foreground hover:bg-accent/90"
-              onClick={handlePublish}
-              disabled={publishing}
+              variant="outline"
+              className="text-muted-foreground hover:border-destructive/40 hover:text-destructive"
+              onClick={handleDelete}
+              disabled={deleting}
             >
-              {publishing ? 'Publicando...' : 'Publicar'}
+              <Trash2 className="size-4" />
+              {deleting ? 'Excluindo...' : 'Excluir'}
             </Button>
-          )}
-          <Button size="sm" variant="outline" onClick={handleDelete} disabled={deleting}>
-            {deleting ? 'Excluindo...' : 'Excluir'}
-          </Button>
+          </div>
         </div>
-      </div>
 
-      {actionError && (
-        <p className="mb-4 text-sm text-destructive" role="alert">
-          {actionError}
-        </p>
-      )}
+        {actionError && (
+          <p className="mt-4 text-sm text-destructive" role="alert">
+            {actionError}
+          </p>
+        )}
+      </div>
 
       <CourseForm initial={course!} onSaved={handleSaved} />
 
