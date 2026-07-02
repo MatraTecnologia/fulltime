@@ -84,7 +84,8 @@ export const LessonPlayer = ({ lessonId, enrollmentId, completed, onCompleted }:
         url={lesson.video.embedUrl}
         title={lesson.title}
         source={lesson.videoSource}
-        playbackId={lesson.videoRef}
+        playbackId={lesson.video.playbackId}
+        token={lesson.video.token}
       />
 
       {lesson.content && (

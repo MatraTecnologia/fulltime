@@ -17,6 +17,7 @@
     "@fastify/cors": "^11.2.0",
     "@fastify/static": "^9.0.0",
     "@fastify/swagger": "^9.7.0",
+    "@mux/mux-node": "^14.1.1",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@scalar/fastify-api-reference": "^1.44.20",

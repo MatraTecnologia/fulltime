@@ -8,14 +8,16 @@ interface VideoEmbedProps {
   title: string
   source?: VideoSource
   playbackId?: string | null
+  token?: string | null
 }
 
-export const VideoEmbed = ({ url, title, source, playbackId }: VideoEmbedProps) => {
+export const VideoEmbed = ({ url, title, source, playbackId, token }: VideoEmbedProps) => {
   if (source === 'MUX' && playbackId) {
     return (
       <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
         <MuxPlayer
           playbackId={playbackId}
+          tokens={token ? { playback: token } : undefined}
           metadata={{ video_title: title }}
           accentColor="#003060"
           className="h-full w-full"

@@ -27,8 +27,18 @@ export type Lesson = {
   id: string; moduleId: string; title: string; order: number; content: string | null
   videoSource: VideoSource; videoRef: string | null; durationSec: number | null
   attachments: Attachment[]
-  video: { source: VideoSource; embedUrl: string | null }
+  video: { source: VideoSource; embedUrl: string | null; playbackId: string | null; token: string | null }
 }
+
+export type VideoAssetStatus = 'WAITING_UPLOAD' | 'UPLOADING' | 'PROCESSING' | 'READY' | 'ERRORED'
+export type VideoAsset = {
+  id: string; uploadId: string | null; assetId: string | null; playbackId: string | null
+  status: VideoAssetStatus; filename: string | null; durationSec: number | null
+  error: string | null; lessonId: string | null; createdById: string
+  createdAt: string; updatedAt: string
+  lesson: { id: string; title: string } | null
+}
+export type CreateUploadResponse = { id: string; uploadUrl: string }
 
 export type Enrollment = {
   id: string; userId: string; courseId: string; status: EnrollmentStatus; enrolledAt: string

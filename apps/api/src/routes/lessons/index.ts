@@ -3,6 +3,7 @@ import { Prisma, VideoSource } from '../../generated/prisma/client.js'
 import { prisma } from '../../lib/prisma.js'
 import { requireAuth, requireRole } from '../../lib/session.js'
 import { resolveVideo } from '../../lib/video.js'
+import { signPlaybackId } from '../../lib/mux.js'
 
 export default async function lessonRoutes(app: FastifyInstance) {
   app.post('/modules/:moduleId/lessons', {
@@ -82,7 +83,10 @@ export default async function lessonRoutes(app: FastifyInstance) {
 
     if (!lesson) return reply.status(404).send({ error: 'Aula não encontrada.' })
 
-    return { ...lesson, video: resolveVideo(lesson.videoSource, lesson.videoRef) }
+    const video = resolveVideo(lesson.videoSource, lesson.videoRef)
+    if (video.playbackId) video.token = await signPlaybackId(video.playbackId)
+
+    return { ...lesson, video }
   })
 
   app.patch('/lessons/:id', {

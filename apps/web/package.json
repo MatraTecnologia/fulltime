@@ -14,6 +14,7 @@
     "@fulltime/ui": "workspace:*",
     "@hookform/resolvers": "^5.4.0",
     "@mux/mux-player-react": "^3.13.0",
+    "@mux/mux-uploader-react": "^1.5.0",
     "@shadcn/react": "^0.1.0",
     "axios": "^1.18.1",
     "better-auth": "^1.6.22",
