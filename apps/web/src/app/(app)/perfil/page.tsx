@@ -6,8 +6,8 @@ import { Mail, Shield } from 'lucide-react'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { User } from '@/lib/types'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Card, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
+import { PageHeader } from '../_components/page-header'
 
 const ROLE_LABEL: Record<string, string> = {
   admin: 'Administrador',
@@ -35,9 +35,7 @@ const PerfilPage = () => {
         if (e instanceof ApiError && e.status === 401) {
           router.replace('/login')
         } else {
-          setError(
-            e instanceof ApiError ? e.message : 'Não foi possível carregar o perfil.',
-          )
+          setError(e instanceof ApiError ? e.message : 'Não foi possível carregar o perfil.')
         }
       })
   }, [router])
@@ -45,7 +43,7 @@ const PerfilPage = () => {
   if (!user && !error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Spinner className="size-7 text-primary" />
+        <Spinner className="size-7 text-brand-navy" />
       </div>
     )
   }
@@ -53,59 +51,56 @@ const PerfilPage = () => {
   if (error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-destructive" role="alert">
-          {error}
-        </p>
+        <p className="text-sm text-destructive" role="alert">{error}</p>
       </div>
     )
   }
 
   return (
-    <div className="max-w-lg space-y-6">
-      <h1 className="text-2xl font-bold text-foreground">Meu Perfil</h1>
-      <Card>
-        <CardContent className="p-0">
-          <div className="flex flex-col items-center gap-4 rounded-t-xl bg-primary p-8 sm:flex-row sm:items-center">
-            <Avatar className="size-20 ring-2 ring-accent ring-offset-2 ring-offset-primary">
-              {user!.image && (
-                <AvatarImage src={user!.image} alt={user!.name} />
-              )}
-              <AvatarFallback className="bg-white/10 text-primary-foreground text-2xl font-bold">
-                {getInitials(user!.name)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h2 className="text-xl font-semibold text-primary-foreground">{user!.name}</h2>
-              <p className="mt-0.5 text-sm text-primary-foreground/70">
-                {ROLE_LABEL[user!.role] ?? user!.role}
-              </p>
-            </div>
-          </div>
+    <div className="mx-auto max-w-2xl space-y-8">
+      <PageHeader title="Meu perfil" description="Seus dados de acesso na plataforma." />
 
-          <div className="space-y-4 p-6">
-            <div className="flex items-center gap-3 text-sm">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted">
-                <Mail className="size-4 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">E-mail</p>
-                <p className="font-medium text-foreground">{user!.email}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 text-sm">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted">
-                <Shield className="size-4 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Função</p>
-                <p className="font-medium text-foreground">
-                  {ROLE_LABEL[user!.role] ?? user!.role}
-                </p>
-              </div>
+      <div className="overflow-hidden rounded-card bg-white shadow-card ring-1 ring-brand-navy/[0.06]">
+        <div className="flex flex-col items-center gap-4 bg-brand-navy p-8 sm:flex-row">
+          <Avatar className="size-20 ring-2 ring-brand-amber ring-offset-2 ring-offset-brand-navy">
+            {user!.image && <AvatarImage src={user!.image} alt={user!.name} />}
+            <AvatarFallback className="bg-white/10 font-display text-2xl font-bold text-white">
+              {getInitials(user!.name)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="text-center sm:text-left">
+            <h2 className="font-display text-xl font-extrabold tracking-tight text-white">
+              {user!.name}
+            </h2>
+            <p className="mt-0.5 text-sm text-white/60">
+              {ROLE_LABEL[user!.role] ?? user!.role}
+            </p>
+          </div>
+        </div>
+
+        <dl className="divide-y divide-hairline p-2">
+          <div className="flex items-center gap-3 p-4">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-blue/15 text-brand-blue-strong">
+              <Mail className="size-4" />
+            </span>
+            <div>
+              <dt className="text-xs text-muted-foreground">E-mail</dt>
+              <dd className="font-medium text-brand-navy">{user!.email}</dd>
             </div>
           </div>
-        </CardContent>
-      </Card>
+          <div className="flex items-center gap-3 p-4">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-purple/15 text-brand-purple-strong">
+              <Shield className="size-4" />
+            </span>
+            <div>
+              <dt className="text-xs text-muted-foreground">Função</dt>
+              <dd className="font-medium text-brand-navy">
+                {ROLE_LABEL[user!.role] ?? user!.role}
+              </dd>
+            </div>
+          </div>
+        </dl>
+      </div>
     </div>
   )
 }

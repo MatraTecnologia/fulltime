@@ -2,27 +2,24 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { ArrowLeft, CalendarDays, Plus, Trash2 } from 'lucide-react'
 import { apiFetch, ApiError } from '@/lib/api'
-import type { ChildDetail, ChildRecord, ChildRecordType } from '@/lib/types'
-import { Badge } from '@/components/ui/badge'
+import type { ChildDetail, ChildRecord } from '@/lib/types'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
+import { Empty, EmptyContent, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { Spinner } from '@/components/ui/spinner'
 import RecordForm from '@/components/record-form'
+import { RecordList } from '../../_components/record-list'
+import { ShareLinks } from '../../_components/share-links'
 
-const TYPE_LABELS: Record<ChildRecordType, string> = {
-  EVOLUCAO: 'Evolução',
-  SESSAO: 'Sessão',
-  PEI: 'PEI',
-}
-
-const TYPE_CLASSES: Record<ChildRecordType, string> = {
-  EVOLUCAO: 'bg-blue-100 text-blue-700 border-blue-200',
-  SESSAO: 'bg-green-100 text-green-700 border-green-200',
-  PEI: 'bg-purple-100 text-purple-700 border-purple-200',
-}
+const getInitials = (name: string) =>
+  name
+    .split(' ')
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
 
 const formatDate = (value: string | null) => {
   if (!value) return ''
@@ -54,7 +51,7 @@ const CriancaDetalhePage = () => {
   }, [id, router])
 
   const handleRecordCreated = (record: ChildRecord) => {
-    setChild((prev) => prev ? { ...prev, records: [record, ...prev.records] } : prev)
+    setChild((prev) => (prev ? { ...prev, records: [record, ...prev.records] } : prev))
     setRecordDialogOpen(false)
   }
 
@@ -62,7 +59,9 @@ const CriancaDetalhePage = () => {
     if (!window.confirm('Excluir este registro?')) return
     try {
       await apiFetch(`/records/${recordId}`, { method: 'DELETE' })
-      setChild((prev) => prev ? { ...prev, records: prev.records.filter((r) => r.id !== recordId) } : prev)
+      setChild((prev) =>
+        prev ? { ...prev, records: prev.records.filter((r) => r.id !== recordId) } : prev,
+      )
     } catch (e) {
       setActionError(e instanceof ApiError ? e.message : 'Não foi possível excluir o registro.')
     }
@@ -80,7 +79,7 @@ const CriancaDetalhePage = () => {
 
   if (notFound) {
     return (
-      <Empty>
+      <Empty className="rounded-card border-none bg-white shadow-card">
         <EmptyHeader>
           <EmptyTitle>Criança não encontrada</EmptyTitle>
           <EmptyDescription>Esta criança não existe ou você não tem acesso.</EmptyDescription>
@@ -97,7 +96,7 @@ const CriancaDetalhePage = () => {
   if (!child && !error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Spinner className="size-8" />
+        <Spinner className="size-8 text-brand-navy" />
       </div>
     )
   }
@@ -111,67 +110,82 @@ const CriancaDetalhePage = () => {
   }
 
   return (
-    <div>
-      {actionError && <p role="alert" className="mb-4 text-sm text-destructive">{actionError}</p>}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-brand-navy">{child!.name}</h1>
-          {child!.birthDate && (
-            <p className="mt-1 text-sm text-brand-navy/60">
-              Nascimento: {formatDate(child!.birthDate)}
-            </p>
-          )}
-          {child!.diagnosis && (
-            <p className="mt-2 text-sm text-brand-navy/70">{child!.diagnosis}</p>
-          )}
+    <div className="mx-auto max-w-4xl space-y-8">
+      <button
+        onClick={() => router.push('/criancas')}
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
+      >
+        <ArrowLeft className="size-4" />
+        Crianças
+      </button>
+
+      {actionError && (
+        <p role="alert" className="text-sm text-destructive">{actionError}</p>
+      )}
+
+      <div className="rounded-card bg-white p-6 shadow-card ring-1 ring-brand-navy/[0.06] sm:p-8">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-4">
+            <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand-blue/15 font-display text-lg font-bold text-brand-blue-strong">
+              {getInitials(child!.name)}
+            </span>
+            <div className="min-w-0">
+              <h1 className="font-display text-2xl font-extrabold tracking-tight text-brand-navy">
+                {child!.name}
+              </h1>
+              {child!.birthDate && (
+                <p className="mt-0.5 flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <CalendarDays className="size-3.5" />
+                  {formatDate(child!.birthDate)}
+                </p>
+              )}
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDeleteChild}
+            className="text-destructive hover:text-destructive"
+          >
+            <Trash2 className="size-4" />
+            Excluir
+          </Button>
         </div>
-        <Button variant="outline" size="sm" onClick={handleDeleteChild}>
-          Excluir criança
-        </Button>
+        {child!.diagnosis && (
+          <p className="mt-4 border-t border-hairline pt-4 text-sm leading-relaxed text-brand-navy/80">
+            {child!.diagnosis}
+          </p>
+        )}
       </div>
 
-      <div className="mt-8">
+      <ShareLinks childId={id} />
+
+      <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-lg font-bold text-brand-navy">Registros</h2>
-          <Button size="sm" onClick={() => setRecordDialogOpen(true)}>Novo registro</Button>
+          <h2 className="font-display text-lg font-bold tracking-tight text-brand-navy">
+            Registros
+          </h2>
+          <Button
+            size="sm"
+            onClick={() => setRecordDialogOpen(true)}
+            className="bg-brand-amber font-semibold text-brand-navy hover:bg-brand-amber/90"
+          >
+            <Plus className="size-4" />
+            Novo registro
+          </Button>
         </div>
 
         {child!.records.length === 0 ? (
-          <Empty className="mt-4">
+          <Empty className="rounded-card border-none bg-white shadow-card">
             <EmptyHeader>
               <EmptyTitle>Nenhum registro</EmptyTitle>
               <EmptyDescription>Adicione o primeiro registro desta criança.</EmptyDescription>
             </EmptyHeader>
           </Empty>
         ) : (
-          <div className="mt-4 flex flex-col gap-3">
-            {child!.records.map((record) => (
-              <Card key={record.id}>
-                <CardContent>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className={TYPE_CLASSES[record.type]}>
-                        {TYPE_LABELS[record.type]}
-                      </Badge>
-                      <span className="text-xs text-brand-navy/50">
-                        {formatDate(record.date)}
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => handleDeleteRecord(record.id)}
-                      className="text-xs text-red-400 hover:text-red-600"
-                      aria-label="Excluir registro"
-                    >
-                      Excluir
-                    </button>
-                  </div>
-                  <p className="mt-2 text-sm text-brand-navy">{record.content}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <RecordList records={child!.records} onDelete={handleDeleteRecord} />
         )}
-      </div>
+      </section>
 
       <Dialog open={recordDialogOpen} onOpenChange={(o) => { if (!o) setRecordDialogOpen(false) }}>
         <DialogContent aria-describedby={undefined}>

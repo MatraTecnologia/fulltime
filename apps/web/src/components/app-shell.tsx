@@ -4,7 +4,16 @@ import { useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Award, Baby, BookOpen, LayoutDashboard, Shield, User } from 'lucide-react'
+import {
+  Award,
+  Baby,
+  BookOpen,
+  GraduationCap,
+  LayoutDashboard,
+  PieChart,
+  User,
+  Users,
+} from 'lucide-react'
 import { useSession } from '@/lib/auth-client'
 import type { Role } from '@/lib/types'
 import { Spinner } from '@/components/ui/spinner'
@@ -13,6 +22,7 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
@@ -23,7 +33,9 @@ import {
 } from '@/components/ui/sidebar'
 import { UserMenu } from './user-menu'
 
-const NAV_LINKS = [
+type NavLink = { href: string; label: string; Icon: typeof LayoutDashboard; roles?: Role[] }
+
+const NAV_LINKS: NavLink[] = [
   { href: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
   { href: '/catalogo', label: 'Cursos', Icon: BookOpen },
   { href: '/certificados', label: 'Certificados', Icon: Award },
@@ -31,11 +43,19 @@ const NAV_LINKS = [
   { href: '/perfil', label: 'Perfil', Icon: User },
 ]
 
-const ADMIN_LINK = { href: '/admin/cursos', label: 'Admin', Icon: Shield }
-const ADMIN_ROLES: Role[] = ['admin', 'instrutor']
+const ADMIN_LINKS: NavLink[] = [
+  { href: '/admin', label: 'Visão geral', Icon: PieChart, roles: ['admin'] },
+  { href: '/admin/cursos', label: 'Cursos', Icon: GraduationCap, roles: ['admin', 'instrutor'] },
+  { href: '/admin/usuarios', label: 'Usuários', Icon: Users, roles: ['admin'] },
+]
 
 const ACTIVE_CLS =
-  'data-[active=true]:bg-sidebar-primary data-[active=true]:text-sidebar-primary-foreground data-[active=true]:hover:bg-sidebar-primary data-[active=true]:hover:text-sidebar-primary-foreground'
+  'font-semibold data-[active=true]:bg-sidebar-primary data-[active=true]:text-sidebar-primary-foreground data-[active=true]:shadow-sm data-[active=true]:hover:bg-sidebar-primary data-[active=true]:hover:text-sidebar-primary-foreground focus-visible:ring-2 focus-visible:ring-brand-blue'
+
+const isActive = (pathname: string, href: string) =>
+  href === '/admin'
+    ? pathname === '/admin'
+    : pathname === href || pathname.startsWith(`${href}/`)
 
 export const AppShell = ({ children }: { children: React.ReactNode }) => {
   const { data, isPending } = useSession()
@@ -55,70 +75,64 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
   }
 
   const role = (data.user as { role?: Role } | null)?.role
+  const adminLinks = role ? ADMIN_LINKS.filter((l) => !l.roles || l.roles.includes(role)) : []
+
+  const renderLink = ({ href, label, Icon }: NavLink) => {
+    const active = isActive(pathname, href)
+    return (
+      <SidebarMenuItem key={href}>
+        <SidebarMenuButton asChild isActive={active} tooltip={label} className={ACTIVE_CLS}>
+          <Link href={href} aria-current={active ? 'page' : undefined}>
+            <Icon />
+            <span>{label}</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    )
+  }
 
   return (
     <SidebarProvider>
-      <Sidebar variant="floating" collapsible="icon">
-        <SidebarHeader className="border-b border-sidebar-border px-3 py-3 group-data-[collapsible=icon]:px-1">
-          <Link href="/dashboard" className="flex items-center justify-center">
+      <Sidebar variant="floating" collapsible="icon" className="border-none">
+        <SidebarHeader className="border-b border-sidebar-border px-4 py-4 group-data-[collapsible=icon]:px-1">
+          <Link href="/dashboard" className="flex items-center gap-2.5 group-data-[collapsible=icon]:justify-center">
             <Image
               src="/logo.svg"
               alt="Full Time"
-              width={48}
-              height={48}
+              width={40}
+              height={40}
               priority
-              className="size-12 group-data-[collapsible=icon]:size-8"
+              className="size-10 group-data-[collapsible=icon]:size-8"
             />
+            <span className="font-display text-lg font-extrabold tracking-tight text-brand-navy group-data-[collapsible=icon]:hidden">
+              Full Time
+            </span>
           </Link>
         </SidebarHeader>
 
-        <SidebarContent className="pt-2">
+        <SidebarContent className="gap-1 px-2 pt-3">
           <SidebarGroup>
             <SidebarGroupContent>
-              <SidebarMenu>
-                {NAV_LINKS.map(({ href, label, Icon }) => {
-                  const active =
-                    pathname === href || pathname.startsWith(`${href}/`)
-                  return (
-                    <SidebarMenuItem key={href}>
-                      <SidebarMenuButton asChild isActive={active} tooltip={label} className={ACTIVE_CLS}>
-                        <Link href={href} aria-current={active ? 'page' : undefined}>
-                          <Icon />
-                          <span>{label}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  )
-                })}
-                {role && ADMIN_ROLES.includes(role) && (
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname.startsWith('/admin')}
-                      tooltip={ADMIN_LINK.label}
-                      className={ACTIVE_CLS}
-                    >
-                      <Link
-                        href={ADMIN_LINK.href}
-                        aria-current={
-                          pathname.startsWith('/admin') ? 'page' : undefined
-                        }
-                      >
-                        <ADMIN_LINK.Icon />
-                        <span>{ADMIN_LINK.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )}
-              </SidebarMenu>
+              <SidebarMenu className="gap-1">{NAV_LINKS.map(renderLink)}</SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
+
+          {adminLinks.length > 0 && (
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-[0.7rem] font-semibold tracking-wider text-muted-foreground uppercase">
+                Administração
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu className="gap-1">{adminLinks.map(renderLink)}</SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
         </SidebarContent>
       </Sidebar>
 
       <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-background px-4">
-          <SidebarTrigger className="text-muted-foreground" />
+        <header className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-white/80 px-6 backdrop-blur-sm">
+          <SidebarTrigger className="text-muted-foreground hover:text-brand-navy" />
           <div className="ml-auto">
             <UserMenu
               user={
@@ -132,7 +146,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
             />
           </div>
         </header>
-        <div className="flex-1 p-6">{children}</div>
+        <div className="flex-1 p-6 lg:p-8">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   )

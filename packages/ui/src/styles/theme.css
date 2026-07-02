@@ -1,23 +1,48 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-navy: #003060;
-  --color-brand-navy-50: #e6edf3;
-  --color-brand-navy-100: #c2d2e0;
-  --color-brand-navy-600: #002b56;
-  --color-brand-navy-900: #001a33;
+  --color-white: #fdfcff;
+  --color-surface: #f5f8fb;
 
-  --color-brand-amber: #f5b500;
-  --color-brand-green: #6cb23a;
-  --color-brand-blue: #119bd8;
-  --color-brand-purple: #834ba8;
+  --color-brand-navy: #032e5b;
+  --color-brand-navy-50: #eaf0f6;
+  --color-brand-navy-100: #cbd8e6;
+  --color-brand-navy-600: #022647;
+  --color-brand-navy-900: #01182f;
 
-  --color-surface: #f7f9fb;
+  --color-brand-amber: #fdb509;
+  --color-brand-amber-strong: #8a5a00;
+
+  --color-brand-green: #6ba93c;
+  --color-brand-green-strong: #3c6e1c;
+
+  --color-brand-blue: #0d92e1;
+  --color-brand-blue-strong: #0a6296;
+
+  --color-brand-purple: #8649a5;
+  --color-brand-purple-strong: #6e3789;
+
+  --color-muted-foreground: #516375;
+  --color-hairline: #e2e9f0;
 
   --font-display: "Nunito", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 0.75rem;
+  --text-display-lg: 2.5rem;
+  --text-display-lg--line-height: 1.1;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 800;
+  --text-display: 2rem;
+  --text-display--line-height: 1.15;
+  --text-display--letter-spacing: -0.015em;
+  --text-display--font-weight: 800;
+
+  --radius-card: 1rem;
+  --radius-pill: 9999px;
+
+  --shadow-soft: 0 1px 2px rgba(3, 46, 91, 0.04), 0 1px 3px rgba(3, 46, 91, 0.06);
+  --shadow-card: 0 1px 2px rgba(3, 46, 91, 0.04), 0 10px 30px -12px rgba(3, 46, 91, 0.14);
+  --shadow-lifted: 0 2px 4px rgba(3, 46, 91, 0.05), 0 24px 48px -16px rgba(3, 46, 91, 0.2);
 }
 
 @media (prefers-reduced-motion: reduce) {

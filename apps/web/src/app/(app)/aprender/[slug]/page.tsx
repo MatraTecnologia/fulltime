@@ -88,7 +88,7 @@ const AprenderPage = () => {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Spinner className="size-8" />
+        <Spinner className="size-8 text-brand-navy" />
       </div>
     )
   }
@@ -96,24 +96,28 @@ const AprenderPage = () => {
   if (error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-red-600" role="alert">{error}</p>
+        <p className="text-sm text-destructive" role="alert">{error}</p>
       </div>
     )
   }
 
   if (!enrollmentId) {
     return (
-      <Empty className="min-h-[60vh]">
+      <Empty className="min-h-[60vh] rounded-card border-none bg-white shadow-card">
         <EmptyHeader>
           <EmptyTitle>Você não está matriculado neste curso</EmptyTitle>
           {courseDetail?.title && <EmptyDescription>{courseDetail.title}</EmptyDescription>}
         </EmptyHeader>
         <EmptyContent>
           <div className="flex flex-col items-center gap-2">
-            <Button onClick={handleEnroll} disabled={enrolling}>
+            <Button
+              onClick={handleEnroll}
+              disabled={enrolling}
+              className="bg-brand-amber font-semibold text-brand-navy hover:bg-brand-amber/90"
+            >
               {enrolling ? 'Matriculando…' : 'Matricular-se gratuitamente'}
             </Button>
-            {enrollError && <p className="text-sm text-red-600" role="alert">{enrollError}</p>}
+            {enrollError && <p className="text-sm text-destructive" role="alert">{enrollError}</p>}
           </div>
         </EmptyContent>
       </Empty>
@@ -122,7 +126,7 @@ const AprenderPage = () => {
 
   if (!courseDetail || !activeId) {
     return (
-      <Empty className="min-h-[60vh]">
+      <Empty className="min-h-[60vh] rounded-card border-none bg-white shadow-card">
         <EmptyHeader>
           <EmptyTitle>Este curso não tem aulas ainda</EmptyTitle>
           <EmptyDescription>Volte em breve.</EmptyDescription>
@@ -132,8 +136,10 @@ const AprenderPage = () => {
   }
 
   return (
-    <div>
-      <h1 className="mb-6 font-display text-2xl font-bold text-brand-navy">{courseDetail.title}</h1>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <h1 className="font-display text-2xl font-extrabold tracking-tight text-brand-navy">
+        {courseDetail.title}
+      </h1>
       <div className="flex flex-col gap-6 lg:flex-row">
         <div className="min-w-0 flex-1">
           <LessonPlayer
@@ -143,7 +149,7 @@ const AprenderPage = () => {
             onCompleted={handleCompleted}
           />
         </div>
-        <aside className="lg:w-72 lg:shrink-0">
+        <aside className="lg:w-80 lg:shrink-0">
           <CurriculumNav
             modules={courseDetail.modules}
             completedLessonIds={completedLessonIds}

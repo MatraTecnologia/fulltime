@@ -8,20 +8,20 @@ export const Table = ({ className, ...props }: HTMLAttributes<HTMLTableElement>)
 )
 
 export const Thead = ({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) => (
-  <thead className={cn('border-b border-brand-navy/10 bg-slate-50', className)} {...props} />
+  <thead className={cn('border-b border-hairline bg-surface', className)} {...props} />
 )
 
 export const Tbody = ({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) => (
-  <tbody className={cn('divide-y divide-brand-navy/5', className)} {...props} />
+  <tbody className={cn('divide-y divide-hairline', className)} {...props} />
 )
 
 export const Tr = ({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) => (
-  <tr className={cn('transition-colors hover:bg-slate-50', className)} {...props} />
+  <tr className={cn('transition-colors hover:bg-surface', className)} {...props} />
 )
 
 export const Th = ({ className, ...props }: ThHTMLAttributes<HTMLTableCellElement>) => (
   <th
-    className={cn('px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500', className)}
+    className={cn('px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground', className)}
     {...props}
   />
 )

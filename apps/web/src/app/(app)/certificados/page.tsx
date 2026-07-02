@@ -3,14 +3,15 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Award } from 'lucide-react'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { EnrollmentListItem } from '@/lib/types'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardTitle } from '@/components/ui/card'
-import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
 import { Progress } from '@/components/ui/progress'
 import { Spinner } from '@/components/ui/spinner'
 import { CertificateCard } from '@/components/certificate-card'
+import { PageHeader } from '../_components/page-header'
 
 const isComplete = (e: EnrollmentListItem) =>
   e.totalLessons > 0 && e.progressCount === e.totalLessons
@@ -35,7 +36,7 @@ const CertificadosPage = () => {
   if (!enrollments && !error) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Spinner className="size-8" />
+        <Spinner className="size-8 text-brand-navy" />
       </div>
     )
   }
@@ -50,17 +51,26 @@ const CertificadosPage = () => {
 
   if (enrollments!.length === 0) {
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyTitle>Nenhum curso matriculado</EmptyTitle>
-          <EmptyDescription>Conclua um curso para emitir seu certificado.</EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
-          <Button asChild>
-            <Link href="/cursos">Ver cursos</Link>
-          </Button>
-        </EmptyContent>
-      </Empty>
+      <div className="mx-auto max-w-6xl space-y-8">
+        <PageHeader title="Certificados" description="Conclua um curso para emitir seu certificado." />
+        <Empty className="rounded-card border-none bg-white shadow-card">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Award />
+            </EmptyMedia>
+            <EmptyTitle>Nenhum curso matriculado</EmptyTitle>
+            <EmptyDescription>Explore o catálogo e comece a aprender.</EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button
+              asChild
+              className="bg-brand-amber font-semibold text-brand-navy hover:bg-brand-amber/90"
+            >
+              <Link href="/catalogo">Ver cursos</Link>
+            </Button>
+          </EmptyContent>
+        </Empty>
+      </div>
     )
   }
 
@@ -68,45 +78,53 @@ const CertificadosPage = () => {
   const incomplete = enrollments!.filter((e) => !isComplete(e))
 
   return (
-    <div>
-      <h1 className="font-display text-2xl font-bold text-brand-navy">Certificados</h1>
+    <div className="mx-auto max-w-6xl space-y-8">
+      <PageHeader
+        title="Certificados"
+        description={
+          completed.length > 0
+            ? `${completed.length} curso${completed.length !== 1 ? 's' : ''} concluído${completed.length !== 1 ? 's' : ''} · pronto para emitir.`
+            : 'Conclua todos os módulos de um curso para emitir seu certificado.'
+        }
+      />
 
-      {completed.length > 0 ? (
-        <section className="mt-6" aria-label="Cursos concluídos">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {completed.length > 0 && (
+        <section aria-label="Cursos concluídos">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {completed.map((item) => (
               <CertificateCard key={item.id} enrollment={item} />
             ))}
           </div>
         </section>
-      ) : (
-        <p className="mt-4 text-sm text-brand-navy/60">
-          Conclua todos os módulos de um curso para emitir seu certificado.
-        </p>
       )}
 
       {incomplete.length > 0 && (
-        <section className="mt-8" aria-label="Cursos em andamento">
-          <h2 className="font-display text-lg font-semibold text-brand-navy/70">Em andamento</h2>
-          <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <section aria-label="Cursos em andamento" className="space-y-4">
+          <h2 className="font-display text-lg font-bold tracking-tight text-brand-navy">
+            Em andamento
+          </h2>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {incomplete.map((item) => {
               const remaining = item.totalLessons - item.progressCount
               const pct = Math.round((item.progressCount / (item.totalLessons || 1)) * 100)
               return (
-                <Card key={item.id} className="opacity-70">
-                  <CardContent>
-                    <CardTitle>{item.course.title}</CardTitle>
-                    <div className="mt-3">
-                      <Progress value={pct} />
-                      <p className="mt-1 text-xs text-brand-navy/60">
-                        {item.progressCount} de {item.totalLessons} aulas concluídas
-                      </p>
-                    </div>
-                    <p className="mt-3 text-xs text-brand-navy/50">
-                      Falta{remaining !== 1 ? 'm' : ''} {remaining} aula{remaining !== 1 ? 's' : ''} para emitir o certificado
+                <article
+                  key={item.id}
+                  className="flex flex-col gap-4 rounded-card bg-white p-5 shadow-card ring-1 ring-brand-navy/[0.06]"
+                >
+                  <h3 className="font-display font-bold leading-snug text-brand-navy">
+                    {item.course.title}
+                  </h3>
+                  <div className="space-y-1.5">
+                    <Progress value={pct} className="h-1.5" />
+                    <p className="text-xs text-muted-foreground">
+                      {item.progressCount} de {item.totalLessons} aulas concluídas
                     </p>
-                  </CardContent>
-                </Card>
+                  </div>
+                  <p className="mt-auto text-xs text-muted-foreground">
+                    Falta{remaining !== 1 ? 'm' : ''} {remaining} aula{remaining !== 1 ? 's' : ''} para o certificado.
+                  </p>
+                </article>
               )
             })}
           </div>

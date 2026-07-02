@@ -14,10 +14,10 @@ export const ProgressBar = ({ value, max = 100, className }: ProgressBarProps) =
       aria-valuenow={value}
       aria-valuemin={0}
       aria-valuemax={max}
-      className={cn('h-2 w-full rounded-full bg-brand-navy/10', className)}
+      className={cn('h-2.5 w-full overflow-hidden rounded-pill bg-brand-navy/10', className)}
     >
       <div
-        className="h-full rounded-full bg-brand-amber transition-all"
+        className="h-full rounded-pill bg-gradient-to-r from-brand-amber to-brand-amber transition-all duration-500 ease-out"
         style={{ width: `${pct}%` }}
       />
     </div>

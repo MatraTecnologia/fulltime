@@ -31,6 +31,11 @@ enum ChildRecordType {
   PEI
 }
 
+enum ShareMode {
+  CRIANCA
+  RESPONSAVEL
+}
+
 model User {
   id            String       @id @default(cuid())
   name          String
@@ -38,6 +43,7 @@ model User {
   emailVerified Boolean      @default(false)
   image         String?
   role          String?      @default("profissional")
+  active        Boolean      @default(true)
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   sessions      Session[]
@@ -47,6 +53,7 @@ model User {
   enrollments   Enrollment[]
   children      Child[]      @relation("ChildOwner")
   records       ChildRecord[] @relation("RecordAuthor")
+  shareLinks    ChildShareLink[] @relation("ShareLinkCreator")
 
   @@map("users")
 }
@@ -225,9 +232,26 @@ model Child {
   updatedAt   DateTime      @updatedAt
   owner       User          @relation("ChildOwner", fields: [ownerProfId], references: [id], onDelete: Cascade)
   records     ChildRecord[]
+  shareLinks  ChildShareLink[]
 
   @@index([ownerProfId])
   @@map("children")
+}
+
+model ChildShareLink {
+  id          String    @id @default(cuid())
+  token       String    @unique
+  childId     String
+  mode        ShareMode
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdById String
+  createdAt   DateTime  @default(now())
+  child       Child     @relation(fields: [childId], references: [id], onDelete: Cascade)
+  createdBy   User      @relation("ShareLinkCreator", fields: [createdById], references: [id])
+
+  @@index([childId])
+  @@map("child_share_links")
 }
 
 model ChildRecord {

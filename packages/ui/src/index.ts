@@ -1,6 +1,8 @@
 export { cn } from './lib/cn.js'
+export { chartColors, chartColorsHex, chartPalette, buildChartConfig } from './lib/chart-theme.js'
 export { Button } from './components/button.js'
 export { Card, CardHeader, CardTitle, CardContent } from './components/card.js'
+export { StatCard } from './components/stat-card.js'
 export { Input } from './components/input.js'
 export { CategoryBadge } from './components/category-badge.js'
 export * from './components/label.js'

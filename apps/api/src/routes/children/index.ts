@@ -1,7 +1,8 @@
 import type { FastifyInstance } from 'fastify'
-import { Prisma, ChildRecordType } from '../../generated/prisma/client.js'
+import { Prisma, ChildRecordType, ShareMode } from '../../generated/prisma/client.js'
 import { prisma } from '../../lib/prisma.js'
 import { requireAuth } from '../../lib/session.js'
+import { generateShareToken } from '../../lib/shareToken.js'
 
 const findOwnedChild = async (id: string, userId: string) => {
   const child = await prisma.child.findUnique({ where: { id } })
@@ -266,5 +267,97 @@ export default async function childrenRoutes(app: FastifyInstance) {
       }
       throw error
     }
+  })
+
+  app.post('/children/:id/share-links', {
+    preHandler: [requireAuth],
+    schema: {
+      tags: ['children'],
+      summary: 'Cria link de acompanhamento da criança',
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string' } },
+      },
+      body: {
+        type: 'object',
+        required: ['mode', 'expiresInDays'],
+        properties: {
+          mode: { type: 'string', enum: ['CRIANCA', 'RESPONSAVEL'] },
+          expiresInDays: { type: 'integer', minimum: 1, maximum: 365 },
+        },
+      },
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const { mode, expiresInDays } = request.body as { mode: ShareMode; expiresInDays: number }
+
+    const child = await findOwnedChild(id, request.session.user.id)
+    if (!child) return reply.status(404).send({ error: 'Criança não encontrada.' })
+
+    const expiresAt = new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000)
+
+    const link = await prisma.childShareLink.create({
+      data: {
+        childId: id,
+        mode,
+        expiresAt,
+        token: generateShareToken(),
+        createdById: request.session.user.id,
+      },
+    })
+    return reply.status(201).send(link)
+  })
+
+  app.get('/children/:id/share-links', {
+    preHandler: [requireAuth],
+    schema: {
+      tags: ['children'],
+      summary: 'Lista links de acompanhamento da criança',
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string' } },
+      },
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+
+    const child = await findOwnedChild(id, request.session.user.id)
+    if (!child) return reply.status(404).send({ error: 'Criança não encontrada.' })
+
+    return prisma.childShareLink.findMany({
+      where: { childId: id },
+      orderBy: { createdAt: 'desc' },
+    })
+  })
+
+  app.delete('/share-links/:id', {
+    preHandler: [requireAuth],
+    schema: {
+      tags: ['children'],
+      summary: 'Revoga link de acompanhamento',
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string' } },
+      },
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+
+    const link = await prisma.childShareLink.findUnique({
+      where: { id },
+      include: { child: { select: { ownerProfId: true } } },
+    })
+    if (!link || link.child.ownerProfId !== request.session.user.id) {
+      return reply.status(404).send({ error: 'Link não encontrado.' })
+    }
+
+    const revoked = await prisma.childShareLink.update({
+      where: { id },
+      data: { revokedAt: link.revokedAt ?? new Date() },
+    })
+    return revoked
   })
 }

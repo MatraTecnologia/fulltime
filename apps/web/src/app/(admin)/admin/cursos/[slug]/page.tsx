@@ -1,14 +1,23 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { CourseDetail } from '@/lib/types'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
 import CourseForm from '@/components/course-form'
 import CurriculumEditor from '@/components/curriculum-editor'
+
+const STATUS_LABELS = { DRAFT: 'Rascunho', PUBLISHED: 'Publicado' } as const
+const STATUS_BADGE = {
+  DRAFT: 'bg-brand-amber/15 text-brand-amber-strong',
+  PUBLISHED: 'bg-brand-green/12 text-brand-green-strong',
+} as const
 
 const CursoDetalhePage = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -110,9 +119,22 @@ const CursoDetalhePage = () => {
   }
 
   return (
-    <div className="mx-auto max-w-xl">
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <h1 className="font-display text-2xl font-bold text-brand-navy">{course!.title}</h1>
+    <div className="mx-auto max-w-xl space-y-6">
+      <Link
+        href="/admin/cursos"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-brand-navy"
+      >
+        <ArrowLeft className="size-4" />
+        Cursos
+      </Link>
+
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-2">
+          <h1 className="font-display text-2xl font-extrabold tracking-tight text-brand-navy sm:text-3xl">
+            {course!.title}
+          </h1>
+          <Badge className={STATUS_BADGE[course!.status]}>{STATUS_LABELS[course!.status]}</Badge>
+        </div>
         <div className="flex items-center gap-2">
           {course!.status === 'DRAFT' && (
             <Button
