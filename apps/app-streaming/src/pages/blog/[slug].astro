@@ -1,0 +1,39 @@
+---
+import PublicLayout from "@/layouts/PublicLayout.astro"
+import { apiServer } from "@/lib/api"
+import type { PostDetail } from "@/lib/types"
+import { formatDate } from "@/lib/format"
+
+const { slug } = Astro.params
+const cookie = Astro.request.headers.get('cookie')
+const post = await apiServer<PostDetail>(`/posts/${slug}`, cookie).catch(() => null)
+if (!post) return Astro.redirect('/blog')
+---
+<PublicLayout title={`${post.title} — Blog Full Time`}>
+  <article class="mx-auto max-w-3xl px-6 py-12">
+    <a href="/blog" class="text-sm font-medium text-brand-blue hover:underline">← Voltar ao blog</a>
+
+    {post.categories.length > 0 && (
+      <div class="mt-6 flex flex-wrap items-center gap-2 text-xs">
+        {post.categories.map(c => (
+          <span class="rounded-pill bg-brand-blue/10 px-3 py-1 font-semibold text-brand-blue">{c.name}</span>
+        ))}
+      </div>
+    )}
+
+    <h1 class="mt-4 font-display text-4xl font-extrabold leading-tight text-brand-navy">{post.title}</h1>
+    {post.excerpt && <p class="mt-3 text-lg leading-relaxed text-brand-navy/60">{post.excerpt}</p>}
+
+    <div class="mt-6 flex items-center gap-3 border-b border-hairline pb-8 text-sm text-brand-navy/60">
+      <span class="grid size-10 place-items-center rounded-full bg-brand-navy/10 font-display font-bold text-brand-navy">{post.author.name.charAt(0)}</span>
+      <div>
+        <p class="font-medium text-brand-navy">{post.author.name}</p>
+        {post.publishedAt && <p class="text-xs">{formatDate(post.publishedAt)}</p>}
+      </div>
+    </div>
+
+    {post.coverImage && <img src={post.coverImage} alt="" class="mt-8 aspect-video w-full rounded-card object-cover" />}
+
+    <div class="mt-8 whitespace-pre-wrap text-base leading-relaxed text-brand-navy/80">{post.content}</div>
+  </article>
+</PublicLayout>

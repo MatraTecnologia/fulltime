@@ -77,3 +77,11 @@ export type CertificateItem = {
   course: { id: string; slug: string; title: string; coverImage: string | null }
   user?: { id: string; name: string }
 }
+
+export type PostListItem = {
+  id: string; slug: string; title: string; excerpt: string | null; coverImage: string | null
+  status: CourseStatus; publishedAt: string | null; createdAt: string
+  author: { id: string; name: string; image: string | null }
+  categories: { id: string; name: string }[]
+}
+export type PostDetail = PostListItem & { content: string }
