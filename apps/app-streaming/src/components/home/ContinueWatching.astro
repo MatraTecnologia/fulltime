@@ -1,0 +1,29 @@
+---
+import type { EnrollmentListItem } from "@/lib/types"
+interface Props { enrollments: EnrollmentListItem[] }
+const { enrollments } = Astro.props
+const inProgress = enrollments.filter(e => e.status === 'ACTIVE' && e.progressCount < e.totalLessons)
+const pct = (e: EnrollmentListItem) => e.totalLessons ? Math.round((e.progressCount / e.totalLessons) * 100) : 0
+---
+{inProgress.length > 0 && (
+  <section class="mx-auto max-w-7xl px-6 py-8">
+    <h2 class="font-display text-xl font-extrabold text-brand-navy">Continue de onde parou</h2>
+    <p class="text-sm text-muted-foreground">Retome seus estudos e continue evoluindo.</p>
+    <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      {inProgress.map(e => (
+        <a href={`/aprender/${e.course.slug}`} class="block overflow-hidden rounded-card bg-white shadow-card">
+          <div class="aspect-video bg-surface">
+            {e.course.coverImage && <img src={e.course.coverImage} alt={e.course.title} class="h-full w-full object-cover" />}
+          </div>
+          <div class="p-3">
+            <h3 class="text-sm font-semibold text-brand-navy line-clamp-2">{e.course.title}</h3>
+            <div class="mt-2 h-1.5 w-full rounded-pill bg-surface">
+              <div class="h-full rounded-pill bg-brand-blue" style={`width:${pct(e)}%`}></div>
+            </div>
+            <span class="mt-1 block text-xs text-muted-foreground">{pct(e)}% concluído</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+)}

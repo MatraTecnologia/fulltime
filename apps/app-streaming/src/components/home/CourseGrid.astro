@@ -1,0 +1,13 @@
+---
+import type { CourseListItem } from "@/lib/types"
+import CourseCard from "./CourseCard.astro"
+interface Props { title: string; subtitle?: string; courses: CourseListItem[] }
+const { title, subtitle, courses } = Astro.props
+---
+<section class="mx-auto max-w-7xl px-6 py-8">
+  <h2 class="font-display text-xl font-extrabold text-brand-navy">{title}</h2>
+  {subtitle && <p class="text-sm text-muted-foreground">{subtitle}</p>}
+  <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {courses.map(c => <CourseCard course={c} />)}
+  </div>
+</section>

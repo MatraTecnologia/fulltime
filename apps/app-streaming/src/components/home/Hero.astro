@@ -1,0 +1,18 @@
+---
+import type { CourseListItem } from "@/lib/types"
+interface Props { course: CourseListItem | undefined }
+const { course } = Astro.props
+---
+{course && (
+  <section class="mx-auto max-w-7xl px-6 pt-8">
+    <div class="relative overflow-hidden rounded-card bg-brand-navy text-white shadow-lifted">
+      {course.coverImage && <img src={course.coverImage} alt="" class="absolute inset-0 h-full w-full object-cover opacity-40" />}
+      <div class="relative max-w-xl p-10">
+        <span class="inline-block rounded-pill bg-brand-blue px-3 py-1 text-xs font-semibold">Em destaque</span>
+        <h1 class="mt-4 font-display text-3xl font-extrabold leading-tight">{course.title}</h1>
+        {course.description && <p class="mt-3 text-sm text-white/80 line-clamp-3">{course.description}</p>}
+        <a href={`/aprender/${course.slug}`} class="mt-6 inline-block rounded-pill bg-brand-amber px-6 py-3 font-semibold text-brand-navy">Assistir agora</a>
+      </div>
+    </div>
+  </section>
+)}

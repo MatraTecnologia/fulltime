@@ -1,0 +1,14 @@
+---
+import type { CourseListItem } from "@/lib/types"
+interface Props { course: CourseListItem }
+const { course } = Astro.props
+---
+<a href={`/aprender/${course.slug}`} class="group block overflow-hidden rounded-card bg-white shadow-card transition hover:shadow-lifted">
+  <div class="aspect-video w-full bg-surface">
+    {course.coverImage && <img src={course.coverImage} alt={course.title} class="h-full w-full object-cover" />}
+  </div>
+  <div class="p-4">
+    <h3 class="font-display font-bold text-brand-navy line-clamp-2">{course.title}</h3>
+    <p class="mt-1 text-xs text-muted-foreground">{course.instructor.name}</p>
+  </div>
+</a>

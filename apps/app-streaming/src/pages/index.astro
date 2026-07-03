@@ -1,12 +1,19 @@
 ---
-import BaseLayout from "@/layouts/BaseLayout.astro"
+import AppLayout from "@/layouts/AppLayout.astro"
+import Hero from "@/components/home/Hero.astro"
+import ContinueWatching from "@/components/home/ContinueWatching.astro"
+import CourseGrid from "@/components/home/CourseGrid.astro"
+import { apiServer } from "@/lib/api"
+import type { CourseListItem, EnrollmentListItem } from "@/lib/types"
+
+const cookie = Astro.request.headers.get('cookie')
+const [courses, enrollments] = await Promise.all([
+  apiServer<CourseListItem[]>('/courses', cookie).catch(() => []),
+  apiServer<EnrollmentListItem[]>('/enrollments', cookie).catch(() => []),
+])
 ---
-<BaseLayout title="Full Time — Streaming">
-  <main class="mx-auto max-w-3xl px-6 py-20">
-    <h1 class="font-display text-4xl font-extrabold text-brand-navy">Full Time</h1>
-    <p class="mt-4 text-brand-blue">Fundação Astro pronta.</p>
-    <button class="mt-6 rounded-pill bg-brand-amber px-6 py-3 font-semibold text-brand-navy">
-      Botão de teste
-    </button>
-  </main>
-</BaseLayout>
+<AppLayout title="Início — Full Time" user={Astro.locals.user}>
+  <Hero course={courses[0]} />
+  <ContinueWatching enrollments={enrollments} />
+  <CourseGrid title="Formações em destaque" subtitle="Conteúdos selecionados para a sua prática profissional." courses={courses} />
+</AppLayout>
