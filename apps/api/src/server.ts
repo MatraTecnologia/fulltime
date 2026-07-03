@@ -13,7 +13,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const app = Fastify({ logger: true, trustProxy: true })
 
 await app.register(fastifyCors, {
-  origin: [process.env.FRONTEND_URL ?? 'http://localhost:3000'],
+  origin: [
+    process.env.FRONTEND_URL ?? 'http://localhost:3000',
+    process.env.STREAMING_URL ?? 'http://localhost:4321',
+  ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],

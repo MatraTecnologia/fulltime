@@ -1,14 +1,14 @@
 @import "@fulltime/ui/theme.css";
-@import "@fontsource/plus-jakarta-sans/400.css";
-@import "@fontsource/plus-jakarta-sans/600.css";
-@import "@fontsource/plus-jakarta-sans/700.css";
-@import "@fontsource/plus-jakarta-sans/800.css";
+@import "@fontsource/nunito/400.css";
+@import "@fontsource/nunito/600.css";
+@import "@fontsource/nunito/700.css";
+@import "@fontsource/nunito/800.css";
 @import "@fontsource/inter/400.css";
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
 
 @theme {
-  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Nunito", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -16,4 +16,10 @@ html {
   font-family: var(--font-sans);
   color: var(--color-brand-navy);
   background: var(--color-white);
+}
+
+/* Banner com fade nas bordas: a imagem se dissolve no fundo da página (imagem no centro, bordas esmaecendo). Reutilizável em qualquer banner. */
+.banner-fade {
+  -webkit-mask-image: radial-gradient(ellipse 82% 84% at 50% 42%, #000 40%, transparent 82%);
+          mask-image: radial-gradient(ellipse 82% 84% at 50% 42%, #000 40%, transparent 82%);
 }

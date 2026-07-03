@@ -1,0 +1,65 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro"
+import { RegisterButton } from "@/components/eventos/RegisterButton.tsx"
+import { apiServer } from "@/lib/api"
+import type { EventDetail, EventType } from "@/lib/types"
+
+const { slug } = Astro.params
+const cookie = Astro.request.headers.get('cookie')
+
+const event = await apiServer<EventDetail>(`/events/${slug}`, cookie).catch(() => null)
+
+const tipoLabel: Record<EventType, string> = {
+  WEBINAR: 'Webinário',
+  LIVE: 'Live',
+  WORKSHOP: 'Workshop',
+}
+
+const dataHora = (iso: string) =>
+  new Intl.DateTimeFormat('pt-BR', {
+    weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  }).format(new Date(iso)) + 'h'
+---
+<AppLayout title={event ? `${event.title} — Full Time` : "Evento — Full Time"} user={Astro.locals.user}>
+  {event ? (
+    <section class="mx-auto max-w-3xl px-6 py-12">
+      <a href="/eventos" class="text-sm font-semibold text-brand-blue hover:underline">← Todos os eventos</a>
+
+      <div class="mt-6 rounded-card bg-white p-8 shadow-card">
+        <span class="inline-block rounded-pill bg-brand-navy-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-navy">
+          {tipoLabel[event.type]}
+        </span>
+        <h1 class="mt-4 font-display text-3xl font-extrabold text-brand-navy">{event.title}</h1>
+
+        <div class="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
+          <span>{dataHora(event.startsAt)}</span>
+          {event.durationMin && <span>Duração: {event.durationMin} min</span>}
+          <span>{event._count.registrations} inscritos</span>
+        </div>
+
+        {event.description && (
+          <p class="mt-6 whitespace-pre-line text-brand-navy/80">{event.description}</p>
+        )}
+
+        {event.url && (
+          <p class="mt-4 text-sm">
+            <a href={event.url} target="_blank" rel="noopener noreferrer" class="font-semibold text-brand-blue hover:underline">
+              Acessar transmissão
+            </a>
+          </p>
+        )}
+
+        <div class="mt-8">
+          <RegisterButton client:load eventId={event.id} slug={slug!} initialRegistered={event.registered ?? false} />
+        </div>
+      </div>
+    </section>
+  ) : (
+    <section class="mx-auto max-w-lg px-6 py-24 text-center">
+      <h1 class="font-display text-2xl font-extrabold text-brand-navy">Evento não encontrado</h1>
+      <p class="mt-2 text-brand-navy/70">Este evento não existe ou não está mais disponível.</p>
+      <a href="/eventos" class="mt-6 inline-block rounded-pill bg-brand-amber px-6 py-3 font-semibold text-brand-navy">Ver eventos</a>
+    </section>
+  )}
+</AppLayout>

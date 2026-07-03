@@ -3,15 +3,14 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft, BookOpen, ExternalLink, Trash2 } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Trash2 } from 'lucide-react'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { CourseDetail } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
-import CourseForm from '@/components/course-form'
-import CurriculumEditor from '@/components/curriculum-editor'
+import CourseWizard from '@/components/course-wizard'
 
 const STATUS_LABELS = { DRAFT: 'Rascunho', PUBLISHED: 'Publicado' } as const
 const STATUS_BADGE = {
@@ -25,14 +24,8 @@ const CursoDetalhePage = () => {
   const [course, setCourse] = useState<CourseDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [notFound, setNotFound] = useState(false)
-  const [publishing, setPublishing] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
-
-  const reload = async () => {
-    const data = await apiFetch<CourseDetail>(`/courses/${slug}`)
-    setCourse(data)
-  }
 
   useEffect(() => {
     apiFetch<CourseDetail>(`/courses/${slug}`)
@@ -48,28 +41,6 @@ const CursoDetalhePage = () => {
       })
   }, [slug, router])
 
-  const handleSaved = async (updated: CourseDetail) => {
-    if (updated.slug !== slug) {
-      router.replace(`/admin/cursos/${updated.slug}`)
-      return
-    }
-    await reload()
-  }
-
-  const handlePublish = async () => {
-    if (!course) return
-    setActionError(null)
-    setPublishing(true)
-    try {
-      await apiFetch(`/courses/${course.id}/publish`, { method: 'POST' })
-      await reload()
-    } catch (e) {
-      setActionError(e instanceof ApiError ? e.message : 'Não foi possível publicar o curso.')
-    } finally {
-      setPublishing(false)
-    }
-  }
-
   const handleDelete = async () => {
     if (!course) return
     if (!window.confirm(`Excluir "${course.title}"? Esta ação não pode ser desfeita.`)) return
@@ -79,7 +50,6 @@ const CursoDetalhePage = () => {
       router.push('/admin/cursos')
     } catch (e) {
       setActionError(e instanceof ApiError ? e.message : 'Não foi possível excluir o curso.')
-    } finally {
       setDeleting(false)
     }
   }
@@ -128,60 +98,42 @@ const CursoDetalhePage = () => {
         Cursos
       </Link>
 
-      <div className="rounded-card bg-white p-6 shadow-card ring-1 ring-brand-navy/[0.06]">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0 space-y-2">
-            <Badge className={STATUS_BADGE[course!.status]}>{STATUS_LABELS[course!.status]}</Badge>
-            <h1 className="font-display text-2xl font-extrabold tracking-tight text-brand-navy sm:text-3xl">
-              {course!.title}
-            </h1>
-            <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <BookOpen className="size-4 shrink-0" />
-              {course!.modules.length} módulo{course!.modules.length !== 1 ? 's' : ''}
-            </p>
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            {course!.status === 'PUBLISHED' && (
-              <Button size="sm" variant="outline" asChild>
-                <Link href={`/catalogo/${course!.slug}`} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="size-4" />
-                  Visualizar
-                </Link>
-              </Button>
-            )}
-            {course!.status === 'DRAFT' && (
-              <Button
-                size="sm"
-                className="bg-accent text-accent-foreground hover:bg-accent/90"
-                onClick={handlePublish}
-                disabled={publishing}
-              >
-                {publishing ? 'Publicando...' : 'Publicar'}
-              </Button>
-            )}
-            <Button
-              size="sm"
-              variant="outline"
-              className="text-muted-foreground hover:border-destructive/40 hover:text-destructive"
-              onClick={handleDelete}
-              disabled={deleting}
-            >
-              <Trash2 className="size-4" />
-              {deleting ? 'Excluindo...' : 'Excluir'}
-            </Button>
-          </div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <h1 className="font-display text-2xl font-extrabold tracking-tight text-brand-navy sm:text-3xl">
+            {course!.title}
+          </h1>
+          <Badge className={STATUS_BADGE[course!.status]}>{STATUS_LABELS[course!.status]}</Badge>
         </div>
-
-        {actionError && (
-          <p className="mt-4 text-sm text-destructive" role="alert">
-            {actionError}
-          </p>
-        )}
+        <div className="flex shrink-0 items-center gap-2">
+          {course!.status === 'PUBLISHED' && (
+            <Button size="sm" variant="outline" asChild>
+              <Link href={`/catalogo/${course!.slug}`} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="size-4" />
+                Visualizar
+              </Link>
+            </Button>
+          )}
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-muted-foreground hover:border-destructive/40 hover:text-destructive"
+            onClick={handleDelete}
+            disabled={deleting}
+          >
+            <Trash2 className="size-4" />
+            {deleting ? 'Excluindo...' : 'Excluir'}
+          </Button>
+        </div>
       </div>
 
-      <CourseForm initial={course!} onSaved={handleSaved} />
+      {actionError && (
+        <p className="text-sm text-destructive" role="alert">
+          {actionError}
+        </p>
+      )}
 
-      <CurriculumEditor course={course!} onChange={reload} />
+      <CourseWizard initialCourse={course!} />
     </div>
   )
 }

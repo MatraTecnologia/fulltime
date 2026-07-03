@@ -1,0 +1,87 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro"
+import { apiServer } from "@/lib/api"
+import type { EventListItem, EventType } from "@/lib/types"
+
+const cookie = Astro.request.headers.get('cookie')
+
+const [upcoming, past] = await Promise.all([
+  apiServer<EventListItem[]>('/events?when=upcoming', cookie).catch(() => []),
+  apiServer<EventListItem[]>('/events?when=past', cookie).catch(() => []),
+])
+
+const tipoLabel: Record<EventType, string> = {
+  WEBINAR: 'Webinário',
+  LIVE: 'Live',
+  WORKSHOP: 'Workshop',
+}
+
+const dia = (iso: string) =>
+  new Intl.DateTimeFormat('pt-BR', { day: '2-digit' }).format(new Date(iso))
+const mes = (iso: string) =>
+  new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(new Date(iso)).replace('.', '').toUpperCase()
+const hora = (iso: string) =>
+  new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(new Date(iso)) + 'h'
+---
+<AppLayout title="Eventos — Full Time" user={Astro.locals.user}>
+  <section class="mx-auto max-w-7xl px-6 py-10">
+    <h1 class="font-display text-3xl font-extrabold text-brand-navy">Eventos</h1>
+    <p class="mt-2 text-sm text-muted-foreground">Participe ao vivo dos nossos webinários, lives e workshops.</p>
+
+    <h2 class="mt-10 font-display text-xl font-extrabold text-brand-navy">Próximos eventos</h2>
+    {upcoming.length > 0 ? (
+      <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {upcoming.map(e => (
+          <a href={`/eventos/${e.slug}`} class="flex flex-col rounded-card bg-white p-5 shadow-card transition hover:shadow-md">
+            <div class="flex items-start gap-4">
+              <div class="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-brand-navy-50 text-brand-navy">
+                <span class="text-lg font-extrabold leading-none">{dia(e.startsAt)}</span>
+                <span class="text-[10px] font-semibold leading-none">{mes(e.startsAt)}</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold uppercase tracking-wide text-brand-blue">{tipoLabel[e.type]}</p>
+                <p class="mt-1 line-clamp-2 font-display text-base font-bold text-brand-navy">{e.title}</p>
+                <p class="mt-1 text-xs text-muted-foreground">{hora(e.startsAt)} · Online</p>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between border-t border-hairline pt-3">
+              <span class="text-xs text-muted-foreground">{e._count.registrations} inscritos</span>
+              <span class="rounded-pill bg-brand-amber px-4 py-1.5 text-xs font-semibold text-brand-navy">Ver evento</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="mt-4 rounded-card bg-surface p-12 text-center">
+        <p class="font-display text-lg font-bold text-brand-navy">Nenhum evento agendado</p>
+        <p class="mt-2 text-sm text-muted-foreground">Ainda não há eventos futuros. Volte em breve para conferir as novidades.</p>
+      </div>
+    )}
+
+    {past.length > 0 && (
+      <>
+        <h2 class="mt-12 font-display text-xl font-extrabold text-brand-navy">Eventos anteriores</h2>
+        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {past.map(e => (
+            <a href={`/eventos/${e.slug}`} class="flex flex-col rounded-card bg-white p-5 opacity-80 shadow-card transition hover:opacity-100">
+              <div class="flex items-start gap-4">
+                <div class="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-surface text-brand-navy">
+                  <span class="text-lg font-extrabold leading-none">{dia(e.startsAt)}</span>
+                  <span class="text-[10px] font-semibold leading-none">{mes(e.startsAt)}</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tipoLabel[e.type]}</p>
+                  <p class="mt-1 line-clamp-2 font-display text-base font-bold text-brand-navy">{e.title}</p>
+                  <p class="mt-1 text-xs text-muted-foreground">{hora(e.startsAt)} · Online</p>
+                </div>
+              </div>
+              <div class="mt-4 border-t border-hairline pt-3">
+                <span class="text-xs text-muted-foreground">{e._count.registrations} inscritos</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </>
+    )}
+  </section>
+</AppLayout>

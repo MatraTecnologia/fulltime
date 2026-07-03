@@ -108,7 +108,7 @@ const CurriculumEditor = ({ course, onChange }: CurriculumEditorProps) => {
       ) : (
         <div className="flex flex-col gap-4">
           {modules.map((m) => (
-            <ModuleEditor key={m.id} module={m} onChange={onChange} />
+            <ModuleEditor key={m.id} module={m} courseSlug={course.slug} onChange={onChange} />
           ))}
         </div>
       )}

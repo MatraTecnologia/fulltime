@@ -1,0 +1,61 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro"
+import CourseCard from "@/components/home/CourseCard.astro"
+import { apiServer } from "@/lib/api"
+import type { TrackDetail } from "@/lib/types"
+
+const { slug } = Astro.params
+const cookie = Astro.request.headers.get('cookie')
+const track = await apiServer<TrackDetail>('/tracks/' + slug, cookie).catch(() => null)
+
+const levelLabels = {
+  INICIANTE: 'Iniciante',
+  INTERMEDIARIO: 'Intermediário',
+  AVANCADO: 'Avançado',
+} as const
+
+const headerColor = track?.color ?? 'bg-brand-blue'
+---
+<AppLayout title={`${track?.title ?? 'Trilha'} — Full Time`} user={Astro.locals.user}>
+  {track ? (
+    <section class="mx-auto max-w-5xl px-6 py-10">
+      <a href="/trilhas" class="text-sm font-semibold text-brand-blue hover:underline">← Todas as trilhas</a>
+
+      <div class={`mt-4 overflow-hidden rounded-card ${headerColor} p-8 text-white shadow-card`}>
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-2xl">{track.icon ?? '📚'}</div>
+        <h1 class="mt-4 font-display text-3xl font-extrabold leading-tight">{track.title}</h1>
+        {track.description && <p class="mt-3 max-w-2xl text-sm text-white/85">{track.description}</p>}
+        <div class="mt-5 flex flex-wrap items-center gap-2">
+          <span class="inline-block rounded-pill bg-white/20 px-3 py-1 text-xs font-medium">{levelLabels[track.level]}</span>
+          <span class="inline-block rounded-pill bg-white/20 px-3 py-1 text-xs font-medium">{track.courses.length} {track.courses.length === 1 ? 'curso' : 'cursos'}</span>
+        </div>
+      </div>
+
+      {track.courses.length > 0 ? (
+        <ol class="mt-10 space-y-6">
+          {track.courses.map((item, index) => (
+            <li class="flex items-start gap-4">
+              <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-navy font-display text-sm font-bold text-white">{index + 1}</div>
+              <div class="min-w-0 flex-1">
+                <CourseCard course={item.course} />
+              </div>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <div class="mt-10 rounded-card bg-surface p-12 text-center">
+          <p class="font-display text-lg font-bold text-brand-navy">Esta trilha ainda não tem cursos</p>
+          <p class="mt-2 text-sm text-muted-foreground">Os cursos desta jornada serão adicionados em breve.</p>
+        </div>
+      )}
+    </section>
+  ) : (
+    <section class="mx-auto max-w-5xl px-6 py-10">
+      <div class="mt-4 rounded-card bg-surface p-12 text-center">
+        <p class="font-display text-lg font-bold text-brand-navy">Trilha não encontrada</p>
+        <p class="mt-2 text-sm text-muted-foreground">A trilha que você procura não existe ou não está mais disponível.</p>
+        <a href="/trilhas" class="mt-4 inline-block rounded-pill bg-brand-blue px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90">Ver todas as trilhas</a>
+      </div>
+    </section>
+  )}
+</AppLayout>

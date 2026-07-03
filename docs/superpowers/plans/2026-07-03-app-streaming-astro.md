@@ -1539,6 +1539,77 @@ git commit -m "feat(app-streaming): abas e painel lateral do player (notas, recu
 
 ---
 
+### Task 11: Branding (logos) + polish de estilização
+
+Aplica a identidade visual real (logos em `apps/app-streaming/public/`) e faz um passe de refinamento visual em todos os componentes, fiel às imagens do design. Entrega: wordmarks de texto substituídos pela logo, favicon configurado, e componentes polidos (espaçamento, sombras, hover, raio, hierarquia tipográfica) como no `plataforma-geral`.
+
+**Files:**
+- Assets já presentes: `apps/app-streaming/public/logo.svg` (marca completa 991x905), `apps/app-streaming/public/icone.svg` (símbolo 586x582), `apps/app-streaming/public/icone.ico` (favicon).
+- Modify: `apps/app-streaming/src/layouts/BaseLayout.astro` (favicon + preconnect fontes)
+- Modify: `apps/app-streaming/src/components/app/AppHeader.tsx` (logo.svg no lugar do texto)
+- Modify: `apps/app-streaming/src/layouts/AuthLayout.astro` (logo.svg centralizada)
+- Modify: `apps/app-streaming/src/components/home/SiteFooter.astro` (logo em branco/negativo)
+- Modify (polish): componentes de `src/components/home/` e `src/components/player/` — refinamento visual, sem novas features.
+
+**Interfaces:**
+- Consumes: assets em `public/` (servidos na raiz: `/logo.svg`, `/icone.svg`, `/icone.ico`).
+- Produces: identidade visual consistente; nenhuma mudança de assinatura de componente.
+
+- [ ] **Step 1: Favicon + head no `BaseLayout.astro`**
+
+Adicionar no `<head>`:
+```html
+<link rel="icon" href="/icone.ico" sizes="any" />
+<link rel="icon" type="image/svg+xml" href="/icone.svg" />
+```
+
+- [ ] **Step 2: Logo no `AppHeader.tsx`**
+
+Trocar o wordmark de texto (`<a ...>Full <span>Time</span></a>`) por:
+```tsx
+<a href="/" className="flex items-center gap-2">
+  <img src="/icone.svg" alt="Full Time" className="h-8 w-auto" />
+  <span className="font-display text-xl font-extrabold text-brand-navy">Full <span className="text-brand-blue">Time</span></span>
+</a>
+```
+(ícone à esquerda do wordmark; usar `/icone.svg` para o mark compacto no header.)
+
+- [ ] **Step 3: Logo no `AuthLayout.astro`**
+
+Trocar o wordmark de texto pela logo completa centralizada:
+```astro
+<div class="mb-8 flex justify-center">
+  <img src="/logo.svg" alt="Full Time" class="h-16 w-auto" />
+</div>
+```
+
+- [ ] **Step 4: Logo negativa no `SiteFooter.astro`**
+
+No footer navy, usar a logo em versão clara (ex.: `class="h-10 w-auto brightness-0 invert"` sobre fundo escuro, se a SVG for colorida; senão a logo colorida sobre navy). Validar contraste visualmente.
+
+- [ ] **Step 5: Passe de polish nos componentes**
+
+Refinamento visual (sem novas features nem mudança de dados/props), fiel às imagens do design (`design/plataforma-geral/*.png`):
+- Consistência de raio (`rounded-card`/`rounded-pill`), sombras (`shadow-card`/`shadow-lifted` em hover), espaçamento generoso (base branca com respiro), hierarquia tipográfica (`font-display` nos títulos).
+- Cards: hover elevando (`hover:shadow-lifted`), transição suave, imagem `object-cover`.
+- Hero, trilhas (4 cores da logo), grades: alinhamento e proporções como no design.
+- Player: colunas equilibradas, sidebar com divisórias `border-hairline`, aba ativa com sublinhado `brand-blue`.
+- Estados hover/focus visíveis (a11y), foco de teclado preservado.
+
+- [ ] **Step 6: Verificar build + fidelidade visual**
+
+Run: `pnpm --filter app-streaming build` (limpo) e `dev` logado.
+Expected: logo aparece no header, auth e footer; favicon no navegador; componentes visualmente alinhados ao design, sem regressão de layout/quebra.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add apps/app-streaming/public apps/app-streaming/src/layouts/BaseLayout.astro apps/app-streaming/src/layouts/AuthLayout.astro apps/app-streaming/src/components/app/AppHeader.tsx apps/app-streaming/src/components/home/ apps/app-streaming/src/components/player/
+git commit -m "feat(app-streaming): branding (logos) + polish de estilização"
+```
+
+---
+
 ## Self-Review
 
 **Spec coverage:**

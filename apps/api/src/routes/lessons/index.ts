@@ -247,6 +247,197 @@ export default async function lessonRoutes(app: FastifyInstance) {
     }
   })
 
+  app.get('/lessons/:id/note', {
+    preHandler: [requireAuth],
+    schema: {
+      tags: ['lessons'],
+      summary: 'Nota do usuário logado para a aula',
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string' } },
+      },
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+
+    const note = await prisma.lessonNote.findUnique({
+      where: { userId_lessonId: { userId: request.session.user.id, lessonId: id } },
+    })
+
+    return { content: note?.content ?? '' }
+  })
+
+  app.put('/lessons/:id/note', {
+    preHandler: [requireAuth],
+    schema: {
+      tags: ['lessons'],
+      summary: 'Cria ou atualiza a nota do usuário logado para a aula',
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string' } },
+      },
+      body: {
+        type: 'object',
+        required: ['content'],
+        properties: {
+          content: { type: 'string' },
+        },
+      },
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const { content } = request.body as { content: string }
+    const userId = request.session.user.id
+
+    const note = await prisma.lessonNote.upsert({
+      where: { userId_lessonId: { userId, lessonId: id } },
+      create: { userId, lessonId: id, content },
+      update: { content },
+    })
+
+    return { content: note.content }
+  })
+
+  app.get('/lessons/:id/comments', {
+    preHandler: [requireAuth],
+    schema: {
+      tags: ['lessons'],
+      summary: 'Lista comentários da aula',
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string' } },
+      },
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+
+    const comments = await prisma.lessonComment.findMany({
+      where: { lessonId: id },
+      orderBy: { createdAt: 'desc' },
+      include: { user: { select: { id: true, name: true, image: true } } },
+    })
+
+    return comments.map(c => ({
+      id: c.id,
+      content: c.content,
+      createdAt: c.createdAt,
+      author: c.user,
+    }))
+  })
+
+  app.post('/lessons/:id/comments', {
+    preHandler: [requireAuth],
+    schema: {
+      tags: ['lessons'],
+      summary: 'Cria comentário na aula',
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string' } },
+      },
+      body: {
+        type: 'object',
+        required: ['content'],
+        properties: {
+          content: { type: 'string', minLength: 1 },
+        },
+      },
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const { content } = request.body as { content: string }
+
+    const comment = await prisma.lessonComment.create({
+      data: { lessonId: id, userId: request.session.user.id, content },
+      include: { user: { select: { id: true, name: true, image: true } } },
+    })
+
+    return reply.status(201).send({
+      id: comment.id,
+      content: comment.content,
+      createdAt: comment.createdAt,
+      author: comment.user,
+    })
+  })
+
+  app.get('/lessons/:id/rating', {
+    preHandler: [requireAuth],
+    schema: {
+      tags: ['lessons'],
+      summary: 'Avaliação do usuário logado e média geral da aula',
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string' } },
+      },
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const userId = request.session.user.id
+
+    const [rating, aggregate] = await Promise.all([
+      prisma.lessonRating.findUnique({
+        where: { userId_lessonId: { userId, lessonId: id } },
+      }),
+      prisma.lessonRating.aggregate({
+        where: { lessonId: id },
+        _avg: { value: true },
+        _count: true,
+      }),
+    ])
+
+    return {
+      value: rating?.value ?? 0,
+      average: aggregate._avg.value ? Math.round(aggregate._avg.value * 10) / 10 : 0,
+      count: aggregate._count,
+    }
+  })
+
+  app.put('/lessons/:id/rating', {
+    preHandler: [requireAuth],
+    schema: {
+      tags: ['lessons'],
+      summary: 'Cria ou atualiza a avaliação do usuário logado para a aula',
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string' } },
+      },
+      body: {
+        type: 'object',
+        required: ['value'],
+        properties: {
+          value: { type: 'integer', minimum: 1, maximum: 5 },
+        },
+      },
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const { value } = request.body as { value: number }
+    const userId = request.session.user.id
+
+    await prisma.lessonRating.upsert({
+      where: { userId_lessonId: { userId, lessonId: id } },
+      create: { userId, lessonId: id, value },
+      update: { value },
+    })
+
+    const aggregate = await prisma.lessonRating.aggregate({
+      where: { lessonId: id },
+      _avg: { value: true },
+      _count: true,
+    })
+
+    return {
+      value,
+      average: aggregate._avg.value ? Math.round(aggregate._avg.value * 10) / 10 : 0,
+      count: aggregate._count,
+    }
+  })
+
   app.delete('/attachments/:id', {
     preHandler: [requireAuth, requireRole('admin', 'instrutor')],
     schema: {

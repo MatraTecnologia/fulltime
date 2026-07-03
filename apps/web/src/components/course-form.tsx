@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Spinner } from '@/components/ui/spinner'
+import CoverImageField from './cover-image-field'
 import {
   Combobox,
   ComboboxContent,
@@ -67,7 +68,7 @@ const CourseForm = ({ initial, onSaved }: CourseFormProps) => {
       const payload = {
         title,
         description: description || undefined,
-        coverImage: coverImage || undefined,
+        coverImage: coverImage || null,
         slug: slug || undefined,
         instructorId: instructorId || undefined,
       }
@@ -149,16 +150,7 @@ const CourseForm = ({ initial, onSaved }: CourseFormProps) => {
           rows={4}
         />
       </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="course-cover">Imagem de capa (URL)</Label>
-        <Input
-          id="course-cover"
-          type="url"
-          value={coverImage}
-          onChange={(e) => setCoverImage(e.target.value)}
-          placeholder="https://..."
-        />
-      </div>
+      <CoverImageField value={coverImage} onChange={setCoverImage} />
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="course-slug">Slug</Label>
         <Input

@@ -34,6 +34,16 @@ export const auth = betterAuth({
     additionalFields: {
       role: { type: 'string', required: false, defaultValue: 'profissional', input: false },
     },
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+        await sendEmail({
+          to: user.email,
+          subject: 'Confirme a alteração de e-mail',
+          html: brandEmail('Alterar e-mail', `Recebemos um pedido para alterar seu e-mail para ${newEmail}. Confirme para aplicar a mudança.`, { url, label: 'Confirmar alteração' }),
+        })
+      },
+    },
   },
   emailAndPassword: {
     enabled: true,

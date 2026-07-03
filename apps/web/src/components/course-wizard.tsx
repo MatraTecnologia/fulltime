@@ -85,11 +85,12 @@ const ReviewRow = ({ icon, label, value }: { icon: React.ReactNode; label: strin
   </div>
 )
 
-const CourseWizard = () => {
+const CourseWizard = ({ initialCourse }: { initialCourse?: CourseDetail }) => {
   const router = useRouter()
+  const editing = Boolean(initialCourse)
   const [step, setStep] = useState(1)
-  const [maxReached, setMaxReached] = useState(1)
-  const [course, setCourse] = useState<CourseDetail | null>(null)
+  const [maxReached, setMaxReached] = useState(initialCourse ? 3 : 1)
+  const [course, setCourse] = useState<CourseDetail | null>(initialCourse ?? null)
   const [navigating, setNavigating] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [publishError, setPublishError] = useState<string | null>(null)
@@ -115,6 +116,9 @@ const CourseWizard = () => {
   }
 
   const handleSaved = (c: CourseDetail) => {
+    if (editing && course && c.slug !== course.slug) {
+      router.replace(`/admin/cursos/${c.slug}`)
+    }
     setCourse(c)
     setStep(2)
     setMaxReached((m) => Math.max(m, 2))
@@ -126,9 +130,14 @@ const CourseWizard = () => {
     setPublishing(true)
     try {
       await apiFetch(`/courses/${course.id}/publish`, { method: 'POST' })
-      router.push(`/admin/cursos/${course.slug}`)
+      if (editing) {
+        await refreshCourse()
+      } else {
+        router.push(`/admin/cursos/${course.slug}`)
+      }
     } catch (err) {
       setPublishError(err instanceof ApiError ? err.message : 'Não foi possível publicar o curso.')
+    } finally {
       setPublishing(false)
     }
   }
@@ -209,15 +218,21 @@ const CourseWizard = () => {
             <Button type="button" variant="outline" onClick={() => goTo(2)} disabled={publishing}>
               Voltar
             </Button>
-            <Button
-              type="button"
-              onClick={handlePublish}
-              disabled={publishing || totalLessons === 0}
-              className="bg-accent text-accent-foreground hover:bg-accent/90"
-            >
-              {publishing && <Spinner className="size-4" />}
-              {publishing ? 'Publicando...' : 'Publicar curso'}
-            </Button>
+            {course.status === 'PUBLISHED' ? (
+              <Button type="button" onClick={() => router.push('/admin/cursos')}>
+                Concluir
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={handlePublish}
+                disabled={publishing || totalLessons === 0}
+                className="bg-accent text-accent-foreground hover:bg-accent/90"
+              >
+                {publishing && <Spinner className="size-4" />}
+                {publishing ? 'Publicando...' : 'Publicar curso'}
+              </Button>
+            )}
           </div>
         </div>
       )}

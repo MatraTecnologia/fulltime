@@ -14,18 +14,23 @@ export default async function courseRoutes(app: FastifyInstance) {
         type: 'object',
         properties: {
           status: { type: 'string', enum: ['DRAFT', 'PUBLISHED'] },
+          category: { type: 'string' },
         },
       },
     },
   }, async (request) => {
     const session = await auth.api.getSession({ headers: fromNodeHeaders(request.headers) })
     const isPrivileged = session?.user.role === 'admin' || session?.user.role === 'instrutor'
-    const { status } = request.query as { status?: CourseStatus }
+    const { status, category } = request.query as { status?: CourseStatus; category?: string }
 
     return prisma.course.findMany({
-      where: { status: isPrivileged && status ? status : CourseStatus.PUBLISHED },
+      where: {
+        status: isPrivileged && status ? status : CourseStatus.PUBLISHED,
+        ...(category ? { categories: { some: { slug: category } } } : {}),
+      },
       include: {
         instructor: { select: { id: true, name: true } },
+        categories: { select: { id: true, slug: true, name: true } },
         _count: { select: { modules: true } },
       },
       orderBy: { createdAt: 'desc' },
@@ -85,7 +90,7 @@ export default async function courseRoutes(app: FastifyInstance) {
         properties: {
           title: { type: 'string' },
           description: { type: 'string' },
-          coverImage: { type: 'string' },
+          coverImage: { type: ['string', 'null'] },
           slug: { type: 'string' },
           instructorId: { type: 'string' },
         },
@@ -95,7 +100,7 @@ export default async function courseRoutes(app: FastifyInstance) {
     const { title, description, coverImage, slug, instructorId } = request.body as {
       title: string
       description?: string
-      coverImage?: string
+      coverImage?: string | null
       slug?: string
       instructorId?: string
     }
@@ -137,7 +142,7 @@ export default async function courseRoutes(app: FastifyInstance) {
         properties: {
           title: { type: 'string' },
           description: { type: 'string' },
-          coverImage: { type: 'string' },
+          coverImage: { type: ['string', 'null'] },
           slug: { type: 'string' },
           status: { type: 'string', enum: ['DRAFT', 'PUBLISHED'] },
           instructorId: { type: 'string' },
@@ -149,7 +154,7 @@ export default async function courseRoutes(app: FastifyInstance) {
     const { title, description, coverImage, slug, status, instructorId } = request.body as {
       title?: string
       description?: string
-      coverImage?: string
+      coverImage?: string | null
       slug?: string
       status?: CourseStatus
       instructorId?: string

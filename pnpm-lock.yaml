@@ -90,9 +90,9 @@ importers:
       '@fontsource/inter':
         specifier: ^5.0.0
         version: 5.2.8
-      '@fontsource/plus-jakarta-sans':
+      '@fontsource/nunito':
         specifier: ^5.0.0
-        version: 5.2.8
+        version: 5.2.7
       '@fulltime/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -1209,8 +1209,8 @@ packages:
   '@fontsource/inter@5.2.8':
     resolution: {integrity: sha512-P6r5WnJoKiNVV+zvW2xM13gNdFhAEpQ9dQJHt3naLvfg+LkF2ldgSLiF4T41lf1SQCM9QmkqPTn4TH568IRagg==}
 
-  '@fontsource/plus-jakarta-sans@5.2.8':
-    resolution: {integrity: sha512-P5qE49fqdeD+7DXH1KBxmMPlB17LTz1zvBhFH0tFzfnYTKVJVyb0pR6plh0ZGXxcB+Oayb54FZZw3V42/DawTw==}
+  '@fontsource/nunito@5.2.7':
+    resolution: {integrity: sha512-pmtBq0H9ex9nk+RtJYEJOD9pag393iHETnl/PVKleF4i06cd0ttngK5ZCTgYb5eOqR3Xdlrjtev8m7bmgYprew==}
 
   '@hono/node-server@1.19.11':
     resolution: {integrity: sha512-dr8/3zEaB+p0D2n/IUrlPF1HZm586qgJNXK1a9fhg/PzdtkK7Ksd5l312tJX2yBuALqDYBlG20QEbayqPyxn+g==}
@@ -6559,7 +6559,7 @@ snapshots:
 
   '@fontsource/inter@5.2.8': {}
 
-  '@fontsource/plus-jakarta-sans@5.2.8': {}
+  '@fontsource/nunito@5.2.7': {}
 
   '@hono/node-server@1.19.11(hono@4.12.27)':
     dependencies:

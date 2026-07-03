@@ -7,7 +7,7 @@ export const VideoStage = ({ lesson }: Props) => {
   const { video, title } = lesson
   if (video.source === 'MUX' && video.playbackId) {
     return (
-      <div className="aspect-video w-full overflow-hidden rounded-card bg-black">
+      <div className="aspect-video w-full bg-black">
         <MuxPlayer
           playbackId={video.playbackId}
           tokens={video.token ? { playback: video.token } : undefined}
@@ -20,10 +20,20 @@ export const VideoStage = ({ lesson }: Props) => {
   }
   if (video.embedUrl) {
     return (
-      <div className="relative aspect-video w-full overflow-hidden rounded-card">
-        <iframe src={video.embedUrl} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="absolute inset-0 h-full w-full border-0" />
+      <div className="relative aspect-video w-full bg-black">
+        <iframe
+          src={video.embedUrl}
+          title={title}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 h-full w-full border-0"
+        />
       </div>
     )
   }
-  return <div className="grid aspect-video w-full place-items-center rounded-card bg-brand-navy/10 text-sm text-brand-navy/60">Vídeo indisponível</div>
+  return (
+    <div className="grid aspect-video w-full place-items-center bg-brand-navy text-sm text-white/50">
+      Vídeo indisponível
+    </div>
+  )
 }

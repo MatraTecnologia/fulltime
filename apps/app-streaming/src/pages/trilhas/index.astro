@@ -1,0 +1,50 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro"
+import { apiServer } from "@/lib/api"
+import type { TrackListItem } from "@/lib/types"
+
+const cookie = Astro.request.headers.get('cookie')
+const tracks = await apiServer<TrackListItem[]>('/tracks', cookie).catch(() => [])
+
+const levelLabels = {
+  INICIANTE: 'Iniciante',
+  INTERMEDIARIO: 'Intermediário',
+  AVANCADO: 'Avançado',
+} as const
+
+const palette = ['bg-brand-blue', 'bg-brand-purple', 'bg-brand-green', 'bg-brand-amber']
+const colorFor = (track: TrackListItem, index: number) =>
+  track.color ?? palette[index % palette.length]
+---
+<AppLayout title="Trilhas — Full Time" user={Astro.locals.user}>
+  <section class="mx-auto max-w-7xl px-6 py-10">
+    <h1 class="font-display text-3xl font-extrabold text-brand-navy">Trilhas de Aprendizagem</h1>
+    <p class="mt-2 text-sm text-muted-foreground">Jornadas completas que organizam os cursos na ordem certa para a sua formação profissional.</p>
+
+    {tracks.length > 0 ? (
+      <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {tracks.map((track, index) => (
+          <a
+            href={`/trilhas/${track.slug}`}
+            class={`group relative flex flex-col justify-between overflow-hidden rounded-card ${colorFor(track, index)} p-5 text-white shadow-card transition hover:shadow-lifted`}
+          >
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-lg">{track.icon ?? '📚'}</div>
+            <div class="mt-6">
+              <h3 class="font-display text-lg font-bold leading-tight">{track.title}</h3>
+              <p class="mt-1 text-sm text-white/85">{track._count.courses} {track._count.courses === 1 ? 'curso' : 'cursos'}</p>
+            </div>
+            <div class="mt-4 flex items-center justify-between">
+              <span class="inline-block rounded-pill bg-white/20 px-3 py-1 text-xs font-medium">{levelLabels[track.level]}</span>
+              <svg class="h-4 w-4 opacity-80 transition group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none"><path d="M7 5l6 5-6 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="mt-12 rounded-card bg-surface p-12 text-center">
+        <p class="font-display text-lg font-bold text-brand-navy">Nenhuma trilha por aqui ainda</p>
+        <p class="mt-2 text-sm text-muted-foreground">Assim que novas trilhas forem publicadas, elas aparecerão aqui.</p>
+      </div>
+    )}
+  </section>
+</AppLayout>

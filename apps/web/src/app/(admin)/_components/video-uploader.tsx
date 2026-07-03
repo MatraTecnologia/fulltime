@@ -1,16 +1,16 @@
 'use client'
 
-import { useState, type ComponentProps, type CSSProperties } from 'react'
+import { useId, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { CheckCircle2, Loader2 } from 'lucide-react'
 import { apiFetch, ApiError } from '@/lib/api'
 import type { CreateUploadResponse } from '@/lib/types'
 import { Spinner } from '@/components/ui/spinner'
 
-const MuxUploader = dynamic(() => import('@mux/mux-uploader-react'), {
+const MuxDropzone = dynamic(() => import('./mux-dropzone'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-40 items-center justify-center rounded-card border border-dashed border-brand-navy/15">
+    <div className="flex h-40 items-center justify-center rounded-card border-2 border-dashed border-brand-navy/15">
       <Spinner className="size-6 text-primary" />
     </div>
   ),
@@ -21,14 +21,8 @@ type VideoUploaderProps = {
   onSuccess?: () => void
 }
 
-type UploaderProps = ComponentProps<typeof MuxUploader>
-
-const uploaderStyle = {
-  '--progress-bar-fill-color': 'var(--color-brand-blue)',
-  '--progress-radial-fill-color': 'var(--color-brand-blue)',
-} as CSSProperties
-
 export const VideoUploader = ({ lessonId, onSuccess }: VideoUploaderProps) => {
+  const uploaderId = useId().replace(/[^a-zA-Z0-9]/g, '')
   const [progress, setProgress] = useState(0)
   const [uploading, setUploading] = useState(false)
   const [done, setDone] = useState(false)
@@ -63,33 +57,39 @@ export const VideoUploader = ({ lessonId, onSuccess }: VideoUploaderProps) => {
 
   return (
     <div className="space-y-3">
-      <MuxUploader
+      <MuxDropzone
+        uploaderId={uploaderId}
         endpoint={createEndpoint}
-        style={uploaderStyle}
         onUploadStart={() => {
           setUploading(true)
           setProgress(0)
           setError(null)
         }}
-        onProgress={
-          ((e: CustomEvent<number>) => setProgress(Math.round(e.detail))) as unknown as UploaderProps['onProgress']
-        }
+        onProgress={setProgress}
         onSuccess={() => {
           setUploading(false)
           setDone(true)
           onSuccess?.()
         }}
-        onUploadError={(e: CustomEvent<{ message: string }>) => {
+        onUploadError={(message) => {
           setUploading(false)
-          setError(e.detail?.message ?? 'Falha no envio do vídeo.')
+          setError(message)
         }}
       />
 
       {uploading && (
-        <p className="flex items-center gap-2 text-sm font-medium text-brand-blue-strong">
-          <Loader2 className="size-4 animate-spin" aria-hidden />
-          Enviando… {progress}%
-        </p>
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 text-sm font-medium text-brand-blue-strong">
+            <Loader2 className="size-4 animate-spin" aria-hidden />
+            Enviando… {progress}%
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-brand-navy-50">
+            <div
+              className="h-full rounded-full bg-brand-blue transition-[width] duration-200"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
       )}
 
       {error && (

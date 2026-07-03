@@ -44,6 +44,23 @@ enum VideoAssetStatus {
   ERRORED
 }
 
+enum TrackLevel {
+  INICIANTE
+  INTERMEDIARIO
+  AVANCADO
+}
+
+enum EventType {
+  WEBINAR
+  LIVE
+  WORKSHOP
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+}
+
 model User {
   id            String       @id @default(cuid())
   name          String
@@ -63,6 +80,10 @@ model User {
   records       ChildRecord[] @relation("RecordAuthor")
   shareLinks    ChildShareLink[] @relation("ShareLinkCreator")
   videoAssets   VideoAsset[]
+  notes         LessonNote[]
+  comments      LessonComment[]
+  ratings       LessonRating[]
+  eventRegistrations EventRegistration[]
 
   @@map("users")
 }
@@ -137,6 +158,8 @@ model Course {
   instructor   User         @relation("CourseInstructor", fields: [instructorId], references: [id])
   modules      Module[]
   enrollments  Enrollment[]
+  categories   Category[]   @relation("CourseCategories")
+  tracks       TrackCourse[]
 
   @@map("courses")
 }
@@ -161,6 +184,7 @@ model Lesson {
   title       String
   order       Int
   content     String?
+  transcript  String?
   videoSource VideoSource      @default(NONE)
   videoRef    String?
   durationSec Int?
@@ -170,6 +194,9 @@ model Lesson {
   attachments Attachment[]
   progress    LessonProgress[]
   videoAssets VideoAsset[]
+  notes       LessonNote[]
+  comments    LessonComment[]
+  ratings     LessonRating[]
 
   @@index([moduleId])
   @@map("lessons")
@@ -299,4 +326,122 @@ model VideoAsset {
   @@index([status])
   @@index([lessonId])
   @@map("video_assets")
+}
+
+model LessonNote {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@map("lesson_notes")
+}
+
+model LessonComment {
+  id        String   @id @default(cuid())
+  lessonId  String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+  @@map("lesson_comments")
+}
+
+model LessonRating {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String
+  value     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@map("lesson_ratings")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  color       String?
+  icon        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  courses     Course[] @relation("CourseCategories")
+
+  @@map("categories")
+}
+
+model Track {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  description String?
+  coverImage  String?
+  color       String?
+  icon        String?
+  level       TrackLevel    @default(INICIANTE)
+  status      CourseStatus  @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  courses     TrackCourse[]
+
+  @@map("tracks")
+}
+
+model TrackCourse {
+  id       String @id @default(cuid())
+  trackId  String
+  courseId String
+  order    Int
+  track    Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([trackId, courseId])
+  @@index([trackId])
+  @@map("track_courses")
+}
+
+model Event {
+  id            String              @id @default(cuid())
+  slug          String              @unique
+  title         String
+  description   String?
+  type          EventType           @default(WEBINAR)
+  status        EventStatus         @default(DRAFT)
+  startsAt      DateTime
+  durationMin   Int?
+  url           String?
+  coverImage    String?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  registrations EventRegistration[]
+
+  @@index([startsAt])
+  @@map("events")
+}
+
+model EventRegistration {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@map("event_registrations")
 }

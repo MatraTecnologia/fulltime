@@ -10,10 +10,11 @@ import LessonEditor from './lesson-editor'
 
 interface ModuleEditorProps {
   module: ModuleWithLessons
+  courseSlug: string
   onChange: () => void | Promise<void>
 }
 
-const ModuleEditor = ({ module, onChange }: ModuleEditorProps) => {
+const ModuleEditor = ({ module, courseSlug, onChange }: ModuleEditorProps) => {
   const [editing, setEditing] = useState(false)
   const [title, setTitle] = useState(module.title)
   const [saving, setSaving] = useState(false)
@@ -146,7 +147,7 @@ const ModuleEditor = ({ module, onChange }: ModuleEditorProps) => {
         {module.lessons.length > 0 && (
           <div className="mb-3 flex flex-col gap-2">
             {module.lessons.map((lesson) => (
-              <LessonEditor key={lesson.id} lesson={lesson} onChange={onChange} />
+              <LessonEditor key={lesson.id} lesson={lesson} courseSlug={courseSlug} />
             ))}
           </div>
         )}
