@@ -61,6 +61,11 @@ enum EventStatus {
   PUBLISHED
 }
 
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
 model User {
   id            String       @id @default(cuid())
   name          String
@@ -84,6 +89,7 @@ model User {
   comments      LessonComment[]
   ratings       LessonRating[]
   eventRegistrations EventRegistration[]
+  posts         Post[]       @relation("PostAuthor")
 
   @@map("users")
 }
@@ -380,6 +386,7 @@ model Category {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   courses     Course[] @relation("CourseCategories")
+  posts       Post[]   @relation("PostCategories")
 
   @@map("categories")
 }
@@ -412,6 +419,25 @@ model TrackCourse {
   @@unique([trackId, courseId])
   @@index([trackId])
   @@map("track_courses")
+}
+
+model Post {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  title       String
+  excerpt     String?
+  coverImage  String?
+  content     String
+  status      PostStatus @default(DRAFT)
+  publishedAt DateTime?
+  authorId    String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  author      User       @relation("PostAuthor", fields: [authorId], references: [id])
+  categories  Category[] @relation("PostCategories")
+
+  @@index([status, publishedAt])
+  @@map("posts")
 }
 
 model Event {
