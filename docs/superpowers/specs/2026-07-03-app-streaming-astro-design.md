@@ -14,7 +14,8 @@ Entrega focada. `apps/web` (Next) segue de pé até paridade, aí é aposentado.
 
 - **Stack:** tudo em **Astro** (modo `server`/SSR + adapter Node). Interatividade via **React islands**; player Mux reescrito como island. O scaffold Astro atual (`index.astro`) é descartado.
 - **Better Auth já está 100% no `apps/api`** (Fastify + Prisma adapter, `crossSubDomainCookies`, roles `admin|instrutor|profissional`, e-mail/verificação/reset). Aqui só criamos a **UI de login** e apontamos o client — **não é setup de backend**.
-- **Design system:** novo pacote `packages/ui-tokens` (preset Tailwind + CSS vars: cores da logo, Nunito/Inter) consumido pelos `.astro` e pelos islands; primitivos React de `@fulltime/ui` reusados **dentro** dos islands. **Light-only.**
+- **Design system:** **reusar `@fulltime/ui`** — ele já expõe `theme.css` (Tailwind 4 `@theme` com as cores da logo) importável como CSS puro nos `.astro`, **e** os primitivos React (Button, Card, Input, Tabs, VideoEmbed/Mux, Spinner, ProgressBar…) usados **dentro** dos islands. Sem novo pacote (DRY). **Light-only.**
+- **Tipografia (design `plataforma-geral`):** headings **`'Plus Jakarta Sans'`**, textos **`'Inter'`** — override de `--font-display` no `globals.css` do `app-streaming` (o `theme.css` traz Nunito por padrão).
 - **Migração incremental:** `apps/web` continua servindo; `app-streaming` cresce em paralelo até paridade.
 - **Fora agora (YAGNI):** área da criança / link tokenizado (vira projeto separado no futuro), site de marketing separado, dashboard e dashboard-admin (specs próprios depois), dark mode.
 - **Rota do player:** `/aprender/[slug]` (igual ao web).
@@ -47,20 +48,21 @@ Entrega focada. `apps/web` (Next) segue de pé até paridade, aí é aposentado.
 
 ## Arquitetura
 
-### Frente 0 — Fundação de design (bloqueia o resto)
+### Frente 0 — Fundação de design (reuso, não novo pacote)
 
-Novo pacote **`packages/ui-tokens`**:
-- Preset Tailwind 4 + CSS vars com as cores da marca, tipografia (Nunito display / Inter texto), escala de espaçamento e raio.
-- Exporta tanto para consumo em `.astro` (classes utilitárias/tokens) quanto para os islands React (que também podem usar `@fulltime/ui`).
+`@fulltime/ui` já é o ponto de verdade da identidade:
+- `@fulltime/ui/theme.css` — Tailwind 4 `@theme` com cores da marca, espaçamento, raio e sombras. Importado no `globals.css` do `app-streaming` → tokens disponíveis nos `.astro`.
+- Primitivos React (`Button`, `Card`, `Input`, `Tabs`, `VideoEmbed`, `Spinner`, `ProgressBar`, `StatCard`…) reusados dentro dos islands.
+- **Tipografia do `plataforma-geral` (override):** headings `'Plus Jakarta Sans'`, textos `'Inter'`. O `theme.css` usa Nunito em `--font-display`; o `globals.css` do `app-streaming` **sobrescreve** `--font-display: 'Plus Jakarta Sans'` e mantém `--font-sans: 'Inter'`, carregando ambas as fontes (via `@fontsource` ou `<link>` Google Fonts).
 - Light-only, contraste AA sobre base branca.
 
-**Interface:** um único ponto de verdade de identidade; `app-streaming` e (futuramente) os dashboards importam daqui. Não altera assinatura pública de `@fulltime/ui`.
+**Interface:** nenhuma mudança na assinatura pública de `@fulltime/ui`; `app-streaming` só consome e sobrescreve a fonte de display localmente. Zero duplicação de design system.
 
 ### Frente 1 — Fundação Astro
 
 `apps/app-streaming` reconfigurado:
 - `astro.config.mjs`: `output: 'server'`, adapter **Node**, integrações **`@astrojs/react`** e **Tailwind 4** (`@tailwindcss/vite`).
-- `package.json`: dependências `astro`, `@astrojs/react`, `@astrojs/node`, `react`, `react-dom`, `@mux/mux-player-react`, `better-auth`, `@fulltime/ui`, `@fulltime/ui-tokens`, `tailwindcss`.
+- `package.json`: dependências `astro`, `@astrojs/react`, `@astrojs/node`, `react`, `react-dom`, `@mux/mux-player-react`, `better-auth`, `@fulltime/ui`, `tailwindcss`, `@fontsource/plus-jakarta-sans`, `@fontsource/inter`.
 - `src/lib/api.ts` — equivalente Astro do `apiFetch`/`apiServer`: no server (frontmatter/middleware) encaminha o cookie de sessão; nos islands usa fetch com credenciais.
 - `src/lib/auth-client.ts` — `createAuthClient({ baseURL: API_URL, basePath: '/auth' })` (variante vanilla/react).
 
@@ -133,10 +135,9 @@ Rota `/aprender/[slug]` (protegida). Server busca curso + módulos/aulas + matr�
 
 ## Ordem de execução (por dependência)
 
-1. **`packages/ui-tokens`** (tokens + preset Tailwind, light-only).
-2. **Fundação Astro** (config server/Node, React, Tailwind, `api.ts`, `auth-client.ts`).
-3. **Autenticação** (middleware + páginas de auth + ajuste `trustedOrigins`).
-4. **Home / Catálogo** (seções sobre a fundação; dados reais + placeholders).
-5. **Player de aula** (`LessonPlayer` island + sidebar + abas + notas).
+1. **Fundação Astro** (config server/Node, React, Tailwind, `globals.css` reusando `@fulltime/ui/theme.css` + override de fonte Plus Jakarta Sans/Inter, `api.ts`, `auth-client.ts`).
+2. **Autenticação** (middleware + páginas de auth + ajuste `trustedOrigins`).
+3. **Home / Catálogo** (seções sobre a fundação; dados reais + placeholders).
+4. **Player de aula** (`LessonPlayer` island + sidebar + abas + notas).
 
-> Criado em 2026-07-03 15:58 (-03) · Última modificação: 2026-07-03 15:58 (-03)
+> Criado em 2026-07-03 15:58 (-03) · Última modificação: 2026-07-03 16:05 (-03)
