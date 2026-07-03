@@ -3,6 +3,14 @@ import AppLayout from "@/layouts/AppLayout.astro"
 import Hero from "@/components/home/Hero.astro"
 import ContinueWatching from "@/components/home/ContinueWatching.astro"
 import CourseGrid from "@/components/home/CourseGrid.astro"
+import Trilhas from "@/components/home/Trilhas.astro"
+import Categorias from "@/components/home/Categorias.astro"
+import PlanoEventos from "@/components/home/PlanoEventos.astro"
+import ProfessoresEventos from "@/components/home/ProfessoresEventos.astro"
+import Depoimentos from "@/components/home/Depoimentos.astro"
+import Stats from "@/components/home/Stats.astro"
+import FAQ from "@/components/home/FAQ.astro"
+import SiteFooter from "@/components/home/SiteFooter.astro"
 import { apiServer } from "@/lib/api"
 import type { CourseListItem, EnrollmentListItem } from "@/lib/types"
 
@@ -15,5 +23,22 @@ const [courses, enrollments] = await Promise.all([
 <AppLayout title="Início — Full Time" user={Astro.locals.user}>
   <Hero course={courses[0]} />
   <ContinueWatching enrollments={enrollments} />
+  <Trilhas />
   <CourseGrid title="Formações em destaque" subtitle="Conteúdos selecionados para a sua prática profissional." courses={courses} />
+  <section class="mx-auto max-w-7xl px-6 py-8">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <Categorias />
+      <PlanoEventos />
+    </div>
+  </section>
+  <ProfessoresEventos />
+  <section class="mx-auto max-w-7xl px-6 py-8">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div class="lg:col-span-1"><Depoimentos /></div>
+      <div class="lg:col-span-2"><Stats /></div>
+    </div>
+  </section>
+  <CourseGrid title="Últimos Conteúdos Adicionados" subtitle="Fique por dentro das novidades da plataforma." courses={courses} />
+  <FAQ />
+  <SiteFooter />
 </AppLayout>

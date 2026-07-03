@@ -1,0 +1,53 @@
+---
+// PLACEHOLDER: sem endpoint — dados mock, substituir quando houver API
+const recomendados = [
+  { titulo: 'Adaptações de Materiais Didáticos', meta: '18 Min · Introdutório' },
+  { titulo: 'Intervenções Comportamentais Positivas', meta: '18 Min · Introdutório' },
+  { titulo: 'Comunicação Alternativa e Aumentativa', meta: '18 Min · Introdutório' },
+]
+
+const plano = [
+  { texto: 'Assistir 3 aulas', fracao: '2/3', pct: 66, cor: 'bg-brand-blue' },
+  { texto: 'Concluir 1 formação', fracao: '0/1', pct: 0, cor: 'bg-brand-purple' },
+  { texto: 'Participar de 1 evento', fracao: '1/1', pct: 100, cor: 'bg-brand-green' },
+]
+---
+<div class="flex h-full flex-col rounded-card bg-white p-5 shadow-card">
+  <div class="flex items-start justify-between">
+    <h2 class="font-display text-lg font-extrabold text-brand-navy">Recomendado para você</h2>
+    <a href="#" class="text-xs font-semibold text-brand-blue hover:underline">Ver todo</a>
+  </div>
+  <ul class="mt-4 flex flex-1 flex-col gap-3">
+    {recomendados.map(r => (
+      <li class="flex items-center gap-3">
+        <div class="h-12 w-16 shrink-0 rounded-lg bg-surface"></div>
+        <div class="min-w-0">
+          <p class="truncate text-sm font-semibold text-brand-navy">{r.titulo}</p>
+          <p class="text-xs text-muted-foreground">{r.meta}</p>
+        </div>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<div class="flex h-full flex-col rounded-card bg-white p-5 shadow-card">
+  <h2 class="font-display text-lg font-extrabold text-brand-navy">Plano de Estudos da Semana</h2>
+  <p class="text-xs text-muted-foreground">Organize sua rotina e mantenha o foco.</p>
+  <ul class="mt-4 flex flex-1 flex-col gap-4">
+    {plano.map(p => (
+      <li>
+        <div class="flex items-center justify-between text-sm">
+          <span class="flex items-center gap-2 font-medium text-brand-navy">
+            <span class={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] text-white ${p.cor}`}>{p.pct === 100 ? '✓' : ''}</span>
+            {p.texto}
+          </span>
+          <span class="text-xs font-semibold text-muted-foreground">{p.fracao}</span>
+        </div>
+        <div class="mt-2 h-1.5 w-full rounded-pill bg-surface">
+          <div class={`h-full rounded-pill ${p.cor}`} style={`width:${p.pct}%`}></div>
+        </div>
+      </li>
+    ))}
+  </ul>
+  <a href="#" class="mt-4 block rounded-pill border border-brand-navy px-4 py-2 text-center text-sm font-semibold text-brand-navy transition hover:bg-brand-navy hover:text-white">Ver meu plano completo</a>
+</div>

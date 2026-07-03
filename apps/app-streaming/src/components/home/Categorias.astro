@@ -1,0 +1,31 @@
+---
+// PLACEHOLDER: sem modelo de categoria na API — dados mock, substituir quando houver.
+const categorias = [
+  { nome: 'Práticas Pedagógicas', cor: 'bg-brand-purple/10 text-brand-purple' },
+  { nome: 'Inclusão', cor: 'bg-brand-blue/10 text-brand-blue' },
+  { nome: 'Neurodesenvolvimento', cor: 'bg-brand-amber/10 text-brand-amber-strong' },
+  { nome: 'Psicomotricidade', cor: 'bg-rose-500/10 text-rose-500' },
+  { nome: 'Gestão Escolar', cor: 'bg-brand-green/10 text-brand-green-strong' },
+  { nome: 'Tecnologias Educacionais', cor: 'bg-indigo-500/10 text-indigo-500' },
+]
+---
+<div class="flex h-full flex-col rounded-card bg-white p-5 shadow-card">
+  <div class="flex items-start justify-between">
+    <div>
+      <h2 class="font-display text-lg font-extrabold text-brand-navy">Categorias</h2>
+      <p class="text-xs text-muted-foreground">Encontre conteúdos por área de interesse.</p>
+    </div>
+    <a href="#" class="text-xs font-semibold text-brand-blue hover:underline">Ver todas</a>
+  </div>
+  <ul class="mt-4 flex flex-1 flex-col gap-1">
+    {categorias.map(c => (
+      <li>
+        <a href="#" class="flex items-center gap-3 rounded-lg px-2 py-2 transition hover:bg-surface">
+          <span class={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${c.cor}`}>●</span>
+          <span class="flex-1 text-sm font-medium text-brand-navy">{c.nome}</span>
+          <svg class="h-4 w-4 text-muted-foreground" viewBox="0 0 20 20" fill="none"><path d="M7 5l6 5-6 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>

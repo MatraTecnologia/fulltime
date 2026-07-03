@@ -1,0 +1,20 @@
+---
+// PLACEHOLDER: sem endpoint — dados mock, substituir quando houver API
+const stats = [
+  { icone: '📚', valor: '+500', label: 'Aulas disponíveis' },
+  { icone: '🧑‍🤝‍🧑', valor: '+12 mil', label: 'Profissionais impactados' },
+  { icone: '🎓', valor: '+50', label: 'Especialistas renomados' },
+  { icone: '🏆', valor: '98%', label: 'Satisfação dos alunos' },
+]
+---
+<div class="flex h-full flex-col justify-center rounded-card bg-brand-navy p-6 text-white shadow-card">
+  <div class="grid grid-cols-2 gap-6 sm:grid-cols-4">
+    {stats.map(s => (
+      <div class="flex flex-col items-center gap-2 text-center">
+        <span class="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-xl">{s.icone}</span>
+        <span class="font-display text-2xl font-extrabold">{s.valor}</span>
+        <span class="text-xs text-white/75">{s.label}</span>
+      </div>
+    ))}
+  </div>
+</div>

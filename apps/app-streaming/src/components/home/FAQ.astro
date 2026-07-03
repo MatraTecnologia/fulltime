@@ -1,0 +1,33 @@
+---
+// PLACEHOLDER: sem endpoint — dados mock, substituir quando houver API
+const perguntas = [
+  { pergunta: 'Como funcionam os cursos da plataforma?', resposta: 'Os cursos são 100% online, organizados em módulos e aulas em vídeo que você assiste no seu próprio ritmo.' },
+  { pergunta: 'Preciso de certificado para me matricular?', resposta: 'Não. A matrícula é livre para qualquer profissional interessado em se aperfeiçoar.' },
+  { pergunta: 'Os certificados são reconhecidos?', resposta: 'Sim, todos os certificados emitidos são válidos para progressão de carreira.' },
+  { pergunta: 'Como funcionam os eventos ao vivo?', resposta: 'Os eventos acontecem por videoconferência, com inscrição prévia e materiais de apoio.' },
+  { pergunta: 'Posso acessar os cursos pelo celular?', resposta: 'Sim, a plataforma é totalmente responsiva e funciona em qualquer dispositivo.' },
+]
+---
+<section class="mx-auto max-w-7xl px-6 py-8">
+  <h2 class="font-display text-xl font-extrabold text-brand-navy">Dúvidas Frequentes</h2>
+  <p class="text-sm text-muted-foreground">Encontre respostas para as principais dúvidas.</p>
+  <div class="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr]">
+    <div class="grid grid-cols-1 gap-x-8 sm:grid-cols-2">
+      {perguntas.map(p => (
+        <details class="group border-b border-hairline py-3">
+          <summary class="flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-brand-navy">
+            {p.pergunta}
+            <svg class="h-4 w-4 shrink-0 text-muted-foreground transition group-open:rotate-180" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </summary>
+          <p class="mt-2 text-sm text-muted-foreground">{p.resposta}</p>
+        </details>
+      ))}
+    </div>
+    <div class="flex flex-col items-start gap-3 rounded-card bg-white p-5 shadow-card">
+      <span class="flex h-11 w-11 items-center justify-center rounded-full bg-brand-blue/10 text-xl">🎧</span>
+      <h3 class="font-display text-base font-bold text-brand-navy">Ainda tem dúvidas?</h3>
+      <p class="text-sm text-muted-foreground">Nossa equipe está pronta para te ajudar!</p>
+      <a href="#" class="mt-1 w-full rounded-pill bg-brand-blue px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brand-blue-strong">Falar com suporte</a>
+    </div>
+  </div>
+</section>
