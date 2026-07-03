@@ -1,0 +1,15 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro"
+interface Props { title: string }
+const { title } = Astro.props
+---
+<BaseLayout title={title}>
+  <main class="flex min-h-screen items-center justify-center bg-surface px-4">
+    <div class="w-full max-w-md">
+      <div class="mb-8 text-center">
+        <span class="font-display text-2xl font-extrabold text-brand-navy">Full <span class="text-brand-blue">Time</span></span>
+      </div>
+      <slot />
+    </div>
+  </main>
+</BaseLayout>
