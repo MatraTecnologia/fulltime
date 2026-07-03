@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@fulltime/ui'
 import type { Lesson } from '@/lib/types'
+import { safeHref } from '@/lib/url'
 
 interface Props { lesson: Lesson; nextLessonTitle: string | null }
 
@@ -32,12 +33,15 @@ export const SidePanel = ({ lesson, nextLessonTitle }: Props) => {
         <h3 className="font-display font-bold text-brand-navy">Recursos da aula</h3>
         {lesson.attachments.length ? (
           <ul className="mt-2 space-y-2">
-            {lesson.attachments.map(a => (
-              <li key={a.id} className="flex items-center justify-between rounded-card border border-hairline p-3 text-sm">
-                <span className="truncate text-brand-navy">{a.name}</span>
-                <a href={a.url} target="_blank" rel="noopener noreferrer" className="shrink-0 text-brand-blue">↓</a>
-              </li>
-            ))}
+            {lesson.attachments.map(a => {
+              const href = safeHref(a.url)
+              return (
+                <li key={a.id} className="flex items-center justify-between rounded-card border border-hairline p-3 text-sm">
+                  <span className="truncate text-brand-navy">{a.name}</span>
+                  {href && <a href={href} target="_blank" rel="noopener noreferrer" className="shrink-0 text-brand-blue">↓</a>}
+                </li>
+              )
+            })}
           </ul>
         ) : <p className="mt-2 text-sm text-brand-navy/50">Sem recursos.</p>}
       </section>

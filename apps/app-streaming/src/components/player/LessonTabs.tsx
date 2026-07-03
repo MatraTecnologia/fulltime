@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Lesson } from '@/lib/types'
+import { safeHref } from '@/lib/url'
 
 interface Props { lesson: Lesson; instructorName: string }
 const TABS = ['Sobre a aula', 'Transcrição', 'Materiais', 'Atividades', 'Comentários'] as const
@@ -25,11 +26,16 @@ export const LessonTabs = ({ lesson, instructorName }: Props) => {
           lesson.attachments.length
             ? (
               <ul className="space-y-2">
-                {lesson.attachments.map(a => (
-                  <li key={a.id}>
-                    <a href={a.url} target="_blank" rel="noopener noreferrer" className="text-brand-blue underline">{a.name}</a>
-                  </li>
-                ))}
+                {lesson.attachments.map(a => {
+                  const href = safeHref(a.url)
+                  return (
+                    <li key={a.id}>
+                      {href
+                        ? <a href={href} target="_blank" rel="noopener noreferrer" className="text-brand-blue underline">{a.name}</a>
+                        : <span className="text-brand-navy/50">{a.name}</span>}
+                    </li>
+                  )
+                })}
               </ul>
             )
             : <p>Nenhum material para esta aula.</p>
