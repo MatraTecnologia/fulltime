@@ -14,6 +14,7 @@ const NAV = [
   { label: 'Categorias', href: '/categorias' },
   { label: 'Eventos', href: '/eventos' },
   { label: 'Certificações', href: '/certificacoes' },
+  { label: 'Blog', href: '/blog' },
 ]
 
 export const AppHeader = ({ user }: Props) => {
