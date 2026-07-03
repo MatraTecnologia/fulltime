@@ -2,4 +2,10 @@
 import AuthLayout from "@/layouts/AuthLayout.astro"
 import { VerifyNotice } from "@/components/auth/VerifyNotice.tsx"
 ---
-<AuthLayout title="Verifique seu e-mail — Full Time"><VerifyNotice client:load /></AuthLayout>
+<AuthLayout
+  title="Verifique seu e-mail — Full Time"
+  heading="Verifique seu e-mail"
+  subheading="Confirme seu endereço para ativar a conta."
+>
+  <VerifyNotice client:load />
+</AuthLayout>

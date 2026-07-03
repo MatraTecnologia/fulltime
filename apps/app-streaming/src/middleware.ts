@@ -1,7 +1,7 @@
 import { defineMiddleware } from 'astro:middleware'
 import { apiServer } from './lib/api'
 
-const PUBLIC_PATHS = ['/login', '/cadastro', '/recuperar-senha', '/redefinir-senha', '/verificar', '/preview-player']
+const PUBLIC_PATHS = ['/login', '/cadastro', '/recuperar-senha', '/redefinir-senha', '/verificar', '/verificar-codigo', '/preview-player', '/preview-profile', '/acesso-negado', '/manutencao']
 
 const isPublic = (pathname: string) =>
   PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'))

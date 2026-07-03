@@ -1,0 +1,10 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro"
+import { ProfilePage } from "@/components/profile/ProfilePage.tsx"
+
+const user = Astro.locals.user
+if (!user) return Astro.redirect('/login')
+---
+<AppLayout title="Meu perfil — Full Time" user={user}>
+  <ProfilePage client:load user={user} />
+</AppLayout>

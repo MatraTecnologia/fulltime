@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Label } from '@fulltime/ui'
 import { authClient } from '@/lib/auth-client'
+import { TextField, FormAlert, Spinner, primaryBtnCls, linkCls } from './ui'
 
 export const ForgotPasswordForm = () => {
   const [email, setEmail] = useState('')
@@ -15,22 +15,35 @@ export const ForgotPasswordForm = () => {
     setSent(true)
   }
 
+  if (sent) {
+    return (
+      <div className="space-y-5">
+        <FormAlert kind="success">
+          <p className="font-semibold">Verifique seu e-mail</p>
+          <p>Se existir uma conta com <strong>{email}</strong>, enviamos um link para redefinir a senha.</p>
+        </FormAlert>
+        <a href="/login" className={primaryBtnCls}>Voltar para o login</a>
+        <p className="text-center text-sm text-muted-foreground">
+          Não recebeu? Confira a caixa de spam ou tente novamente em instantes.
+        </p>
+      </div>
+    )
+  }
+
   return (
-    <Card>
-      <CardHeader><CardTitle className="text-xl">Recuperar senha</CardTitle></CardHeader>
-      <CardContent>
-        {sent ? (
-          <p className="text-sm text-brand-navy/80">Se existir uma conta com esse e-mail, enviamos um link para redefinir a senha.</p>
-        ) : (
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div className="space-y-2"><Label htmlFor="email">E-mail</Label><Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required /></div>
-            <Button type="submit" disabled={loading} className="w-full bg-brand-amber font-semibold text-brand-navy hover:bg-brand-amber/90">
-              {loading ? 'Enviando…' : 'Enviar link'}
-            </Button>
-          </form>
-        )}
-        <a href="/login" className="mt-4 inline-block text-sm text-brand-blue underline">Voltar para o login</a>
-      </CardContent>
-    </Card>
+    <div className="space-y-5">
+      <form onSubmit={onSubmit} className="space-y-4">
+        <TextField id="email" label="E-mail" type="email" value={email} onChange={setEmail} autoComplete="email" placeholder="voce@exemplo.com" required />
+
+        <button type="submit" disabled={loading} className={primaryBtnCls}>
+          {loading && <Spinner />}
+          {loading ? 'Enviando…' : 'Enviar link'}
+        </button>
+      </form>
+
+      <p className="text-center text-sm text-muted-foreground">
+        Lembrou a senha? <a href="/login" className={linkCls}>Voltar para o login</a>
+      </p>
+    </div>
   )
 }

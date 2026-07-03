@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Label } from '@fulltime/ui'
 import { signUp } from '@/lib/auth-client'
+import { PasswordField, TextField, FormAlert, Spinner, GoogleButton, Divider, primaryBtnCls, linkCls } from './ui'
 
 export const SignupForm = () => {
   const [name, setName] = useState('')
@@ -21,31 +21,43 @@ export const SignupForm = () => {
 
   if (done) {
     return (
-      <Card>
-        <CardHeader><CardTitle className="text-xl">Confirme seu e-mail</CardTitle></CardHeader>
-        <CardContent>
-          <p className="text-sm text-brand-navy/80">Enviamos um link de verificação para <strong>{email}</strong>. Abra-o para ativar sua conta.</p>
-          <a href="/login" className="mt-4 inline-block text-sm text-brand-blue underline">Voltar para o login</a>
-        </CardContent>
-      </Card>
+      <div className="space-y-5">
+        <FormAlert kind="success">
+          <p className="font-semibold">Confirme seu e-mail</p>
+          <p>Enviamos um link de verificação para <strong>{email}</strong>. Abra-o para ativar sua conta.</p>
+        </FormAlert>
+        <a href="/login" className={primaryBtnCls}>Voltar para o login</a>
+        <p className="text-center text-sm text-muted-foreground">
+          Não recebeu? Verifique a caixa de spam ou tente novamente em instantes.
+        </p>
+      </div>
     )
   }
 
   return (
-    <Card>
-      <CardHeader><CardTitle className="text-xl">Criar conta</CardTitle></CardHeader>
-      <CardContent>
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div className="space-y-2"><Label htmlFor="name">Nome</Label><Input id="name" value={name} onChange={e => setName(e.target.value)} required /></div>
-          <div className="space-y-2"><Label htmlFor="email">E-mail</Label><Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required /></div>
-          <div className="space-y-2"><Label htmlFor="password">Senha</Label><Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={8} /></div>
-          {error && <p role="alert" className="text-sm text-brand-navy/80">{error}</p>}
-          <Button type="submit" disabled={loading} className="w-full bg-brand-amber font-semibold text-brand-navy hover:bg-brand-amber/90">
-            {loading ? 'Criando…' : 'Criar conta'}
-          </Button>
-        </form>
-        <a href="/login" className="mt-4 inline-block text-sm text-brand-blue underline">Já tenho conta</a>
-      </CardContent>
-    </Card>
+    <div className="space-y-5">
+      <form onSubmit={onSubmit} className="space-y-4">
+        <TextField id="name" label="Nome" value={name} onChange={setName} autoComplete="name" placeholder="Seu nome completo" required />
+        <TextField id="email" label="E-mail" type="email" value={email} onChange={setEmail} autoComplete="email" placeholder="voce@exemplo.com" required />
+        <PasswordField id="password" label="Senha" value={password} onChange={setPassword} autoComplete="new-password" placeholder="Mínimo de 8 caracteres" required minLength={8} />
+
+        {error && <FormAlert kind="error"><p>{error}</p></FormAlert>}
+
+        <button type="submit" disabled={loading} className={primaryBtnCls}>
+          {loading && <Spinner />}
+          {loading ? 'Criando…' : 'Criar conta'}
+        </button>
+      </form>
+
+      <Divider label="ou" />
+      <GoogleButton />
+
+      <p className="text-center text-sm text-muted-foreground">
+        Já tem conta? <a href="/login" className={linkCls}>Entrar</a>
+      </p>
+      <p className="text-center text-xs text-brand-navy/45">
+        Precisa de ajuda? <a href="mailto:matratecnologia@gmail.com" className="font-medium text-brand-navy/60 hover:underline">Falar com o suporte</a>
+      </p>
+    </div>
   )
 }

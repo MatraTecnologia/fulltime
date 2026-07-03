@@ -1,0 +1,45 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro"
+---
+<BaseLayout title="Acesso negado — Full Time">
+  <main class="flex min-h-screen flex-col items-center justify-center bg-surface px-4 py-12 sm:px-6">
+    <a href="/" class="auth-fade mb-10 flex items-center gap-2.5">
+      <img src="/icone.svg" alt="" class="h-8 w-auto" />
+      <span class="font-display text-lg font-extrabold text-brand-navy">Full <span class="text-brand-blue">Time</span></span>
+    </a>
+
+    <div class="auth-rise w-full max-w-lg rounded-card bg-white p-8 text-center shadow-card sm:p-12">
+      <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-brand-navy text-brand-amber shadow-lifted">
+        <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="4" y="10.5" width="16" height="10.5" rx="2.5" stroke="currentColor" stroke-width="1.8" />
+          <path d="M7.5 10.5V7.5a4.5 4.5 0 0 1 9 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <circle cx="12" cy="15.5" r="1.4" fill="currentColor" />
+          <path d="M12 16.9v1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </div>
+
+      <p class="mt-8 font-display text-7xl font-extrabold leading-none tracking-tight text-brand-navy sm:text-8xl">403</p>
+      <h1 class="mt-4 font-display text-2xl font-extrabold tracking-tight text-brand-navy sm:text-3xl">Acesso negado</h1>
+      <p class="mx-auto mt-3 max-w-sm text-muted-foreground">
+        Você não tem permissão para acessar esta página.
+      </p>
+
+      <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:justify-center">
+        <a
+          href="/"
+          class="inline-flex items-center justify-center rounded-xl bg-brand-blue px-6 py-3 font-semibold text-white transition hover:bg-brand-blue-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+        >
+          Voltar para o início
+        </a>
+        <a
+          href="/login"
+          class="inline-flex items-center justify-center rounded-xl border border-hairline bg-white px-6 py-3 font-semibold text-brand-navy transition hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-navy focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+        >
+          Fazer login
+        </a>
+      </div>
+    </div>
+
+    <p class="auth-fade mt-8 text-xs text-muted-foreground">© 2026 Full Time · Formação continuada para profissionais da educação</p>
+  </main>
+</BaseLayout>

@@ -2,4 +2,10 @@
 import AuthLayout from "@/layouts/AuthLayout.astro"
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm.tsx"
 ---
-<AuthLayout title="Redefinir senha — Full Time"><ResetPasswordForm client:load /></AuthLayout>
+<AuthLayout
+  title="Redefinir senha — Full Time"
+  heading="Criar nova senha"
+  subheading="Escolha uma senha forte para proteger sua conta."
+>
+  <ResetPasswordForm client:load />
+</AuthLayout>

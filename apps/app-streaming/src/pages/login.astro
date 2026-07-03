@@ -2,4 +2,10 @@
 import AuthLayout from "@/layouts/AuthLayout.astro"
 import { LoginForm } from "@/components/auth/LoginForm.tsx"
 ---
-<AuthLayout title="Entrar — Full Time"><LoginForm client:load /></AuthLayout>
+<AuthLayout
+  title="Entrar — Full Time"
+  heading="Bem-vindo de volta"
+  subheading="Entre para continuar sua jornada de aprendizado."
+>
+  <LoginForm client:load />
+</AuthLayout>

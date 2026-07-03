@@ -1,0 +1,8 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro"
+import { ProfilePage } from "@/components/profile/ProfilePage.tsx"
+const user = { id: 'u1', name: 'Ryan M. O. V.', email: 'ryan@example.com', role: 'profissional', image: null }
+---
+<AppLayout title="preview perfil" user={user}>
+  <ProfilePage client:load user={user} />
+</AppLayout>

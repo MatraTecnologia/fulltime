@@ -1,0 +1,52 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro"
+import { primaryBtnCls } from "@/components/auth/ui"
+
+const passos = [
+  {
+    titulo: "Explore as formações",
+    texto: "Navegue pelo catálogo e escolha por onde começar sua jornada.",
+    icone: '<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H10l2 2h6.5A1.5 1.5 0 0 1 20 7.5v9A1.5 1.5 0 0 1 18.5 18h-13A1.5 1.5 0 0 1 4 16.5v-11Z" />',
+  },
+  {
+    titulo: "Monte seu perfil",
+    texto: "Complete seus dados e personalize sua experiência na plataforma.",
+    icone: '<circle cx="12" cy="8" r="3.2" /><path d="M5.5 19a6.5 6.5 0 0 1 13 0" />',
+  },
+  {
+    titulo: "Participe de eventos ao vivo",
+    texto: "Acompanhe encontros e aulas ao vivo com especialistas da área.",
+    icone: '<rect x="4" y="6" width="12.5" height="12" rx="1.6" /><path d="M16.5 10.5 20 8.5v7l-3.5-2v-3Z" />',
+  },
+]
+---
+<AuthLayout
+  title="Primeiro acesso — Full Time"
+  heading="Tudo pronto para começar"
+  subheading="Sua conta está ativa. Veja por onde começar."
+>
+  <div class="space-y-6">
+    <div class="rounded-xl border border-hairline bg-white p-5 shadow-soft sm:p-6">
+      <ul class="space-y-5">
+        {passos.map((p, i) => (
+          <li class="flex items-start gap-4">
+            <span class="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-blue/10 text-brand-blue">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={p.icone} />
+              <span class="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-brand-amber text-xs font-bold text-brand-navy">{i + 1}</span>
+            </span>
+            <div class="pt-0.5">
+              <p class="font-display font-bold text-brand-navy">{p.titulo}</p>
+              <p class="mt-0.5 text-sm text-muted-foreground">{p.texto}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <a href="/" class={primaryBtnCls}>Ir para a plataforma</a>
+
+    <p class="text-center text-sm text-muted-foreground">
+      Precisa de ajuda? <a href="mailto:matratecnologia@gmail.com" class="font-medium text-brand-navy/60 hover:underline">Falar com o suporte</a>
+    </p>
+  </div>
+</AuthLayout>
