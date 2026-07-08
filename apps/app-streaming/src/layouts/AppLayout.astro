@@ -4,7 +4,7 @@ import { AppHeader } from "@/components/app/AppHeader.tsx"
 interface Props { title: string; user: App.Locals['user'] }
 const { title, user } = Astro.props
 ---
-<BaseLayout title={title}>
+<BaseLayout title={title} noindex>
   <AppHeader client:load user={user} />
   <slot />
 </BaseLayout>

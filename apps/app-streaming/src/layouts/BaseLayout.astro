@@ -1,14 +1,34 @@
 ---
 import "@/styles/globals.css"
-interface Props { title: string }
-const { title } = Astro.props
+interface Props {
+  title: string
+  description?: string
+  image?: string
+  noindex?: boolean
+}
+const { title, description, image, noindex } = Astro.props
+const canonical = new URL(Astro.url.pathname, Astro.url.origin).toString()
+const ogImage = image ?? '/logo.svg'
 ---
 <!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/icone.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/icone.svg" />
     <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Full Time" />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    {description && <meta name="twitter:description" content={description} />}
   </head>
   <body class="min-h-screen bg-white text-brand-navy antialiased">
     <slot />
