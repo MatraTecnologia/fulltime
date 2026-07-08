@@ -5,6 +5,7 @@ import { sendEmail } from './mail.js'
 
 const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000'
 const streamingUrl = process.env.STREAMING_URL ?? 'http://localhost:4321'
+const dashboardUrl = process.env.DASHBOARD_URL ?? 'http://localhost:3005'
 
 const brandEmail = (title: string, body: string, cta: { url: string; label: string }) => `
   <div style="max-width:560px;margin:32px auto;font-family:Inter,Arial,sans-serif;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">
@@ -67,5 +68,5 @@ export const auth = betterAuth({
       })
     },
   },
-  trustedOrigins: [frontendUrl, streamingUrl, process.env.BETTER_AUTH_URL ?? 'http://localhost:3333'],
+  trustedOrigins: [frontendUrl, streamingUrl, dashboardUrl, process.env.BETTER_AUTH_URL ?? 'http://localhost:3333'],
 })

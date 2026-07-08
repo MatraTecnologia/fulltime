@@ -16,6 +16,7 @@ await app.register(fastifyCors, {
   origin: [
     process.env.FRONTEND_URL ?? 'http://localhost:3000',
     process.env.STREAMING_URL ?? 'http://localhost:4321',
+    process.env.DASHBOARD_URL ?? 'http://localhost:3005',
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   credentials: true,
