@@ -6,9 +6,18 @@ import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/layout/theme-toggle"
 import { UserMenu } from "@/components/layout/user-menu"
+import { useCurrentUser } from "@/hooks/use-current-user"
 import type { InstructorProfile } from "@/types"
 
 export const AppHeader = ({ profile }: { profile: InstructorProfile }) => {
+  const { user } = useCurrentUser()
+  const displayProfile: InstructorProfile = {
+    ...profile,
+    name: user?.name ?? profile.name,
+    email: user?.email ?? profile.email,
+    avatarUrl: user?.avatarUrl ?? profile.avatarUrl,
+  }
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur-md">
       <SidebarTrigger className="text-muted-foreground" />
@@ -37,7 +46,7 @@ export const AppHeader = ({ profile }: { profile: InstructorProfile }) => {
           <span className="absolute right-2 top-2 size-2 rounded-full bg-destructive ring-2 ring-background" />
         </Button>
         <Separator orientation="vertical" className="mx-1 h-6" />
-        <UserMenu profile={profile} />
+        <UserMenu profile={displayProfile} />
       </div>
     </header>
   )

@@ -1,8 +1,7 @@
 import { Download } from "lucide-react"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { Button } from "@/components/ui/button"
-import { StudentsTable } from "@/components/dashboard/students-table"
-import { students } from "@/lib/mock/students"
+import { StudentsTableConnected } from "@/components/dashboard/students-table-connected"
 
 const StudentsPage = () => {
   return (
@@ -14,7 +13,7 @@ const StudentsPage = () => {
         </Button>
       </PageHeader>
 
-      <StudentsTable students={students} />
+      <StudentsTableConnected />
     </div>
   )
 }

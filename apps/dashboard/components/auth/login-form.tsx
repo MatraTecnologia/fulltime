@@ -33,18 +33,23 @@ export const LoginForm = () => {
     setError("")
     setNotice("")
     setUnverified(false)
-    const { error } = await signIn.email({ email, password, rememberMe: remember })
-    setLoading(false)
-    if (error) {
-      if (error.status === 403) {
-        setUnverified(true)
-        setError("Seu e-mail ainda não foi verificado. Confira sua caixa de entrada ou reenvie o link abaixo.")
-      } else {
-        setError(error.message ?? "E-mail ou senha incorretos. Tente novamente.")
+    try {
+      const { error } = await signIn.email({ email, password, rememberMe: remember })
+      if (error) {
+        if (error.status === 403) {
+          setUnverified(true)
+          setError("Seu e-mail ainda não foi verificado. Confira sua caixa de entrada ou reenvie o link abaixo.")
+        } else {
+          setError(error.message ?? "E-mail ou senha incorretos. Tente novamente.")
+        }
+        return
       }
-      return
+      router.replace(safeNext(params.get("next")))
+    } catch {
+      setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.")
+    } finally {
+      setLoading(false)
     }
-    router.replace(safeNext(params.get("next")))
   }
 
   const onResend = async () => {
