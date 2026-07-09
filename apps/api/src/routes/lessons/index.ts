@@ -4,8 +4,11 @@ import { prisma } from '../../lib/prisma.js'
 import { requireAuth, requireRole } from '../../lib/session.js'
 import { resolveVideo } from '../../lib/video.js'
 import { signPlaybackId } from '../../lib/mux.js'
+import { registerQuizRoutes } from './quiz.js'
 
 export default async function lessonRoutes(app: FastifyInstance) {
+  registerQuizRoutes(app)
+
   app.post('/modules/:moduleId/lessons', {
     preHandler: [requireAuth, requireRole('admin', 'instrutor')],
     schema: {
@@ -22,6 +25,7 @@ export default async function lessonRoutes(app: FastifyInstance) {
         properties: {
           title: { type: 'string' },
           content: { type: 'string' },
+          transcript: { type: 'string' },
           thumbnail: { type: 'string' },
           videoSource: { type: 'string', enum: ['MUX', 'YOUTUBE', 'VIMEO', 'NONE'], default: 'NONE' },
           videoRef: { type: 'string' },
@@ -32,9 +36,10 @@ export default async function lessonRoutes(app: FastifyInstance) {
     },
   }, async (request, reply) => {
     const { moduleId } = request.params as { moduleId: string }
-    const { title, content, thumbnail, videoSource, videoRef, durationSec, order: orderInput } = request.body as {
+    const { title, content, transcript, thumbnail, videoSource, videoRef, durationSec, order: orderInput } = request.body as {
       title: string
       content?: string
+      transcript?: string
       thumbnail?: string
       videoSource?: VideoSource
       videoRef?: string
@@ -53,7 +58,7 @@ export default async function lessonRoutes(app: FastifyInstance) {
 
     try {
       const lesson = await prisma.lesson.create({
-        data: { moduleId, title, content, thumbnail, videoSource, videoRef, durationSec, order },
+        data: { moduleId, title, content, transcript, thumbnail, videoSource, videoRef, durationSec, order },
       })
       return reply.status(201).send(lesson)
     } catch (error) {
@@ -106,6 +111,7 @@ export default async function lessonRoutes(app: FastifyInstance) {
         properties: {
           title: { type: 'string' },
           content: { type: 'string' },
+          transcript: { type: 'string' },
           thumbnail: { type: 'string' },
           videoSource: { type: 'string', enum: ['MUX', 'YOUTUBE', 'VIMEO', 'NONE'] },
           videoRef: { type: 'string' },
@@ -116,9 +122,10 @@ export default async function lessonRoutes(app: FastifyInstance) {
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string }
-    const { title, content, thumbnail, videoSource, videoRef, durationSec, order } = request.body as {
+    const { title, content, transcript, thumbnail, videoSource, videoRef, durationSec, order } = request.body as {
       title?: string
       content?: string
+      transcript?: string
       thumbnail?: string
       videoSource?: VideoSource
       videoRef?: string
@@ -129,7 +136,7 @@ export default async function lessonRoutes(app: FastifyInstance) {
     try {
       const lesson = await prisma.lesson.update({
         where: { id },
-        data: { title, content, thumbnail, videoSource, videoRef, durationSec, order },
+        data: { title, content, transcript, thumbnail, videoSource, videoRef, durationSec, order },
       })
       return lesson
     } catch (error) {

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { FolderPlus, GripVertical, Pencil, Trash2, Video } from "lucide-react"
+import { FolderPlus, GripVertical, ListChecks, Pencil, Trash2, Video } from "lucide-react"
 import {
   Accordion,
   AccordionContent,
@@ -24,6 +24,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { EmptyState } from "@/components/dashboard/empty-state"
 import { AddContentSheet } from "@/components/dashboard/course-detail/add-content-sheet"
 import { EditLessonSheet } from "@/components/dashboard/course-detail/edit-lesson-sheet"
+import { QuizEditorSheet } from "@/components/dashboard/course-detail/quiz-editor-sheet"
 import { useCreateModule, useDeleteLesson, useDeleteModule } from "@/hooks/use-course-detail"
 import { formatDurationSec, type CourseLessonNode, type CourseModuleNode } from "@/services/courses-detail"
 
@@ -91,6 +92,7 @@ export const CourseContentTab = ({
   const deleteModule = useDeleteModule(slug)
   const deleteLesson = useDeleteLesson(slug)
   const [editingLesson, setEditingLesson] = React.useState<CourseLessonNode | null>(null)
+  const [quizLesson, setQuizLesson] = React.useState<CourseLessonNode | null>(null)
 
   return (
     <div className="flex flex-col gap-4">
@@ -172,6 +174,15 @@ export const CourseContentTab = ({
                           variant="ghost"
                           size="icon"
                           className="size-8 shrink-0 text-muted-foreground"
+                          aria-label="Atividade da aula"
+                          onClick={() => setQuizLesson(lesson)}
+                        >
+                          <ListChecks className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 shrink-0 text-muted-foreground"
                           aria-label="Editar aula"
                           onClick={() => setEditingLesson(lesson)}
                         >
@@ -202,6 +213,15 @@ export const CourseContentTab = ({
           slug={slug}
           open={!!editingLesson}
           onOpenChange={(open) => !open && setEditingLesson(null)}
+        />
+      )}
+
+      {quizLesson && (
+        <QuizEditorSheet
+          lessonId={quizLesson.id}
+          lessonTitle={quizLesson.title}
+          open={!!quizLesson}
+          onOpenChange={(open) => !open && setQuizLesson(null)}
         />
       )}
     </div>

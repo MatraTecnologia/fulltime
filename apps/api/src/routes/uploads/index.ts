@@ -15,6 +15,21 @@ const extFromType = (type: string) => {
   return map[type] ?? 'bin'
 }
 
+const FILE_EXT: Record<string, string> = {
+  'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/avif': 'avif', 'image/gif': 'gif',
+  'application/pdf': 'pdf',
+  'application/msword': 'doc',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+  'application/vnd.ms-powerpoint': 'ppt',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
+  'application/vnd.ms-excel': 'xls',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+  'application/zip': 'zip',
+  'application/x-zip-compressed': 'zip',
+  'text/plain': 'txt',
+  'text/csv': 'csv',
+}
+
 const uploadsDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'public', 'uploads')
 
 export default async function uploadRoutes(app: FastifyInstance) {
@@ -76,6 +91,40 @@ export default async function uploadRoutes(app: FastifyInstance) {
 
     await mkdir(uploadsDir, { recursive: true })
     const name = `${randomUUID()}.${extFromType(contentType)}`
+    await writeFile(join(uploadsDir, name), buffer)
+
+    const base = `${request.protocol}://${request.headers.host ?? ''}`
+    return reply.status(201).send({ publicUrl: `${base}/static/uploads/${name}` })
+  })
+
+  app.post('/uploads/file', {
+    preHandler: [requireAuth, requireRole('admin', 'instrutor')],
+    schema: {
+      tags: ['uploads'],
+      summary: 'Upload de material (documento ou imagem, armazenamento local)',
+      body: {
+        type: 'object',
+        required: ['dataUrl'],
+        properties: { dataUrl: { type: 'string' } },
+      },
+    },
+  }, async (request, reply) => {
+    const { dataUrl } = request.body as { dataUrl: string }
+    const match = /^data:([^;]+);base64,(.+)$/.exec(dataUrl)
+    if (!match) return reply.status(400).send({ error: 'Arquivo inválido.' })
+
+    const contentType = match[1] ?? ''
+    const base64 = match[2] ?? ''
+    const ext = FILE_EXT[contentType]
+    if (!ext) return reply.status(400).send({ error: 'Formato de arquivo não suportado.' })
+
+    const buffer = Buffer.from(base64, 'base64')
+    if (buffer.length > 25 * 1024 * 1024) {
+      return reply.status(413).send({ error: 'Arquivo muito grande (máx. 25 MB).' })
+    }
+
+    await mkdir(uploadsDir, { recursive: true })
+    const name = `${randomUUID()}.${ext}`
     await writeFile(join(uploadsDir, name), buffer)
 
     const base = `${request.protocol}://${request.headers.host ?? ''}`

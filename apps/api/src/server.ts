@@ -10,7 +10,7 @@ import { join, dirname } from 'path'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const app = Fastify({ logger: true, trustProxy: true, bodyLimit: 12 * 1024 * 1024 })
+const app = Fastify({ logger: true, trustProxy: true, bodyLimit: 34 * 1024 * 1024 })
 
 await app.register(fastifyCors, {
   origin: [

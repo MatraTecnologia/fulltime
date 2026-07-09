@@ -4,6 +4,7 @@ import { safeHref } from '@/lib/url'
 import { formatDate, formatDuration } from '@/lib/format'
 import { apiClient, ApiError } from '@/lib/api'
 import { IconStar } from '@/components/icons'
+import { QuizPanel } from './QuizPanel'
 
 interface Props {
   lesson: Lesson
@@ -188,8 +189,7 @@ export const LessonTabs = ({ lesson, course, isDone, saving, completeError, onCo
             ? <p className="whitespace-pre-wrap">{lesson.transcript}</p>
             : <p className="text-brand-navy/50">Transcrição em breve.</p>
         )}
-        {/* PLACEHOLDER: sem endpoint — atividades */}
-        {tab === 'Atividades' && <p className="text-brand-navy/50">Atividades em breve.</p>}
+        {tab === 'Atividades' && <QuizPanel lessonId={lesson.id} />}
 
         {tab === 'Comentários' && (
           <div className="space-y-5">

@@ -13,3 +13,9 @@ export const uploadImage = async (file: File): Promise<string> => {
   const { data } = await api.post<{ publicUrl: string }>("/uploads/image", { dataUrl })
   return data.publicUrl
 }
+
+export const uploadFile = async (file: File): Promise<string> => {
+  const dataUrl = await readAsDataUrl(file)
+  const { data } = await api.post<{ publicUrl: string }>("/uploads/file", { dataUrl })
+  return data.publicUrl
+}

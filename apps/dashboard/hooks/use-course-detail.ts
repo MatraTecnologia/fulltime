@@ -5,17 +5,24 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { getApiErrorMessage } from "@/lib/api"
 import {
+  createAttachment,
   createCourse,
   createLesson,
   createModule,
+  deleteAttachment,
   deleteLesson,
+  deleteLessonQuiz,
   deleteModule,
   getCourseBySlug,
+  getLesson,
+  getLessonQuiz,
   publishCourse,
+  saveLessonQuiz,
   updateCourse,
   updateLesson,
   type CreateCourseInput,
   type CreateLessonInput,
+  type QuizPayload,
   type UpdateCourseInput,
   type UpdateLessonInput,
 } from "@/services/courses-detail"
@@ -115,8 +122,9 @@ export const useUpdateLesson = (slug: string) => {
 
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: UpdateLessonInput }) => updateLesson(id, input),
-    onSuccess: () => {
+    onSuccess: (_data, { id }) => {
       qc.invalidateQueries({ queryKey: ["course", slug] })
+      qc.invalidateQueries({ queryKey: ["lesson", id] })
       toast.success("Aula atualizada.")
     },
     onError: (error) => toast.error(getApiErrorMessage(error)),
@@ -131,6 +139,73 @@ export const useDeleteLesson = (slug: string) => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["course", slug] })
       toast.success("Aula excluída.")
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error)),
+  })
+}
+
+export const useLesson = (id: string, enabled = true) =>
+  useQuery({
+    queryKey: ["lesson", id],
+    queryFn: () => getLesson(id),
+    enabled: enabled && !!id,
+  })
+
+export const useCreateAttachment = (lessonId: string) => {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: (input: { name: string; url: string; type?: string }) =>
+      createAttachment(lessonId, input),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["lesson", lessonId] })
+      toast.success("Material adicionado.")
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error)),
+  })
+}
+
+export const useDeleteAttachment = (lessonId: string) => {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => deleteAttachment(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["lesson", lessonId] })
+      toast.success("Material removido.")
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error)),
+  })
+}
+
+export const useLessonQuiz = (lessonId: string, enabled = true) =>
+  useQuery({
+    queryKey: ["lesson", lessonId, "quiz"],
+    queryFn: () => getLessonQuiz(lessonId),
+    enabled: enabled && !!lessonId,
+  })
+
+export const useSaveLessonQuiz = (lessonId: string) => {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: (payload: QuizPayload) => saveLessonQuiz(lessonId, payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["lesson", lessonId, "quiz"] })
+      toast.success("Atividade salva.")
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error)),
+  })
+}
+
+export const useDeleteLessonQuiz = (lessonId: string) => {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => deleteLessonQuiz(lessonId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["lesson", lessonId, "quiz"] })
+      toast.success("Atividade excluída.")
     },
     onError: (error) => toast.error(getApiErrorMessage(error)),
   })

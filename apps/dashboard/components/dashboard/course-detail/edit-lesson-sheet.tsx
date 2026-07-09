@@ -15,6 +15,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import {
@@ -24,7 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useUpdateLesson } from "@/hooks/use-course-detail"
+import { LessonMaterialsSection } from "@/components/dashboard/course-detail/lesson-materials-section"
+import { useLesson, useUpdateLesson } from "@/hooks/use-course-detail"
 import { getApiErrorMessage } from "@/lib/api"
 import { uploadImage } from "@/services/uploads"
 import { createVideoUpload, getVideoStatus, uploadVideoToMux } from "@/services/videos"
@@ -48,8 +50,11 @@ export const EditLessonSheet = ({
 }) => {
   const qc = useQueryClient()
   const updateLesson = useUpdateLesson(slug)
+  const lessonDetail = useLesson(lesson.id, open)
 
   const [title, setTitle] = React.useState(lesson.title)
+  const [content, setContent] = React.useState("")
+  const [transcript, setTranscript] = React.useState("")
   const [thumbnail, setThumbnail] = React.useState(lesson.thumbnail ?? "")
   const [uploadingThumbnail, setUploadingThumbnail] = React.useState(false)
   const [videoSource, setVideoSource] = React.useState<LessonVideoSource>(
@@ -59,8 +64,16 @@ export const EditLessonSheet = ({
   const [videoUrl, setVideoUrl] = React.useState("")
   const [submitting, setSubmitting] = React.useState(false)
 
+  const [loaded, setLoaded] = React.useState(false)
+
   const thumbnailInputRef = React.useRef<HTMLInputElement>(null)
   const videoInputRef = React.useRef<HTMLInputElement>(null)
+
+  if (!loaded && lessonDetail.data) {
+    setLoaded(true)
+    setContent(lessonDetail.data.content ?? "")
+    setTranscript(lessonDetail.data.transcript ?? "")
+  }
 
   const busy = submitting || uploadingThumbnail || updateLesson.isPending
 
@@ -114,6 +127,8 @@ export const EditLessonSheet = ({
         id: lesson.id,
         input: {
           title: title.trim(),
+          content: loaded ? content.trim() : undefined,
+          transcript: loaded ? transcript.trim() : undefined,
           thumbnail: thumbnail || undefined,
           videoSource: embedRef ? videoSource : undefined,
           videoRef: embedRef,
@@ -152,7 +167,7 @@ export const EditLessonSheet = ({
             <CardHeader>
               <CardTitle className="text-base">Detalhes da aula</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="edit-lesson-title">Título da aula</Label>
                 <Input
@@ -160,6 +175,38 @@ export const EditLessonSheet = ({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-lesson-content">Descrição</Label>
+                {lessonDetail.isPending ? (
+                  <div className="flex justify-center py-4">
+                    <Spinner />
+                  </div>
+                ) : (
+                  <Textarea
+                    id="edit-lesson-content"
+                    rows={4}
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Descreva o que o aluno vai aprender nesta aula..."
+                  />
+                )}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-lesson-transcript">Transcrição</Label>
+                {lessonDetail.isPending ? (
+                  <div className="flex justify-center py-4">
+                    <Spinner />
+                  </div>
+                ) : (
+                  <Textarea
+                    id="edit-lesson-transcript"
+                    rows={5}
+                    value={transcript}
+                    onChange={(e) => setTranscript(e.target.value)}
+                    placeholder="Cole aqui a transcrição do vídeo da aula..."
+                  />
+                )}
               </div>
             </CardContent>
           </Card>
@@ -280,6 +327,12 @@ export const EditLessonSheet = ({
               </button>
             </CardContent>
           </Card>
+
+          <LessonMaterialsSection
+            lessonId={lesson.id}
+            attachments={lessonDetail.data?.attachments ?? []}
+            loading={lessonDetail.isPending}
+          />
         </div>
 
         <SheetFooter className="border-t p-5">

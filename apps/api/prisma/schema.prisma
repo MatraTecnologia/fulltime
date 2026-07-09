@@ -96,6 +96,8 @@ model User {
   eventRegistrations EventRegistration[]
   posts         Post[]       @relation("PostAuthor")
   certificateTemplates CertificateTemplate[]
+  quizAttempts  QuizAttempt[]
+  examAttempts  ExamAttempt[]
 
   @@map("users")
 }
@@ -177,6 +179,7 @@ model Course {
   tracks       TrackCourse[]
   certificateTemplateId String?
   certificateTemplate   CertificateTemplate? @relation(fields: [certificateTemplateId], references: [id], onDelete: SetNull)
+  exams        Exam[]
 
   @@map("courses")
 }
@@ -190,6 +193,7 @@ model Module {
   updatedAt DateTime @updatedAt
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessons   Lesson[]
+  exam      Exam?
 
   @@index([courseId])
   @@map("modules")
@@ -215,6 +219,7 @@ model Lesson {
   notes       LessonNote[]
   comments    LessonComment[]
   ratings     LessonRating[]
+  activity    Activity?
 
   @@index([moduleId])
   @@map("lessons")
@@ -508,4 +513,158 @@ model EventRegistration {
   @@unique([eventId, userId])
   @@index([eventId])
   @@map("event_registrations")
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  lessonId  String   @unique
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lesson    Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions Question[]
+  attempts  QuizAttempt[]
+
+  @@map("activities")
+}
+
+model Question {
+  id         String       @id @default(cuid())
+  activityId String
+  statement  String
+  order      Int
+  activity   Activity     @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  options    QuizOption[]
+
+  @@index([activityId])
+  @@map("questions")
+}
+
+model QuizOption {
+  id         String   @id @default(cuid())
+  questionId String
+  text       String
+  isCorrect  Boolean  @default(false)
+  order      Int
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+  @@map("quiz_options")
+}
+
+model QuizAttempt {
+  id         String   @id @default(cuid())
+  activityId String
+  userId     String
+  score      Int
+  total      Int
+  answers    Json
+  createdAt  DateTime @default(now())
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([activityId, userId])
+  @@map("quiz_attempts")
+}
+
+enum ExamQuestionType {
+  SINGLE
+  MULTIPLE
+  TRUE_FALSE
+  ESSAY
+}
+
+enum ExamStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum ExamAttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  GRADING
+  GRADED
+}
+
+model Exam {
+  id           String        @id @default(cuid())
+  courseId     String
+  moduleId     String?       @unique
+  title        String
+  description  String?
+  passingScore Int           @default(70)
+  maxAttempts  Int?
+  status       ExamStatus    @default(DRAFT)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  course       Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module       Module?       @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  questions    ExamQuestion[]
+  attempts     ExamAttempt[]
+
+  @@index([courseId])
+  @@map("exams")
+}
+
+model ExamQuestion {
+  id      String           @id @default(cuid())
+  examId  String
+  type    ExamQuestionType
+  prompt  String
+  order   Int
+  points  Int              @default(1)
+  exam    Exam             @relation(fields: [examId], references: [id], onDelete: Cascade)
+  options ExamOption[]
+  answers ExamAnswer[]
+
+  @@index([examId])
+  @@map("exam_questions")
+}
+
+model ExamOption {
+  id         String       @id @default(cuid())
+  questionId String
+  text       String
+  isCorrect  Boolean      @default(false)
+  order      Int
+  question   ExamQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+  @@map("exam_options")
+}
+
+model ExamAttempt {
+  id            String            @id @default(cuid())
+  examId        String
+  userId        String
+  attemptNumber Int
+  status        ExamAttemptStatus @default(SUBMITTED)
+  autoScore     Int?
+  manualScore   Int?
+  score         Int?
+  passed        Boolean?
+  startedAt     DateTime          @default(now())
+  submittedAt   DateTime?
+  gradedAt      DateTime?
+  exam          Exam              @relation(fields: [examId], references: [id], onDelete: Cascade)
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers       ExamAnswer[]
+
+  @@index([examId, userId])
+  @@map("exam_attempts")
+}
+
+model ExamAnswer {
+  id                String       @id @default(cuid())
+  attemptId         String
+  questionId        String
+  selectedOptionIds String[]
+  essayText         String?
+  awardedPoints     Int?
+  feedback          String?
+  attempt           ExamAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question          ExamQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([attemptId])
+  @@map("exam_answers")
 }

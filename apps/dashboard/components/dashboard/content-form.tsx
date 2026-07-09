@@ -49,6 +49,7 @@ export const ContentForm = ({
   const [moduleId, setModuleId] = React.useState(modules[0]?.id ?? "")
   const [title, setTitle] = React.useState("")
   const [content, setContent] = React.useState("")
+  const [transcript, setTranscript] = React.useState("")
   const [duration, setDuration] = React.useState("")
   const [thumbnail, setThumbnail] = React.useState("")
   const [uploadingThumbnail, setUploadingThumbnail] = React.useState(false)
@@ -104,6 +105,7 @@ export const ContentForm = ({
   const resetForm = () => {
     setTitle("")
     setContent("")
+    setTranscript("")
     setDuration("")
     setThumbnail("")
     setVideoSource("MUX")
@@ -131,6 +133,7 @@ export const ContentForm = ({
         input: {
           title: title.trim(),
           content: content.trim() || undefined,
+          transcript: transcript.trim() || undefined,
           thumbnail: thumbnail || undefined,
           durationSec: parseDuration(duration),
           videoSource: embedRef ? videoSource : undefined,
@@ -184,6 +187,16 @@ export const ContentForm = ({
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Descreva o que o aluno vai aprender nesta aula..."
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="lesson-transcript">Transcrição (opcional)</Label>
+              <Textarea
+                id="lesson-transcript"
+                rows={4}
+                value={transcript}
+                onChange={(e) => setTranscript(e.target.value)}
+                placeholder="Cole aqui a transcrição do vídeo da aula..."
               />
             </div>
           </CardContent>

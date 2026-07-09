@@ -1,3 +1,4 @@
+import axios from "axios"
 import { api } from "@/lib/api"
 import type { CourseStatus } from "@/types"
 
@@ -51,11 +52,35 @@ export interface UpdateCourseInput {
 export interface CreateLessonInput {
   title: string
   content?: string
+  transcript?: string
   thumbnail?: string
   videoSource?: VideoSource
   videoRef?: string
   durationSec?: number
   order?: number
+}
+
+export interface LessonAttachment {
+  id: string
+  lessonId: string
+  name: string
+  url: string
+  type: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface LessonDetail {
+  id: string
+  moduleId: string
+  title: string
+  content: string | null
+  transcript: string | null
+  thumbnail: string | null
+  videoSource: VideoSource
+  videoRef: string | null
+  durationSec: number | null
+  attachments: LessonAttachment[]
 }
 
 export const getCourseBySlug = async (slug: string): Promise<CourseDetail> => {
@@ -113,6 +138,7 @@ export const createLesson = async (
 export interface UpdateLessonInput {
   title?: string
   content?: string
+  transcript?: string
   thumbnail?: string
   videoSource?: VideoSource
   videoRef?: string
@@ -130,6 +156,80 @@ export const updateLesson = async (
 
 export const deleteLesson = async (id: string): Promise<void> => {
   await api.delete(`/lessons/${id}`)
+}
+
+export const getLesson = async (id: string): Promise<LessonDetail> => {
+  const { data } = await api.get<LessonDetail>(`/lessons/${id}`)
+  return data
+}
+
+export const createAttachment = async (
+  lessonId: string,
+  input: { name: string; url: string; type?: string }
+): Promise<LessonAttachment> => {
+  const { data } = await api.post<LessonAttachment>(`/lessons/${lessonId}/attachments`, input)
+  return data
+}
+
+export const deleteAttachment = async (id: string): Promise<void> => {
+  await api.delete(`/attachments/${id}`)
+}
+
+export interface QuizOption {
+  id: string
+  text: string
+  order: number
+  isCorrect: boolean
+}
+
+export interface QuizQuestion {
+  id: string
+  statement: string
+  order: number
+  options: QuizOption[]
+}
+
+export interface LessonQuiz {
+  id: string
+  lessonId: string
+  title: string
+  questions: QuizQuestion[]
+  lastAttempt: unknown
+}
+
+export interface QuizPayloadOption {
+  text: string
+  isCorrect: boolean
+  order?: number
+}
+
+export interface QuizPayloadQuestion {
+  statement: string
+  order?: number
+  options: QuizPayloadOption[]
+}
+
+export interface QuizPayload {
+  title: string
+  questions: QuizPayloadQuestion[]
+}
+
+export const getLessonQuiz = async (lessonId: string): Promise<LessonQuiz | null> => {
+  try {
+    const { data } = await api.get<LessonQuiz>(`/lessons/${lessonId}/quiz`)
+    return data
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) return null
+    throw error
+  }
+}
+
+export const saveLessonQuiz = async (lessonId: string, payload: QuizPayload): Promise<void> => {
+  await api.put(`/lessons/${lessonId}/quiz`, payload)
+}
+
+export const deleteLessonQuiz = async (lessonId: string): Promise<void> => {
+  await api.delete(`/lessons/${lessonId}/quiz`)
 }
 
 export const formatDurationSec = (durationSec: number | null): string => {

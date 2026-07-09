@@ -10,7 +10,7 @@ export default async function instructorsPublicRoutes(app: FastifyInstance) {
     },
   }, async () => {
     const instructors = await prisma.user.findMany({
-      where: { role: 'instrutor', courses: { some: { status: CourseStatus.PUBLISHED } } },
+      where: { role: { in: ['instrutor', 'admin'] }, courses: { some: { status: CourseStatus.PUBLISHED } } },
       select: {
         id: true,
         name: true,

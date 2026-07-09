@@ -42,6 +42,18 @@ export type EnrollmentDetail = Enrollment & { progress: LessonProgress[]; certif
 export type LessonComment = { id: string; content: string; createdAt: string; author: { id: string; name: string; image: string | null } }
 export type LessonRating = { value: number; average: number; count: number }
 
+export type QuizOptionPublic = { id: string; text: string; order: number }
+export type QuizQuestion = { id: string; statement: string; order: number; options: QuizOptionPublic[] }
+export type QuizLastAttempt = { score: number; total: number; createdAt: string }
+export type Quiz = {
+  id: string; lessonId: string; title: string
+  questions: QuizQuestion[]
+  lastAttempt: QuizLastAttempt | null
+}
+export type QuizCorrection = { questionId: string; correctOptionId: string | null; chosenOptionId: string | null; correct: boolean }
+export type QuizSubmitResult = { score: number; total: number; corrections: QuizCorrection[] }
+export type QuizAttempt = { id: string; score: number; total: number; createdAt: string }
+
 export type TrackLevel = 'INICIANTE' | 'INTERMEDIARIO' | 'AVANCADO'
 export type EventType = 'WEBINAR' | 'LIVE' | 'WORKSHOP'
 export type EventStatus = 'DRAFT' | 'PUBLISHED'
