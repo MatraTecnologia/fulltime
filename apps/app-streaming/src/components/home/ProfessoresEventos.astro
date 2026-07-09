@@ -1,17 +1,26 @@
 ---
-// PLACEHOLDER: sem endpoint — dados mock, substituir quando houver API
-const professores = [
-  { nome: 'Dra. Maria Souza', especialidade: 'Especialista em Alfabetização Adaptada' },
-  { nome: 'Prof. João Lima', especialidade: 'Especialista em Educação Inclusiva' },
-  { nome: 'Dra. Ana Paula', especialidade: 'Neuropsicopedagoga' },
-  { nome: 'Prof. Carlos Mendes', especialidade: 'Especialista em Gestão Escolar' },
-]
+import { apiServer, apiPublicUrl } from "@/lib/api"
+import type { EventListItem, EventType, InstructorListItem } from "@/lib/types"
 
-const eventos = [
-  { dia: '15', mes: 'AGO', tipo: 'Webinário', titulo: 'Estratégias para Crianças com TEA', meta: '20h00 · Online' },
-  { dia: '22', mes: 'AGO', tipo: 'Live', titulo: 'Inclusão na Prática', meta: '19h00 · Online' },
-  { dia: '05', mes: 'SET', tipo: 'Webinário', titulo: 'Neurodesenvolvimento', meta: '20h00 · Online' },
-]
+const cookie = Astro.request.headers.get('cookie')
+const [professores, rawEventos] = await Promise.all([
+  apiServer<InstructorListItem[]>('/instructors', cookie).catch(() => []),
+  apiServer<EventListItem[]>('/events?when=upcoming', cookie).catch(() => []),
+])
+
+const tz = 'America/Sao_Paulo'
+const tipoLabels: Record<EventType, string> = { WEBINAR: 'Webinário', LIVE: 'Live', WORKSHOP: 'Workshop' }
+const eventos = rawEventos.slice(0, 3).map(e => {
+  const d = new Date(e.startsAt)
+  return {
+    slug: e.slug,
+    dia: new Intl.DateTimeFormat('pt-BR', { timeZone: tz, day: '2-digit' }).format(d),
+    mes: new Intl.DateTimeFormat('pt-BR', { timeZone: tz, month: 'short' }).format(d).replace('.', '').toUpperCase(),
+    tipo: tipoLabels[e.type],
+    titulo: e.title,
+    meta: `${new Intl.DateTimeFormat('pt-BR', { timeZone: tz, hour: '2-digit', minute: '2-digit' }).format(d).replace(':', 'h')} · Online`,
+  }
+})
 
 const beneficios = [
   { icone: '📜', titulo: '+50 horas certificadas', texto: 'Cursos reconhecidos e válidos para progressão de carreira.' },
@@ -29,17 +38,25 @@ const beneficios = [
         </div>
         <a href="#" class="text-xs font-semibold text-brand-blue hover:underline">Ver todos</a>
       </div>
-      <ul class="mt-4 flex flex-1 flex-col gap-3">
-        {professores.map(p => (
-          <li class="flex items-center gap-3">
-            <div class="h-10 w-10 shrink-0 rounded-full bg-surface"></div>
-            <div class="min-w-0">
-              <p class="truncate text-sm font-semibold text-brand-navy">{p.nome}</p>
-              <p class="truncate text-xs text-muted-foreground">{p.especialidade}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {professores.length > 0 ? (
+        <ul class="mt-4 flex flex-1 flex-col gap-3">
+          {professores.slice(0, 4).map(p => (
+            <li class="flex items-center gap-3">
+              {p.image ? (
+                <img src={p.image.startsWith('http') ? p.image : apiPublicUrl(p.image)} alt={p.name} class="h-10 w-10 shrink-0 rounded-full object-cover" />
+              ) : (
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface text-sm font-bold text-brand-navy">{p.name.charAt(0)}</div>
+              )}
+              <div class="min-w-0">
+                <p class="truncate text-sm font-semibold text-brand-navy">{p.name}</p>
+                <p class="truncate text-xs text-muted-foreground">{p.area ?? 'Instrutor(a)'}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="mt-4 flex-1 text-sm text-muted-foreground">Nenhum instrutor em destaque ainda.</p>
+      )}
     </div>
 
     <div class="flex flex-col rounded-card bg-white p-5 shadow-card">
@@ -50,21 +67,25 @@ const beneficios = [
         </div>
         <a href="/eventos" class="text-xs font-semibold text-brand-blue hover:underline">Ver todos</a>
       </div>
-      <ul class="mt-4 flex flex-1 flex-col gap-3">
-        {eventos.map(e => (
-          <li class="flex items-center gap-3">
-            <div class="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg bg-brand-navy-50 text-brand-navy">
-              <span class="text-sm font-extrabold leading-none">{e.dia}</span>
-              <span class="text-[10px] font-semibold leading-none">{e.mes}</span>
-            </div>
-            <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-semibold text-brand-navy">{e.tipo}: {e.titulo}</p>
-              <p class="text-xs text-muted-foreground">{e.meta}</p>
-            </div>
-            <a href="/eventos" class="shrink-0 rounded-pill border border-brand-blue px-3 py-1 text-xs font-semibold text-brand-blue transition hover:bg-brand-blue hover:text-white">Inscrever-se</a>
-          </li>
-        ))}
-      </ul>
+      {eventos.length > 0 ? (
+        <ul class="mt-4 flex flex-1 flex-col gap-3">
+          {eventos.map(e => (
+            <li class="flex items-center gap-3">
+              <div class="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg bg-brand-navy-50 text-brand-navy">
+                <span class="text-sm font-extrabold leading-none">{e.dia}</span>
+                <span class="text-[10px] font-semibold leading-none">{e.mes}</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-semibold text-brand-navy">{e.tipo}: {e.titulo}</p>
+                <p class="text-xs text-muted-foreground">{e.meta}</p>
+              </div>
+              <a href={`/eventos/${e.slug}`} class="shrink-0 rounded-pill border border-brand-blue px-3 py-1 text-xs font-semibold text-brand-blue transition hover:bg-brand-blue hover:text-white">Inscrever-se</a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="mt-4 flex-1 text-sm text-muted-foreground">Nenhum evento agendado no momento.</p>
+      )}
     </div>
 
     <div class="relative flex flex-col overflow-hidden rounded-card bg-white p-5 shadow-card">

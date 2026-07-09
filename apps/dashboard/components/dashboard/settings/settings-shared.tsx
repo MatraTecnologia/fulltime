@@ -51,16 +51,28 @@ export const SelectField = ({
   label,
   items,
   defaultValue,
+  value,
+  onValueChange,
   placeholder,
+  disabled,
 }: {
   label: string
   items: Record<string, string>
   defaultValue?: string
+  value?: string
+  onValueChange?: (value: string) => void
   placeholder?: string
+  disabled?: boolean
 }) => {
   return (
     <Field label={label}>
-      <Select items={items} defaultValue={defaultValue}>
+      <Select
+        items={items}
+        defaultValue={defaultValue}
+        value={value}
+        onValueChange={onValueChange ? (next) => onValueChange(next ?? "") : undefined}
+        disabled={disabled}
+      >
         <SelectTrigger className="w-full">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

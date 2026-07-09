@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CourseContentTab } from "@/components/dashboard/course-detail/course-content-tab"
 import { CourseDetailsTab } from "@/components/dashboard/course-detail/course-details-tab"
 import { CourseSettingsTab } from "@/components/dashboard/course-detail/course-settings-tab"
-import type { CourseDetail } from "@/lib/mock/course-detail"
+import type { CourseDetail } from "@/services/courses-detail"
 
 export const CourseDetailTabs = ({ course }: { course: CourseDetail }) => {
   const [tab, setTab] = React.useState("content")
@@ -18,7 +18,7 @@ export const CourseDetailTabs = ({ course }: { course: CourseDetail }) => {
         <TabsTrigger value="settings">Configurações</TabsTrigger>
       </TabsList>
       <TabsContent value="content" className="mt-6">
-        <CourseContentTab modules={course.modules} />
+        <CourseContentTab courseId={course.id} slug={course.slug} modules={course.modules} />
       </TabsContent>
       <TabsContent value="details" className="mt-6">
         <CourseDetailsTab course={course} />

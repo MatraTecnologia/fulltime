@@ -1,33 +1,46 @@
 ---
-// PLACEHOLDER: sem modelo de trilha na API — dados mock, substituir quando houver.
-const trilhas = [
-  { nome: 'Alfabetização Inclusiva', cor: 'bg-brand-blue', icone: '⚓', cursos: 12, horas: 24, nivel: 'Iniciante' },
-  { nome: 'Educação Infantil', cor: 'bg-brand-purple', icone: '🔒', cursos: 15, horas: 30, nivel: 'Iniciante' },
-  { nome: 'Gestão Escolar', cor: 'bg-brand-green', icone: '🏛️', cursos: 10, horas: 20, nivel: 'Intermediário' },
-  { nome: 'Desenvolvimento Infantil', cor: 'bg-brand-amber', icone: '🤝', cursos: 14, horas: 21, nivel: 'Iniciante' },
-]
+import { apiServer } from "@/lib/api"
+import type { TrackListItem } from "@/lib/types"
+
+const cookie = Astro.request.headers.get('cookie')
+const tracks = (await apiServer<TrackListItem[]>('/tracks', cookie).catch(() => [])).slice(0, 4)
+
+const levelLabels = {
+  INICIANTE: 'Iniciante',
+  INTERMEDIARIO: 'Intermediário',
+  AVANCADO: 'Avançado',
+} as const
+
+const palette = ['bg-brand-blue', 'bg-brand-purple', 'bg-brand-green', 'bg-brand-amber']
+const colorFor = (track: TrackListItem, index: number) =>
+  track.color ?? palette[index % palette.length]
 ---
-<section class="mx-auto max-w-7xl px-6 py-8">
-  <div class="flex items-end justify-between">
-    <div>
-      <h2 class="font-display text-xl font-extrabold text-brand-navy">Trilhas de Aprendizagem</h2>
-      <p class="text-sm text-muted-foreground">Jornadas completas para sua formação profissional.</p>
-    </div>
-    <a href="/trilhas" class="text-sm font-semibold text-brand-blue hover:underline">Ver todas as trilhas</a>
-  </div>
-  <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-    {trilhas.map(t => (
-      <div class={`group relative flex flex-col justify-between overflow-hidden rounded-card ${t.cor} p-5 text-white shadow-card transition hover:shadow-lifted`}>
-        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-lg">{t.icone}</div>
-        <div class="mt-6">
-          <h3 class="font-display text-lg font-bold leading-tight">{t.nome}</h3>
-          <p class="mt-1 text-sm text-white/85">{t.cursos} cursos · {t.horas}h</p>
-        </div>
-        <div class="mt-4 flex items-center justify-between">
-          <span class="inline-block rounded-pill bg-white/20 px-3 py-1 text-xs font-medium">{t.nivel}</span>
-          <svg class="h-4 w-4 opacity-80 transition group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none"><path d="M7 5l6 5-6 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
+{tracks.length > 0 && (
+  <section class="mx-auto max-w-7xl px-6 py-8">
+    <div class="flex items-end justify-between">
+      <div>
+        <h2 class="font-display text-xl font-extrabold text-brand-navy">Trilhas de Aprendizagem</h2>
+        <p class="text-sm text-muted-foreground">Jornadas completas para sua formação profissional.</p>
       </div>
-    ))}
-  </div>
-</section>
+      <a href="/trilhas" class="text-sm font-semibold text-brand-blue hover:underline">Ver todas as trilhas</a>
+    </div>
+    <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {tracks.map((track, index) => (
+        <a
+          href={`/trilhas/${track.slug}`}
+          class={`group relative flex flex-col justify-between overflow-hidden rounded-card ${colorFor(track, index)} p-5 text-white shadow-card transition hover:shadow-lifted`}
+        >
+          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-lg">{track.icon ?? '📚'}</div>
+          <div class="mt-6">
+            <h3 class="font-display text-lg font-bold leading-tight">{track.title}</h3>
+            <p class="mt-1 text-sm text-white/85">{track._count.courses} {track._count.courses === 1 ? 'curso' : 'cursos'}</p>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <span class="inline-block rounded-pill bg-white/20 px-3 py-1 text-xs font-medium">{levelLabels[track.level]}</span>
+            <svg class="h-4 w-4 opacity-80 transition group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none"><path d="M7 5l6 5-6 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+)}

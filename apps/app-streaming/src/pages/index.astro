@@ -28,7 +28,7 @@ const [courses, enrollments] = await Promise.all([
   <section class="mx-auto max-w-7xl px-6 py-8">
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <Categorias />
-      <PlanoEventos />
+      <PlanoEventos courses={courses} enrollments={enrollments} />
     </div>
   </section>
   <ProfessoresEventos />

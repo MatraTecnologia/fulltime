@@ -33,6 +33,8 @@ export const apiServer = async <T>(path: string, cookie: string | null, init?: R
   return parse<T>(res)
 }
 
+export const apiPublicUrl = (path: string): string => `${CLIENT_BASE}${path}`
+
 export const apiClient = async <T>(path: string, init?: RequestInit): Promise<T> => {
   const res = await fetch(`${CLIENT_BASE}${path}`, {
     ...init,

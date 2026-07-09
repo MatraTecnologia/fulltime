@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -38,10 +39,12 @@ export const UserMenu = ({ profile }: { profile: InstructorProfile }) => {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="flex items-center gap-1.5">
-          {profile.name}
-          {profile.verified && <BadgeCheck className="size-4 text-primary" />}
-        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="flex items-center gap-1.5">
+            {profile.name}
+            {profile.verified && <BadgeCheck className="size-4 text-primary" />}
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <User className="size-4" />

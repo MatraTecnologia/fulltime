@@ -1,6 +1,6 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro"
-import { apiServer } from "@/lib/api"
+import { apiServer, apiPublicUrl } from "@/lib/api"
 import type { CertificateItem } from "@/lib/types"
 
 const cookie = Astro.request.headers.get('cookie')
@@ -36,20 +36,22 @@ const formatIssuedAt = (iso: string) =>
                 </div>
               </dl>
               <div class="mt-4 flex-1"></div>
-              {cert.url ? (
+              <div class="flex items-center gap-2">
                 <a
-                  href={cert.url}
+                  href={apiPublicUrl(`/certificates/${cert.code}/pdf`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="inline-flex items-center justify-center rounded-pill bg-brand-green px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+                  class="inline-flex flex-1 items-center justify-center rounded-pill bg-brand-green px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
                 >
-                  Baixar
+                  Baixar certificado
                 </a>
-              ) : (
-                <span class="inline-flex cursor-not-allowed items-center justify-center rounded-pill bg-surface px-4 py-2 text-sm font-semibold text-muted-foreground">
-                  Em processamento
-                </span>
-              )}
+                <a
+                  href={`/certificados/${cert.code}`}
+                  class="inline-flex items-center justify-center rounded-pill border-hairline bg-white px-4 py-2 text-sm font-semibold text-brand-navy transition hover:bg-surface"
+                >
+                  Verificar
+                </a>
+              </div>
             </div>
           </div>
         ))}

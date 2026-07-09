@@ -1,8 +1,8 @@
+import Link from "next/link"
 import { Palette } from "lucide-react"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { Button } from "@/components/ui/button"
-import { CertificatesPanel } from "@/components/dashboard/certificates-panel"
-import { issuedCertificates } from "@/lib/mock/certificates"
+import { CertificatesConnected } from "@/components/dashboard/certificates-connected"
 
 const CertificatesPage = () => {
   return (
@@ -11,13 +11,18 @@ const CertificatesPage = () => {
         title="Certificados"
         description="Acompanhe os certificados emitidos e personalize os modelos dos seus cursos."
       >
-        <Button variant="outline" className="gap-1.5">
+        <Button
+          variant="outline"
+          className="gap-1.5"
+          nativeButton={false}
+          render={<Link href="/certificados/templates" />}
+        >
           <Palette className="size-4" />
-          Personalizar certificado
+          Modelos de certificado
         </Button>
       </PageHeader>
 
-      <CertificatesPanel certificates={issuedCertificates} />
+      <CertificatesConnected />
     </div>
   )
 }

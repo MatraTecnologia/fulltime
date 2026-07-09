@@ -148,8 +148,31 @@ export default async function enrollmentRoutes(app: FastifyInstance) {
       prisma.lessonProgress.count({ where: { enrollmentId: id } }),
     ])
 
+    const completed = totalLessons > 0 && completedLessons === totalLessons
+
+    if (completed) {
+      const course = await prisma.course.findUnique({
+        where: { id: enrollment.courseId },
+        select: { certificateTemplateId: true },
+      })
+      try {
+        await prisma.certificate.create({
+          data: {
+            enrollmentId: id,
+            code: generateCertificateCode(),
+            templateId: course?.certificateTemplateId ?? null,
+          },
+        })
+      } catch (error) {
+        if (!(error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002')) {
+          throw error
+        }
+        // certificado já emitido para esta matrícula — segue
+      }
+    }
+
     return {
-      completed: totalLessons > 0 && completedLessons === totalLessons,
+      completed,
       totalLessons,
       completedLessons,
     }

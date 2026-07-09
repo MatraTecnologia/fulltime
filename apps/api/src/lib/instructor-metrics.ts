@@ -267,6 +267,215 @@ export const getInstructorOverview = async (userId: string) => {
   }
 }
 
+const MESES_ABBR = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+const DIAS_ABBR = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+
+const formatHoursShort = (hours: number) =>
+  hours >= 1000 ? `${(hours / 1000).toFixed(1)}k` : String(Math.round(hours))
+
+const emptyReports = () => ({
+  stats: {
+    activeStudents: 0, activeStudentsDelta: 0,
+    newStudents: 0, newStudentsDelta: 0,
+    completionRate: 0, completionRateDelta: 0,
+    watchedHours: '0', watchedHoursDelta: 0,
+  },
+  studentsGrowth: [] as { label: string; value: number }[],
+  completionBreakdown: [] as { label: string; value: number; color: string }[],
+  weeklyEngagement: [] as { label: string; value: number }[],
+  monthlyEnrollments: [] as { label: string; value: number }[],
+})
+
+export const getInstructorReports = async (userId: string) => {
+  const { courseIds } = await getScope(userId)
+  if (courseIds.length === 0) return emptyReports()
+
+  const [enrollments, progress] = await Promise.all([
+    prisma.enrollment.findMany({
+      where: { courseId: { in: courseIds } },
+      select: { id: true, userId: true, status: true, enrolledAt: true },
+    }),
+    prisma.lessonProgress.findMany({
+      where: { enrollment: { courseId: { in: courseIds } } },
+      select: {
+        enrollmentId: true,
+        completedAt: true,
+        enrollment: { select: { userId: true } },
+        lesson: { select: { durationSec: true } },
+      },
+    }),
+  ])
+
+  const now = Date.now()
+  const in30 = new Date(now - 30 * DAY)
+  const in60 = new Date(now - 60 * DAY)
+
+  const totalEnrollments = enrollments.length
+  const completed = enrollments.filter((e) => e.status === 'COMPLETED').length
+  const completionRate = totalEnrollments ? Math.round((completed / totalEnrollments) * 100) : 0
+
+  const newStudents = enrollments.filter((e) => e.enrolledAt >= in30).length
+  const prevNew = enrollments.filter((e) => e.enrolledAt >= in60 && e.enrolledAt < in30).length
+
+  const activeUsers = new Set(progress.filter((p) => p.completedAt >= in30).map((p) => p.enrollment.userId))
+  const prevActiveUsers = new Set(
+    progress.filter((p) => p.completedAt >= in60 && p.completedAt < in30).map((p) => p.enrollment.userId)
+  )
+
+  const watchedSec = progress.reduce((s, p) => s + (p.lesson.durationSec ?? 0), 0)
+  const watched30 = progress.filter((p) => p.completedAt >= in30).reduce((s, p) => s + (p.lesson.durationSec ?? 0), 0)
+  const watchedPrev = progress
+    .filter((p) => p.completedAt >= in60 && p.completedAt < in30)
+    .reduce((s, p) => s + (p.lesson.durationSec ?? 0), 0)
+
+  const withProgress = new Set(progress.map((p) => p.enrollmentId))
+  const active = enrollments.filter((e) => e.status === 'ACTIVE')
+  const inProgress = active.filter((e) => withProgress.has(e.id)).length
+  const notStarted = active.length - inProgress
+  const breakdownTotal = totalEnrollments || 1
+
+  const months = Array.from({ length: 6 }).map((_, i) => {
+    const d = new Date(new Date(now).getFullYear(), new Date(now).getMonth() - (5 - i), 1)
+    return { start: d, end: new Date(d.getFullYear(), d.getMonth() + 1, 1) }
+  })
+
+  const studentsGrowth = months.map(({ end }) => ({
+    label: MESES_ABBR[new Date(end.getFullYear(), end.getMonth() - 1, 1).getMonth()],
+    value: new Set(enrollments.filter((e) => e.enrolledAt < end).map((e) => e.userId)).size,
+  }))
+
+  const monthlyEnrollments = months.map(({ start, end }) => ({
+    label: MESES_ABBR[start.getMonth()],
+    value: enrollments.filter((e) => e.enrolledAt >= start && e.enrolledAt < end).length,
+  }))
+
+  const weeklyEngagement = Array.from({ length: 7 }).map((_, i) => {
+    const day = new Date(now)
+    day.setHours(0, 0, 0, 0)
+    day.setDate(day.getDate() - (6 - i))
+    const next = new Date(day)
+    next.setDate(day.getDate() + 1)
+    return {
+      label: DIAS_ABBR[day.getDay()],
+      value: progress.filter((p) => p.completedAt >= day && p.completedAt < next).length,
+    }
+  })
+
+  return {
+    stats: {
+      activeStudents: activeUsers.size,
+      activeStudentsDelta: pctDelta(activeUsers.size, prevActiveUsers.size),
+      newStudents,
+      newStudentsDelta: pctDelta(newStudents, prevNew),
+      completionRate,
+      completionRateDelta: 0,
+      watchedHours: formatHoursShort(watchedSec / 3600),
+      watchedHoursDelta: pctDelta(watched30, watchedPrev),
+    },
+    studentsGrowth,
+    completionBreakdown: [
+      { label: 'Concluídos', value: Math.round((completed / breakdownTotal) * 100), color: 'var(--chart-1)' },
+      { label: 'Em andamento', value: Math.round((inProgress / breakdownTotal) * 100), color: 'var(--chart-2)' },
+      { label: 'Não iniciados', value: Math.round((notStarted / breakdownTotal) * 100), color: 'var(--chart-4)' },
+    ],
+    weeklyEngagement,
+    monthlyEnrollments,
+  }
+}
+
+export const getInstructorComments = async (userId: string) => {
+  const { lessonIds } = await getScope(userId)
+  if (lessonIds.length === 0) return []
+
+  const comments = await prisma.lessonComment.findMany({
+    where: { lessonId: { in: lessonIds }, parentId: null, userId: { not: userId } },
+    orderBy: { createdAt: 'desc' },
+    take: 40,
+    select: {
+      id: true,
+      lessonId: true,
+      content: true,
+      createdAt: true,
+      user: { select: { name: true, image: true } },
+      lesson: { select: { title: true, module: { select: { course: { select: { title: true } } } } } },
+      replies: {
+        orderBy: { createdAt: 'asc' },
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          userId: true,
+          user: { select: { name: true, image: true } },
+        },
+      },
+    },
+  })
+
+  return comments.map((c) => ({
+    id: c.id,
+    lessonId: c.lessonId,
+    content: c.content,
+    createdAt: c.createdAt.toISOString(),
+    timeAgo: relativeTime(c.createdAt),
+    student: { name: c.user.name, avatarUrl: c.user.image },
+    courseTitle: c.lesson.module.course.title,
+    lessonTitle: c.lesson.title,
+    replies: c.replies.map((r) => ({
+      id: r.id,
+      content: r.content,
+      timeAgo: relativeTime(r.createdAt),
+      author: { name: r.user.name, avatarUrl: r.user.image },
+      isInstructor: r.userId === userId,
+    })),
+    replied: c.replies.some((r) => r.userId === userId),
+  }))
+}
+
+export const getInstructorCertificates = async (userId: string) => {
+  const { courseIds } = await getScope(userId)
+  if (courseIds.length === 0) {
+    return { stats: { total: 0, thisMonth: 0, thisMonthDelta: 0 }, items: [] }
+  }
+
+  const certificates = await prisma.certificate.findMany({
+    where: { enrollment: { courseId: { in: courseIds } } },
+    orderBy: { issuedAt: 'desc' },
+    select: {
+      id: true,
+      code: true,
+      issuedAt: true,
+      url: true,
+      enrollment: {
+        select: {
+          user: { select: { name: true } },
+          course: { select: { title: true } },
+        },
+      },
+    },
+  })
+
+  const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+  const startOfPrevMonth = new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1)
+  const thisMonth = certificates.filter((c) => c.issuedAt >= startOfMonth).length
+  const prevMonth = certificates.filter((c) => c.issuedAt >= startOfPrevMonth && c.issuedAt < startOfMonth).length
+
+  return {
+    stats: {
+      total: certificates.length,
+      thisMonth,
+      thisMonthDelta: pctDelta(thisMonth, prevMonth),
+    },
+    items: certificates.map((c) => ({
+      id: c.id,
+      code: c.code,
+      courseTitle: c.enrollment.course.title,
+      studentName: c.enrollment.user.name,
+      issuedAt: c.issuedAt.toLocaleDateString('pt-BR'),
+      url: c.url,
+    })),
+  }
+}
+
 export const getInstructorStudents = async (userId: string) => {
   const { courseIds, lessonsByCourse } = await getScope(userId)
 

@@ -9,6 +9,7 @@ export type CourseListItem = {
   id: string; slug: string; title: string; description: string | null
   coverImage: string | null; status: CourseStatus; createdAt: string
   instructor: { id: string; name: string }
+  categories?: { id: string; slug: string; name: string }[]
   _count: { modules: number }
 }
 
@@ -71,6 +72,11 @@ export type EventListItem = {
   _count: { registrations: number }
 }
 export type EventDetail = EventListItem & { registered?: boolean }
+
+export type InstructorListItem = {
+  id: string; name: string; image: string | null
+  area: string | null; coursesCount: number
+}
 
 export type CertificateItem = {
   id: string; code: string; issuedAt: string; url: string | null

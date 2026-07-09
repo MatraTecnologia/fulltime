@@ -29,7 +29,7 @@ export default async function videoRoutes(app: FastifyInstance) {
 
     try {
       const upload = await mux.video.uploads.create({
-        cors_origin: CORS_ORIGIN,
+        cors_origin: (request.headers.origin as string | undefined) ?? CORS_ORIGIN,
         new_asset_settings: {
           playback_policies: ['signed'],
           passthrough: asset.id,
@@ -93,6 +93,13 @@ export default async function videoRoutes(app: FastifyInstance) {
     const { id } = request.params as { id: string }
     const asset = await prisma.videoAsset.findUnique({ where: { id } })
     if (!asset) return reply.status(404).send({ error: 'Vídeo não encontrado.' })
+
+    if (asset.lessonId && asset.playbackId) {
+      await prisma.lesson.updateMany({
+        where: { id: asset.lessonId, videoSource: 'MUX', videoRef: asset.playbackId },
+        data: { videoSource: 'NONE', videoRef: null },
+      })
+    }
 
     if (asset.assetId) {
       try {

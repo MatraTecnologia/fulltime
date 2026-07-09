@@ -3,7 +3,7 @@
 import { Cell, Label, Pie, PieChart } from "recharts"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart"
-import type { ReportSlice } from "@/lib/mock/reports"
+import type { ReportSlice } from "@/services/reports"
 
 const chartConfig: ChartConfig = { value: { label: "Cursos" } }
 

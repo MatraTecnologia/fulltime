@@ -58,7 +58,7 @@ export default async function courseRoutes(app: FastifyInstance) {
           orderBy: { order: 'asc' },
           include: {
             lessons: {
-              select: { id: true, title: true, order: true, durationSec: true },
+              select: { id: true, title: true, order: true, durationSec: true, thumbnail: true, videoSource: true },
               orderBy: { order: 'asc' },
             },
           },
@@ -146,24 +146,26 @@ export default async function courseRoutes(app: FastifyInstance) {
           slug: { type: 'string' },
           status: { type: 'string', enum: ['DRAFT', 'PUBLISHED'] },
           instructorId: { type: 'string' },
+          certificateTemplateId: { type: ['string', 'null'] },
         },
       },
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string }
-    const { title, description, coverImage, slug, status, instructorId } = request.body as {
+    const { title, description, coverImage, slug, status, instructorId, certificateTemplateId } = request.body as {
       title?: string
       description?: string
       coverImage?: string | null
       slug?: string
       status?: CourseStatus
       instructorId?: string
+      certificateTemplateId?: string | null
     }
 
     try {
       const course = await prisma.course.update({
         where: { id },
-        data: { title, description, coverImage, slug, status, instructorId },
+        data: { title, description, coverImage, slug, status, instructorId, certificateTemplateId },
         include: { instructor: { select: { id: true, name: true } } },
       })
       return course

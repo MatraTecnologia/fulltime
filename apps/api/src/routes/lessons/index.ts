@@ -22,6 +22,7 @@ export default async function lessonRoutes(app: FastifyInstance) {
         properties: {
           title: { type: 'string' },
           content: { type: 'string' },
+          thumbnail: { type: 'string' },
           videoSource: { type: 'string', enum: ['MUX', 'YOUTUBE', 'VIMEO', 'NONE'], default: 'NONE' },
           videoRef: { type: 'string' },
           durationSec: { type: 'integer', minimum: 0 },
@@ -31,9 +32,10 @@ export default async function lessonRoutes(app: FastifyInstance) {
     },
   }, async (request, reply) => {
     const { moduleId } = request.params as { moduleId: string }
-    const { title, content, videoSource, videoRef, durationSec, order: orderInput } = request.body as {
+    const { title, content, thumbnail, videoSource, videoRef, durationSec, order: orderInput } = request.body as {
       title: string
       content?: string
+      thumbnail?: string
       videoSource?: VideoSource
       videoRef?: string
       durationSec?: number
@@ -51,7 +53,7 @@ export default async function lessonRoutes(app: FastifyInstance) {
 
     try {
       const lesson = await prisma.lesson.create({
-        data: { moduleId, title, content, videoSource, videoRef, durationSec, order },
+        data: { moduleId, title, content, thumbnail, videoSource, videoRef, durationSec, order },
       })
       return reply.status(201).send(lesson)
     } catch (error) {
@@ -104,7 +106,8 @@ export default async function lessonRoutes(app: FastifyInstance) {
         properties: {
           title: { type: 'string' },
           content: { type: 'string' },
-          videoSource: { type: 'string', enum: ['MUX', 'YOUTUBE', 'VIMEO', 'NONE'], default: 'NONE' },
+          thumbnail: { type: 'string' },
+          videoSource: { type: 'string', enum: ['MUX', 'YOUTUBE', 'VIMEO', 'NONE'] },
           videoRef: { type: 'string' },
           durationSec: { type: 'integer', minimum: 0 },
           order: { type: 'integer', minimum: 1 },
@@ -113,9 +116,10 @@ export default async function lessonRoutes(app: FastifyInstance) {
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string }
-    const { title, content, videoSource, videoRef, durationSec, order } = request.body as {
+    const { title, content, thumbnail, videoSource, videoRef, durationSec, order } = request.body as {
       title?: string
       content?: string
+      thumbnail?: string
       videoSource?: VideoSource
       videoRef?: string
       durationSec?: number
@@ -125,7 +129,7 @@ export default async function lessonRoutes(app: FastifyInstance) {
     try {
       const lesson = await prisma.lesson.update({
         where: { id },
-        data: { title, content, videoSource, videoRef, durationSec, order },
+        data: { title, content, thumbnail, videoSource, videoRef, durationSec, order },
       })
       return lesson
     } catch (error) {
@@ -343,15 +347,16 @@ export default async function lessonRoutes(app: FastifyInstance) {
         required: ['content'],
         properties: {
           content: { type: 'string', minLength: 1 },
+          parentId: { type: 'string' },
         },
       },
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string }
-    const { content } = request.body as { content: string }
+    const { content, parentId } = request.body as { content: string; parentId?: string }
 
     const comment = await prisma.lessonComment.create({
-      data: { lessonId: id, userId: request.session.user.id, content },
+      data: { lessonId: id, userId: request.session.user.id, content, parentId },
       include: { user: { select: { id: true, name: true, image: true } } },
     })
 

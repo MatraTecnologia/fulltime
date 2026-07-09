@@ -8,7 +8,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import type { ReportPoint } from "@/lib/mock/reports"
+import type { ReportPoint } from "@/services/reports"
 
 const chartConfig: ChartConfig = {
   value: { label: "Alunos", color: "var(--chart-1)" },

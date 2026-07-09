@@ -61,6 +61,11 @@ enum EventStatus {
   PUBLISHED
 }
 
+enum CertificateStatus {
+  ISSUED
+  REVOKED
+}
+
 enum PostStatus {
   DRAFT
   PUBLISHED
@@ -90,6 +95,7 @@ model User {
   ratings       LessonRating[]
   eventRegistrations EventRegistration[]
   posts         Post[]       @relation("PostAuthor")
+  certificateTemplates CertificateTemplate[]
 
   @@map("users")
 }
@@ -144,6 +150,9 @@ model ProfileProf {
   area      String?
   registro  String?
   bio       String?
+  instagram String?
+  linkedin  String?
+  website   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -166,6 +175,8 @@ model Course {
   enrollments  Enrollment[]
   categories   Category[]   @relation("CourseCategories")
   tracks       TrackCourse[]
+  certificateTemplateId String?
+  certificateTemplate   CertificateTemplate? @relation(fields: [certificateTemplateId], references: [id], onDelete: SetNull)
 
   @@map("courses")
 }
@@ -191,6 +202,7 @@ model Lesson {
   order       Int
   content     String?
   transcript  String?
+  thumbnail   String?
   videoSource VideoSource      @default(NONE)
   videoRef    String?
   durationSec Int?
@@ -253,16 +265,38 @@ model LessonProgress {
 }
 
 model Certificate {
-  id           String     @id @default(cuid())
-  enrollmentId String     @unique
-  code         String     @unique
-  issuedAt     DateTime   @default(now())
+  id           String            @id @default(cuid())
+  enrollmentId String            @unique
+  code         String            @unique
+  issuedAt     DateTime          @default(now())
   url          String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  templateId   String?
+  overrides    Json?
+  status       CertificateStatus @default(ISSUED)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  enrollment   Enrollment           @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  template     CertificateTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
 
   @@map("certificates")
+}
+
+model CertificateTemplate {
+  id              String        @id @default(cuid())
+  name            String
+  pageSize        String        @default("A4_LANDSCAPE")
+  background      String?
+  backgroundColor String?       @default("#ffffff")
+  elements        Json          @default("[]")
+  isDefault       Boolean       @default(false)
+  createdById     String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  createdBy       User          @relation(fields: [createdById], references: [id])
+  courses         Course[]
+  certificates    Certificate[]
+
+  @@map("certificate_templates")
 }
 
 model Child {
@@ -353,12 +387,16 @@ model LessonComment {
   lessonId  String
   userId    String
   content   String
+  parentId  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent    LessonComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   LessonComment[] @relation("CommentReplies")
 
   @@index([lessonId])
+  @@index([parentId])
   @@map("lesson_comments")
 }
 

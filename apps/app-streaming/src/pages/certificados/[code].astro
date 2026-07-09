@@ -1,0 +1,71 @@
+---
+import PublicLayout from "@/layouts/PublicLayout.astro"
+import { apiServer, apiPublicUrl } from "@/lib/api"
+import type { CertificateItem } from "@/lib/types"
+
+const { code } = Astro.params
+const cookie = Astro.request.headers.get('cookie')
+const certificate = await apiServer<CertificateItem>(`/certificates/${code}`, cookie).catch(() => null)
+
+const formatIssuedAt = (iso: string) =>
+  new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(new Date(iso))
+---
+<PublicLayout title="Verificação de certificado — Full Time">
+  <section class="mx-auto max-w-2xl px-6 py-16">
+    {certificate ? (
+      <div class="overflow-hidden rounded-card bg-white shadow-card border-hairline">
+        <div class="flex items-center gap-3 border-b border-hairline bg-brand-green/10 px-6 py-4">
+          <span class="grid size-10 place-items-center rounded-full bg-brand-green text-white">✓</span>
+          <div>
+            <p class="font-display text-base font-bold text-brand-navy">Certificado válido</p>
+            <p class="text-xs text-muted-foreground">Emitido pela plataforma Full Time.</p>
+          </div>
+        </div>
+
+        <div class="p-6">
+          {certificate.course.coverImage && (
+            <img src={certificate.course.coverImage} alt={certificate.course.title} class="aspect-video w-full rounded-card object-cover" />
+          )}
+
+          <h1 class="mt-6 font-display text-2xl font-extrabold leading-tight text-brand-navy">{certificate.course.title}</h1>
+
+          <dl class="mt-6 space-y-3 text-sm">
+            <div class="flex items-center justify-between gap-4 border-b border-hairline pb-3">
+              <dt class="text-muted-foreground">Aluno</dt>
+              <dd class="font-semibold text-brand-navy">{certificate.user?.name}</dd>
+            </div>
+            <div class="flex items-center justify-between gap-4 border-b border-hairline pb-3">
+              <dt class="text-muted-foreground">Emitido em</dt>
+              <dd class="font-semibold text-brand-navy">{formatIssuedAt(certificate.issuedAt)}</dd>
+            </div>
+            <div class="flex items-center justify-between gap-4">
+              <dt class="text-muted-foreground">Código</dt>
+              <dd class="font-mono font-semibold text-brand-navy">{certificate.code}</dd>
+            </div>
+          </dl>
+
+          <a
+            href={apiPublicUrl(`/certificates/${certificate.code}/pdf`)}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="mt-8 inline-flex w-full items-center justify-center rounded-pill bg-brand-green px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+          >
+            Baixar PDF
+          </a>
+        </div>
+      </div>
+    ) : (
+      <div class="flex flex-col items-center rounded-card bg-surface p-12 text-center">
+        <span class="text-5xl">🚫</span>
+        <h1 class="mt-4 font-display text-xl font-bold text-brand-navy">Certificado não encontrado</h1>
+        <p class="mt-2 max-w-md text-sm text-muted-foreground">Não localizamos nenhum certificado com o código <span class="font-mono font-semibold text-brand-navy">{code}</span>. Verifique se o código está correto.</p>
+        <a
+          href="/"
+          class="mt-6 inline-flex items-center justify-center rounded-pill bg-brand-navy px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+        >
+          Voltar ao início
+        </a>
+      </div>
+    )}
+  </section>
+</PublicLayout>

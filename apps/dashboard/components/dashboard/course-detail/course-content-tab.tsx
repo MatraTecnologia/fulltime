@@ -1,136 +1,209 @@
 "use client"
 
-import {
-  Download,
-  FileText,
-  FolderPlus,
-  GripVertical,
-  ListChecks,
-  MoreVertical,
-  Paperclip,
-  Video,
-  type LucideIcon,
-} from "lucide-react"
+import * as React from "react"
+import { FolderPlus, GripVertical, Pencil, Trash2, Video } from "lucide-react"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Card } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Spinner } from "@/components/ui/spinner"
+import { EmptyState } from "@/components/dashboard/empty-state"
 import { AddContentSheet } from "@/components/dashboard/course-detail/add-content-sheet"
-import type { CourseModule, LessonType } from "@/lib/mock/course-detail"
+import { EditLessonSheet } from "@/components/dashboard/course-detail/edit-lesson-sheet"
+import { useCreateModule, useDeleteLesson, useDeleteModule } from "@/hooks/use-course-detail"
+import { formatDurationSec, type CourseLessonNode, type CourseModuleNode } from "@/services/courses-detail"
 
-const lessonIcon: Record<LessonType, LucideIcon> = {
-  video: Video,
-  text: FileText,
-  pdf: FileText,
-  quiz: ListChecks,
+const AddModuleDialog = ({ courseId, slug }: { courseId: string; slug: string }) => {
+  const [open, setOpen] = React.useState(false)
+  const [title, setTitle] = React.useState("")
+  const createModule = useCreateModule(slug)
+
+  const handleCreate = () => {
+    if (!title.trim()) return
+    createModule.mutate(
+      { courseId, title: title.trim() },
+      {
+        onSuccess: () => {
+          setTitle("")
+          setOpen(false)
+        },
+      }
+    )
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger
+        render={
+          <Button variant="outline" className="gap-1.5">
+            <FolderPlus className="size-4" />
+            Adicionar módulo
+          </Button>
+        }
+      />
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Novo módulo</DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-2">
+          <Label htmlFor="module-title">Título do módulo</Label>
+          <Input
+            id="module-title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Ex: Módulo 1 — Fundamentos"
+          />
+        </div>
+        <DialogFooter>
+          <Button onClick={handleCreate} disabled={!title.trim() || createModule.isPending} className="gap-1.5">
+            {createModule.isPending && <Spinner />}
+            Criar módulo
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
 }
 
-const lessonTypeLabel: Record<LessonType, string> = {
-  video: "Vídeo",
-  text: "Texto",
-  pdf: "PDF",
-  quiz: "Quiz",
-}
+export const CourseContentTab = ({
+  courseId,
+  slug,
+  modules,
+}: {
+  courseId: string
+  slug: string
+  modules: CourseModuleNode[]
+}) => {
+  const deleteModule = useDeleteModule(slug)
+  const deleteLesson = useDeleteLesson(slug)
+  const [editingLesson, setEditingLesson] = React.useState<CourseLessonNode | null>(null)
 
-export const CourseContentTab = ({ modules }: { modules: CourseModule[] }) => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-base font-semibold">Estrutura do curso</h2>
           <p className="text-sm text-muted-foreground">
-            Organize os módulos, adicione aulas e anexe materiais para os alunos.
+            Organize os módulos e adicione aulas para os seus alunos.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="gap-1.5">
-            <FolderPlus className="size-4" />
-            Adicionar módulo
-          </Button>
-          <AddContentSheet />
+          <AddModuleDialog courseId={courseId} slug={slug} />
+          <AddContentSheet modules={modules} slug={slug} />
         </div>
       </div>
 
-      <Accordion defaultValue={[modules[0]?.id]} className="flex flex-col gap-3">
-        {modules.map((module) => (
-          <AccordionItem key={module.id} value={module.id} className="rounded-xl border bg-card px-4">
-            <AccordionTrigger className="py-4 hover:no-underline">
-              <div className="flex items-center gap-2 text-left">
-                <GripVertical className="size-4 text-muted-foreground" />
-                <span className="font-medium">{module.title}</span>
-                <Badge variant="outline" className="ml-1 text-xs text-muted-foreground">
-                  {module.lessons.length} aulas
-                </Badge>
+      {modules.length === 0 ? (
+        <EmptyState
+          icon={FolderPlus}
+          title="Nenhum módulo ainda"
+          description="Comece criando um módulo para organizar as aulas do curso."
+        />
+      ) : (
+        <Accordion defaultValue={[modules[0]?.id]} className="flex flex-col gap-3">
+          {modules.map((module) => (
+            <AccordionItem key={module.id} value={module.id} className="rounded-xl border bg-card px-4">
+              <div className="flex items-center gap-1">
+                <AccordionTrigger className="flex-1 py-4 hover:no-underline">
+                  <div className="flex items-center gap-2 text-left">
+                    <GripVertical className="size-4 text-muted-foreground" />
+                    <span className="font-medium">{module.title}</span>
+                    <Badge variant="outline" className="ml-1 text-xs text-muted-foreground">
+                      {module.lessons.length} aulas
+                    </Badge>
+                  </div>
+                </AccordionTrigger>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 shrink-0 text-muted-foreground"
+                  aria-label="Excluir módulo"
+                  onClick={() => deleteModule.mutate(module.id)}
+                >
+                  <Trash2 className="size-4" />
+                </Button>
               </div>
-            </AccordionTrigger>
-            <AccordionContent className="pb-3">
-              <ul className="flex flex-col gap-2">
-                {module.lessons.map((lesson) => {
-                  const Icon = lessonIcon[lesson.type]
-                  return (
-                    <li key={lesson.id} className="rounded-lg border bg-background p-3">
-                      <div className="flex items-center gap-3">
-                        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                          <Icon className="size-4.5" />
-                        </span>
+              <AccordionContent className="pb-3">
+                {module.lessons.length === 0 ? (
+                  <p className="px-1 pb-2 text-sm text-muted-foreground">Nenhuma aula neste módulo ainda.</p>
+                ) : (
+                  <ul className="flex flex-col gap-2">
+                    {module.lessons.map((lesson) => (
+                      <li key={lesson.id} className="flex items-center gap-3 rounded-lg border bg-background p-3">
+                        {lesson.thumbnail ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={lesson.thumbnail}
+                            alt=""
+                            className="h-9 w-16 shrink-0 rounded-md object-cover"
+                          />
+                        ) : (
+                          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <Video className="size-4.5" />
+                          </span>
+                        )}
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium">{lesson.title}</p>
-                          <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                            <span>{lessonTypeLabel[lesson.type]}</span>
-                            <span aria-hidden>·</span>
-                            <span>{lesson.duration}</span>
-                            <Badge
-                              variant="outline"
-                              className={cn(
-                                "text-[0.7rem]",
-                                lesson.status === "published"
-                                  ? "border-success/20 bg-success/10 text-success"
-                                  : "border-warning/20 bg-warning/10 text-warning"
-                              )}
-                            >
-                              {lesson.status === "published" ? "Publicada" : "Rascunho"}
-                            </Badge>
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs text-muted-foreground">{formatDurationSec(lesson.durationSec)}</p>
+                            {lesson.videoSource !== "NONE" && (
+                              <Badge variant="outline" className="gap-1 text-[0.7rem] text-muted-foreground">
+                                <Video className="size-3" />
+                                Vídeo
+                              </Badge>
+                            )}
                           </div>
                         </div>
-                        <Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label="Ações da aula">
-                          <MoreVertical className="size-4" />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 shrink-0 text-muted-foreground"
+                          aria-label="Editar aula"
+                          onClick={() => setEditingLesson(lesson)}
+                        >
+                          <Pencil className="size-4" />
                         </Button>
-                      </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 shrink-0 text-muted-foreground"
+                          aria-label="Excluir aula"
+                          onClick={() => deleteLesson.mutate(lesson.id)}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      )}
 
-                      {lesson.materials.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-2 pl-12">
-                          {lesson.materials.map((material) => (
-                            <span
-                              key={material.id}
-                              className="inline-flex items-center gap-1.5 rounded-md border bg-muted/40 px-2 py-1 text-xs"
-                            >
-                              <Paperclip className="size-3 text-muted-foreground" />
-                              <span className="max-w-40 truncate">{material.name}</span>
-                              <span className="text-muted-foreground">{material.size}</span>
-                              <Download className="size-3 text-muted-foreground" />
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </li>
-                  )
-                })}
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-
-      <Card className="border-dashed p-4 text-center text-sm text-muted-foreground">
-        Arraste aulas entre módulos para reordenar, ou clique em{" "}
-        <span className="font-medium text-foreground">Adicionar conteúdo</span> para incluir novas aulas e materiais.
-      </Card>
+      {editingLesson && (
+        <EditLessonSheet
+          lesson={editingLesson}
+          slug={slug}
+          open={!!editingLesson}
+          onOpenChange={(open) => !open && setEditingLesson(null)}
+        />
+      )}
     </div>
   )
 }

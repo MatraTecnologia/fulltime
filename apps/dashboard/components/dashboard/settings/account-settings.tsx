@@ -1,6 +1,11 @@
+"use client"
+
+import { useState } from "react"
 import { Trash2 } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Card,
   CardContent,
@@ -8,7 +13,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { instructorProfile } from "@/lib/mock/instructor"
+import { authClient } from "@/lib/auth-client"
+import { useMyProfile } from "@/hooks/use-profile"
 import { Field, SelectField } from "./settings-shared"
 
 const languages: Record<string, string> = {
@@ -25,6 +31,23 @@ const timezones: Record<string, string> = {
 }
 
 export const AccountSettings = () => {
+  const { data: profile, isPending } = useMyProfile()
+  const [newEmail, setNewEmail] = useState("")
+  const [changingEmail, setChangingEmail] = useState(false)
+
+  const handleChangeEmail = async () => {
+    if (!newEmail) return
+    setChangingEmail(true)
+    const { error } = await authClient.changeEmail({ newEmail, callbackURL: "/" })
+    setChangingEmail(false)
+    if (error) {
+      toast.error(error.message ?? "Não foi possível alterar o e-mail.")
+      return
+    }
+    toast.success("Enviamos um link de confirmação para o novo e-mail.")
+    setNewEmail("")
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <Card>
@@ -35,15 +58,34 @@ export const AccountSettings = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <Field label="E-mail da conta" htmlFor="account-email">
-            <Input id="account-email" type="email" defaultValue={instructorProfile.email} />
+          <Field label="E-mail atual" htmlFor="account-email">
+            {isPending ? (
+              <Skeleton className="h-9" />
+            ) : (
+              <Input id="account-email" type="email" value={profile?.email ?? ""} readOnly />
+            )}
           </Field>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <Field label="Novo e-mail" htmlFor="account-new-email" className="flex-1">
+              <Input
+                id="account-new-email"
+                type="email"
+                placeholder="novo@email.com"
+                value={newEmail}
+                onChange={(event) => setNewEmail(event.target.value)}
+              />
+            </Field>
+            <Button
+              type="button"
+              onClick={handleChangeEmail}
+              disabled={!newEmail || changingEmail}
+            >
+              {changingEmail ? "Enviando..." : "Alterar e-mail"}
+            </Button>
+          </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <SelectField label="Idioma" items={languages} defaultValue="pt-BR" />
             <SelectField label="Fuso horário" items={timezones} defaultValue="America/Sao_Paulo" />
-          </div>
-          <div className="flex justify-end">
-            <Button type="button">Salvar alterações</Button>
           </div>
         </CardContent>
       </Card>
@@ -63,7 +105,12 @@ export const AccountSettings = () => {
                 Esta ação não poderá ser desfeita.
               </p>
             </div>
-            <Button type="button" variant="destructive" className="gap-1.5">
+            <Button
+              type="button"
+              variant="destructive"
+              className="gap-1.5"
+              onClick={() => toast.info("Fale com o suporte para excluir sua conta.")}
+            >
               <Trash2 className="size-4" />
               Excluir conta
             </Button>

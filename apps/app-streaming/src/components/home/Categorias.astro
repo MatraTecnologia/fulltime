@@ -1,13 +1,9 @@
 ---
-// PLACEHOLDER: sem modelo de categoria na API — dados mock, substituir quando houver.
-const categorias = [
-  { nome: 'Práticas Pedagógicas', cor: 'bg-brand-purple/10 text-brand-purple' },
-  { nome: 'Inclusão', cor: 'bg-brand-blue/10 text-brand-blue' },
-  { nome: 'Neurodesenvolvimento', cor: 'bg-brand-amber/10 text-brand-amber-strong' },
-  { nome: 'Psicomotricidade', cor: 'bg-brand-navy/10 text-brand-navy' },
-  { nome: 'Gestão Escolar', cor: 'bg-brand-green/10 text-brand-green-strong' },
-  { nome: 'Tecnologias Educacionais', cor: 'bg-brand-blue/10 text-brand-blue-strong' },
-]
+import { apiServer } from "@/lib/api"
+import type { Category } from "@/lib/types"
+
+const cookie = Astro.request.headers.get('cookie')
+const categorias = (await apiServer<Category[]>('/categories', cookie).catch(() => [])).slice(0, 6)
 ---
 <div class="flex h-full flex-col rounded-card bg-white p-5 shadow-card">
   <div class="flex items-start justify-between">
@@ -17,15 +13,22 @@ const categorias = [
     </div>
     <a href="/categorias" class="text-xs font-semibold text-brand-blue hover:underline">Ver todas</a>
   </div>
-  <ul class="mt-4 flex flex-1 flex-col gap-1">
-    {categorias.map(c => (
-      <li>
-        <a href="/categorias" class="flex items-center gap-3 rounded-lg px-2 py-2 transition hover:bg-surface">
-          <span class={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${c.cor}`}>●</span>
-          <span class="flex-1 text-sm font-medium text-brand-navy">{c.nome}</span>
-          <svg class="h-4 w-4 text-muted-foreground" viewBox="0 0 20 20" fill="none"><path d="M7 5l6 5-6 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-      </li>
-    ))}
-  </ul>
+  {categorias.length > 0 ? (
+    <ul class="mt-4 flex flex-1 flex-col gap-1">
+      {categorias.map(c => (
+        <li>
+          <a href={`/categorias/${c.slug}`} class="flex items-center gap-3 rounded-lg px-2 py-2 transition hover:bg-surface">
+            <span
+              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm"
+              style={`background-color:${c.color ?? '#0d92e1'}1a;color:${c.color ?? '#0d92e1'}`}
+            >{c.icon ?? '●'}</span>
+            <span class="flex-1 text-sm font-medium text-brand-navy">{c.name}</span>
+            <svg class="h-4 w-4 text-muted-foreground" viewBox="0 0 20 20" fill="none"><path d="M7 5l6 5-6 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p class="mt-6 flex-1 text-sm text-muted-foreground">Nenhuma categoria disponível ainda.</p>
+  )}
 </div>
