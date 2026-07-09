@@ -8,7 +8,8 @@ WORKDIR /build
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json ./apps/api/
-COPY apps/web/package.json ./apps/web/
+COPY apps/app-streaming/package.json ./apps/app-streaming/
+COPY apps/dashboard/package.json ./apps/dashboard/
 COPY packages/config-ts/package.json ./packages/config-ts/
 COPY packages/config-eslint/package.json ./packages/config-eslint/
 COPY packages/ui/package.json ./packages/ui/
