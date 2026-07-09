@@ -3,6 +3,7 @@ import { Prisma, CourseStatus, EnrollmentStatus } from '../../generated/prisma/c
 import { prisma } from '../../lib/prisma.js'
 import { requireAuth } from '../../lib/session.js'
 import { generateCertificateCode } from '../../lib/certificate.js'
+import { areRequiredExamsPassed } from '../../lib/exam-gate.js'
 
 export default async function enrollmentRoutes(app: FastifyInstance) {
   app.post('/courses/:courseId/enroll', {
@@ -148,7 +149,8 @@ export default async function enrollmentRoutes(app: FastifyInstance) {
       prisma.lessonProgress.count({ where: { enrollmentId: id } }),
     ])
 
-    const completed = totalLessons > 0 && completedLessons === totalLessons
+    const lessonsComplete = totalLessons > 0 && completedLessons === totalLessons
+    const completed = lessonsComplete && (await areRequiredExamsPassed(enrollment.userId, enrollment.courseId))
 
     if (completed) {
       const course = await prisma.course.findUnique({
@@ -213,6 +215,12 @@ export default async function enrollmentRoutes(app: FastifyInstance) {
         error: 'Todas as aulas devem ser concluídas antes de emitir o certificado.',
         completedLessons,
         totalLessons,
+      })
+    }
+
+    if (!(await areRequiredExamsPassed(enrollment.userId, enrollment.courseId))) {
+      return reply.status(422).send({
+        error: 'Você precisa ser aprovado em todas as provas do curso antes de emitir o certificado.',
       })
     }
 
