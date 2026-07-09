@@ -15,7 +15,7 @@
 - **Light-only.** Sem dark mode.
 - **Tipografia:** headings `'Plus Jakarta Sans'` (`--font-display`), texto `'Inter'` (`--font-sans`). Classes: `font-display` para títulos, `font-sans` (default) para texto.
 - **Cores da marca** via `@fulltime/ui/theme.css` (`brand-navy #032e5b`, `brand-amber #fdb509`, `brand-green #6ba93c`, `brand-blue #0d92e1`, `brand-purple #8649a5`, base `#fdfcff`). Usar classes `text-brand-navy`, `bg-brand-amber`, etc.
-- **API base:** server usa `import.meta.env.API_URL ?? 'http://localhost:3333'`; client/islands usam `import.meta.env.PUBLIC_API_URL ?? 'http://localhost:3333'`.
+- **API base:** server usa `import.meta.env.API_URL ?? 'http://localhost:3333'`; client/islands usam `import.meta.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3333'`.
 - **Better Auth já existe na API** (`/auth/*`). NÃO reimplementar backend de auth. Apenas UI + client + `trustedOrigins`.
 - **Reusar `@fulltime/ui`**; não duplicar primitivos. Componentes React só dentro de islands.
 - **Sem `console.log`** em código entregue. `const` arrow functions. Sem comentários em código não modificado.
@@ -226,7 +226,7 @@ Cria os helpers de fetch (server encaminha cookie; client usa credenciais) e o c
 /// <reference types="astro/client" />
 interface ImportMetaEnv {
   readonly API_URL?: string
-  readonly PUBLIC_API_URL?: string
+  readonly NEXT_PUBLIC_API_URL?: string
 }
 interface ImportMeta { readonly env: ImportMetaEnv }
 ```
@@ -280,7 +280,7 @@ export type EnrollmentDetail = Enrollment & { progress: LessonProgress[]; certif
 
 ```ts
 const SERVER_BASE = import.meta.env.API_URL ?? 'http://localhost:3333'
-const CLIENT_BASE = import.meta.env.PUBLIC_API_URL ?? 'http://localhost:3333'
+const CLIENT_BASE = import.meta.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3333'
 
 export class ApiError extends Error {
   status: number
@@ -333,7 +333,7 @@ export const apiClient = async <T>(path: string, init?: RequestInit): Promise<T>
 import { createAuthClient } from 'better-auth/react'
 
 export const authClient = createAuthClient({
-  baseURL: import.meta.env.PUBLIC_API_URL ?? 'http://localhost:3333',
+  baseURL: import.meta.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3333',
   basePath: '/auth',
 })
 

@@ -15,6 +15,12 @@ RUN pnpm install --frozen-lockfile
 # ---- build ----
 FROM deps AS build
 
+# URLs da API precisam existir no build: o Vite inlina import.meta.env.* no bundle
+ARG NEXT_PUBLIC_API_URL
+ARG API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV API_URL=$API_URL
+
 COPY packages/config-ts/ ./packages/config-ts/
 COPY packages/ui/ ./packages/ui/
 COPY apps/app-streaming/ ./apps/app-streaming/

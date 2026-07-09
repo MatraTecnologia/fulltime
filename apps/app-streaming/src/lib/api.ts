@@ -1,5 +1,5 @@
 const SERVER_BASE = import.meta.env.API_URL ?? 'http://localhost:3333'
-const CLIENT_BASE = import.meta.env.PUBLIC_API_URL ?? 'http://localhost:3333'
+const CLIENT_BASE = import.meta.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3333'
 
 export class ApiError extends Error {
   status: number
