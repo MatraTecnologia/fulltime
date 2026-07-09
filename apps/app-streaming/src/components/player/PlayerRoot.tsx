@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { CourseDetail, Lesson } from '@/lib/types'
+import type { CourseDetail, CourseProgress, Lesson } from '@/lib/types'
 import { apiClient, ApiError } from '@/lib/api'
 import { CurriculumNav } from './CurriculumNav'
 import { VideoStage } from './VideoStage'
@@ -12,9 +12,10 @@ interface Props {
   initialCompleted: string[]
   initialLessonId: string
   previewLesson?: Lesson
+  progress?: CourseProgress | null
 }
 
-export const PlayerRoot = ({ course, enrollmentId, initialCompleted, initialLessonId, previewLesson }: Props) => {
+export const PlayerRoot = ({ course, enrollmentId, initialCompleted, initialLessonId, previewLesson, progress }: Props) => {
   const [activeId, setActiveId] = useState(initialLessonId)
   const [completed, setCompleted] = useState<Set<string>>(new Set(initialCompleted))
   const [lesson, setLesson] = useState<Lesson | null>(previewLesson ?? null)
@@ -68,7 +69,14 @@ export const PlayerRoot = ({ course, enrollmentId, initialCompleted, initialLess
             </div>
           </div>
         </div>
-        <CurriculumNav modules={course.modules} completedLessonIds={[...completed]} activeId={activeId} onSelect={setActiveId} />
+        <CurriculumNav
+          modules={course.modules}
+          completedLessonIds={[...completed]}
+          activeId={activeId}
+          onSelect={setActiveId}
+          progress={progress}
+          slug={course.slug}
+        />
       </aside>
 
       <main className="min-w-0 bg-white">

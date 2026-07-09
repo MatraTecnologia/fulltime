@@ -3,7 +3,7 @@ import AppLayout from "@/layouts/AppLayout.astro"
 import { PlayerRoot } from "@/components/player/PlayerRoot.tsx"
 import { EnrollGate } from "@/components/player/EnrollGate.tsx"
 import { apiServer } from "@/lib/api"
-import type { CourseDetail, EnrollmentListItem, EnrollmentDetail } from "@/lib/types"
+import type { CourseDetail, EnrollmentListItem, EnrollmentDetail, CourseProgress } from "@/lib/types"
 
 const { slug } = Astro.params
 const cookie = Astro.request.headers.get('cookie')
@@ -14,6 +14,7 @@ if (!course) return Astro.redirect('/')
 const enrollments = await apiServer<EnrollmentListItem[]>('/enrollments', cookie).catch(() => [])
 const found = enrollments.find(e => e.course.slug === slug) ?? null
 const detail = found ? await apiServer<EnrollmentDetail>(`/enrollments/${found.id}`, cookie).catch(() => null) : null
+const progress = found ? await apiServer<CourseProgress>(`/courses/${slug}/progress`, cookie).catch(() => null) : null
 const completedLessonIds = detail?.progress.map(p => p.lessonId) ?? []
 const firstLesson = course.modules[0]?.lessons[0]?.id ?? null
 ---
@@ -27,6 +28,7 @@ const firstLesson = course.modules[0]?.lessons[0]?.id ?? null
       enrollmentId={found.id}
       initialCompleted={completedLessonIds}
       initialLessonId={firstLesson}
+      progress={progress}
     />
   ) : (
     <div class="mx-auto max-w-3xl px-6 py-20 text-center text-brand-navy/70">Este curso ainda não tem aulas.</div>

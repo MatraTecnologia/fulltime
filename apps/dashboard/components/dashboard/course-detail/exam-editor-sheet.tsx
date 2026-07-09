@@ -55,6 +55,13 @@ const toQuestionInput = (questions: EditorQuestion[]): ExamQuestionInput[] =>
         : q.options.map((o, oi) => ({ text: o.text.trim(), isCorrect: o.isCorrect, order: oi })),
   }))
 
+const moveQuestion = (questions: EditorQuestion[], from: number, to: number): EditorQuestion[] => {
+  const next = [...questions]
+  const [moved] = next.splice(from, 1)
+  next.splice(to, 0, moved)
+  return next
+}
+
 const validateQuestions = (questions: EditorQuestion[]): string | null => {
   if (questions.length === 0) return "Adicione ao menos uma questão."
   for (let i = 0; i < questions.length; i++) {
@@ -261,6 +268,10 @@ export const ExamEditorSheet = ({
                   onChange={(next) => setQuestions((prev) => prev.map((q, i) => (i === qi ? next : q)))}
                   onRemove={
                     questions.length > 1 ? () => setQuestions((prev) => prev.filter((_, i) => i !== qi)) : undefined
+                  }
+                  onMoveUp={qi > 0 ? () => setQuestions((prev) => moveQuestion(prev, qi, qi - 1)) : undefined}
+                  onMoveDown={
+                    qi < questions.length - 1 ? () => setQuestions((prev) => moveQuestion(prev, qi, qi + 1)) : undefined
                   }
                 />
               ))}

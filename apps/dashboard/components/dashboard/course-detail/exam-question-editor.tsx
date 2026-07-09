@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus, Trash2 } from "lucide-react"
+import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -50,11 +50,15 @@ export const ExamQuestionEditor = ({
   question,
   onChange,
   onRemove,
+  onMoveUp,
+  onMoveDown,
 }: {
   index: number
   question: EditorQuestion
   onChange: (question: EditorQuestion) => void
   onRemove?: () => void
+  onMoveUp?: () => void
+  onMoveDown?: () => void
 }) => {
   const handleTypeChange = (type: ExamQuestionType) => {
     if (type === question.type) return
@@ -126,17 +130,39 @@ export const ExamQuestionEditor = ({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-base">Questão {index + 1}</CardTitle>
-        {onRemove && (
+        <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
             className="size-8 text-muted-foreground"
-            aria-label="Remover questão"
-            onClick={onRemove}
+            aria-label="Mover questão para cima"
+            disabled={!onMoveUp}
+            onClick={onMoveUp}
           >
-            <Trash2 className="size-4" />
+            <ChevronUp className="size-4" />
           </Button>
-        )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-8 text-muted-foreground"
+            aria-label="Mover questão para baixo"
+            disabled={!onMoveDown}
+            onClick={onMoveDown}
+          >
+            <ChevronDown className="size-4" />
+          </Button>
+          {onRemove && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8 text-muted-foreground"
+              aria-label="Remover questão"
+              onClick={onRemove}
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="grid grid-cols-[1fr_auto] gap-4">

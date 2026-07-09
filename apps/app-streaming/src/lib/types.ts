@@ -96,6 +96,37 @@ export type CertificateItem = {
   user?: { id: string; name: string }
 }
 
+export type ExamQuestionType = 'SINGLE' | 'MULTIPLE' | 'TRUE_FALSE' | 'ESSAY'
+export type ExamOptionPublic = { id: string; text: string }
+export type ExamQuestionPublic = { id: string; type: ExamQuestionType; prompt: string; points: number; options: ExamOptionPublic[] }
+export type ExamLastAttempt = { id: string; status: string; score: number | null; passed: boolean | null }
+export type ExamPlayer = {
+  id: string; title: string; description: string | null
+  passingScore: number; maxAttempts: number | null
+  questions: ExamQuestionPublic[]
+  attemptsUsed: number; passed: boolean; canAttempt: boolean
+  lastAttempt: ExamLastAttempt | null
+}
+export type ExamAnswerInput = { questionId: string; selectedOptionIds?: string[]; essayText?: string }
+export type ExamCorrection = { questionId: string; correctOptionIds: string[]; earned: number }
+export type ExamAttemptResult = {
+  id: string; status: 'GRADED' | 'GRADING'
+  autoScore: number; totalPoints: number; score: number | null; passed: boolean | null
+  needsGrading: boolean; corrections: ExamCorrection[] | null
+}
+export type ExamState = 'none' | 'pending' | 'grading' | 'passed' | 'failed'
+export type ModuleProgress = {
+  id: string; title: string; order: number
+  lessonsDone: number; lessonsTotal: number
+  exam: { id: string; state: ExamState } | null
+  unlocked: boolean; completed: boolean
+}
+export type CourseProgress = {
+  modules: ModuleProgress[]
+  finalExam: { id: string; state: ExamState; unlocked: boolean } | null
+  courseCompleted: boolean
+}
+
 export type PostListItem = {
   id: string; slug: string; title: string; excerpt: string | null; coverImage: string | null
   status: CourseStatus; publishedAt: string | null; createdAt: string

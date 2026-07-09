@@ -1,0 +1,25 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro"
+import { ExamPlayer } from "@/components/exam/ExamPlayer.tsx"
+import { apiServer } from "@/lib/api"
+import type { CourseDetail } from "@/lib/types"
+
+const { slug, examId } = Astro.params
+const user = Astro.locals.user
+if (!user) return Astro.redirect('/login')
+if (!examId) return Astro.redirect('/')
+
+const cookie = Astro.request.headers.get('cookie')
+const course = await apiServer<CourseDetail>(`/courses/${slug}`, cookie).catch(() => null)
+if (!course) return Astro.redirect('/')
+---
+<AppLayout title={`Prova — ${course.title} — Full Time`} user={user}>
+  <div class="mx-auto max-w-3xl px-6 py-10">
+    <a href={`/aprender/${course.slug}`} class="inline-flex items-center gap-1.5 text-xs font-medium text-brand-navy/60 transition-colors hover:text-brand-navy">
+      <span aria-hidden>←</span> Voltar para o curso
+    </a>
+    <div class="mt-6">
+      <ExamPlayer client:load examId={examId} slug={course.slug} />
+    </div>
+  </div>
+</AppLayout>
