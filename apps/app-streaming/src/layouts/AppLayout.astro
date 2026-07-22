@@ -3,8 +3,9 @@ import BaseLayout from "@/layouts/BaseLayout.astro"
 import { AppHeader } from "@/components/app/AppHeader.tsx"
 interface Props { title: string; user: App.Locals['user'] }
 const { title, user } = Astro.props
+const query = Astro.url.searchParams.get('q') ?? ''
 ---
 <BaseLayout title={title} noindex>
-  <AppHeader client:load user={user} />
+  <AppHeader client:load user={user} query={query} />
   <slot />
 </BaseLayout>

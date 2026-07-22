@@ -6,16 +6,28 @@ import type { CourseListItem, Category } from "@/lib/types"
 
 const cookie = Astro.request.headers.get('cookie')
 const activeCategory = Astro.url.searchParams.get('category')
+const query = Astro.url.searchParams.get('q')?.trim() ?? ''
+
+const params = new URLSearchParams()
+if (activeCategory) params.set('category', activeCategory)
+if (query) params.set('q', query)
+const qs = params.toString()
 
 const [courses, categories] = await Promise.all([
-  apiServer<CourseListItem[]>('/courses' + (activeCategory ? '?category=' + activeCategory : ''), cookie).catch(() => []),
+  apiServer<CourseListItem[]>('/courses' + (qs ? '?' + qs : ''), cookie).catch(() => []),
   apiServer<Category[]>('/categories', cookie).catch(() => []),
 ])
 ---
 <AppLayout title="Formações — Full Time" user={Astro.locals.user}>
   <section class="mx-auto max-w-7xl px-6 py-10">
-    <h1 class="font-display text-3xl font-extrabold text-brand-navy">Formações</h1>
-    <p class="mt-2 text-sm text-muted-foreground">Explore os cursos disponíveis e encontre a formação certa para a sua prática profissional.</p>
+    <h1 class="font-display text-3xl font-extrabold text-brand-navy">
+      {query ? `Resultados para “${query}”` : 'Formações'}
+    </h1>
+    <p class="mt-2 text-sm text-muted-foreground">
+      {query
+        ? `${courses.length} ${courses.length === 1 ? 'formação encontrada' : 'formações encontradas'}.`
+        : 'Explore os cursos disponíveis e encontre a formação certa para a sua prática profissional.'}
+    </p>
 
     {categories.length > 0 && (
       <div class="mt-6 flex flex-wrap gap-2">
@@ -43,7 +55,9 @@ const [courses, categories] = await Promise.all([
     ) : (
       <div class="mt-12 rounded-card bg-surface p-12 text-center">
         <p class="font-display text-lg font-bold text-brand-navy">Nenhuma formação por aqui ainda</p>
-        <p class="mt-2 text-sm text-muted-foreground">Não encontramos cursos para esta seleção. Experimente outra categoria.</p>
+        <p class="mt-2 text-sm text-muted-foreground">
+          {query ? `Nenhum resultado para “${query}”. Tente outros termos.` : 'Não encontramos cursos para esta seleção. Experimente outra categoria.'}
+        </p>
       </div>
     )}
   </section>

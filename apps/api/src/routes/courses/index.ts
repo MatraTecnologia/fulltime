@@ -15,18 +15,24 @@ export default async function courseRoutes(app: FastifyInstance) {
         properties: {
           status: { type: 'string', enum: ['DRAFT', 'PUBLISHED'] },
           category: { type: 'string' },
+          q: { type: 'string' },
         },
       },
     },
   }, async (request) => {
     const session = await auth.api.getSession({ headers: fromNodeHeaders(request.headers) })
     const isPrivileged = session?.user.role === 'admin' || session?.user.role === 'instrutor'
-    const { status, category } = request.query as { status?: CourseStatus; category?: string }
+    const { status, category, q } = request.query as { status?: CourseStatus; category?: string; q?: string }
+    const term = q?.trim()
 
     return prisma.course.findMany({
       where: {
         status: isPrivileged && status ? status : CourseStatus.PUBLISHED,
         ...(category ? { categories: { some: { slug: category } } } : {}),
+        ...(term ? { OR: [
+          { title: { contains: term, mode: 'insensitive' } },
+          { description: { contains: term, mode: 'insensitive' } },
+        ] } : {}),
       },
       include: {
         instructor: { select: { id: true, name: true } },

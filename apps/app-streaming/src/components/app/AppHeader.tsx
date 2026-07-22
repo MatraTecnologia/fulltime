@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Avatar } from '@fulltime/ui'
 import { signOut } from '@/lib/auth-client'
-import { IconSearch, IconBell } from '@/components/icons'
+import { IconSearch } from '@/components/icons'
 
 interface Props {
   user: { name: string; image: string | null; role: string } | null
+  query?: string
 }
 
 const NAV = [
@@ -17,7 +18,7 @@ const NAV = [
   { label: 'Blog', href: '/blog' },
 ]
 
-export const AppHeader = ({ user }: Props) => {
+export const AppHeader = ({ user, query = '' }: Props) => {
   const [open, setOpen] = useState(false)
 
   const onSignOut = async () => {
@@ -43,18 +44,19 @@ export const AppHeader = ({ user }: Props) => {
           ))}
         </nav>
 
-        <div className="relative mx-auto hidden w-full max-w-sm md:block">
+        <form action="/formacoes" method="get" role="search" className="relative mx-auto hidden w-full max-w-sm md:block">
           <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-navy/40" />
           <input
+            name="q"
+            type="search"
+            defaultValue={query}
             placeholder="Buscar conteúdo…"
+            aria-label="Buscar conteúdo"
             className="w-full rounded-pill border border-hairline bg-surface py-2.5 pl-10 pr-4 text-sm text-brand-navy placeholder:text-brand-navy/40 focus:border-brand-blue/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-blue/20"
           />
-        </div>
+        </form>
 
         <div className="ml-auto flex shrink-0 items-center gap-3">
-          <button aria-label="Notificações" className="text-brand-navy/50 transition-colors hover:text-brand-navy">
-            <IconBell className="h-5 w-5" />
-          </button>
           <div className="relative">
             <button onClick={() => setOpen((v) => !v)} className="flex items-center gap-2" aria-haspopup="menu" aria-expanded={open}>
               <Avatar src={user?.image ?? undefined} name={user?.name ?? 'Usuário'} size="sm" />
