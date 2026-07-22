@@ -13,7 +13,7 @@ export const SignupForm = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true); setError('')
-    const { error } = await signUp.email({ name, email, password, callbackURL: '/' })
+    const { error } = await signUp.email({ name, email, password, callbackURL: `${window.location.origin}/` })
     setLoading(false)
     if (error) { setError(error.message ?? 'Não foi possível criar a conta.'); return }
     setDone(true)

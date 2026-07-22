@@ -54,7 +54,7 @@ export const ProfilePage = ({ user }: Props) => {
   const onChangeEmail = async (e: React.FormEvent) => {
     e.preventDefault()
     setEmailLoading(true); setEmailError(''); setEmailFeedback('')
-    const { error } = await authClient.changeEmail({ newEmail: email, callbackURL: '/perfil' })
+    const { error } = await authClient.changeEmail({ newEmail: email, callbackURL: `${window.location.origin}/perfil` })
     setEmailLoading(false)
     if (error) { setEmailError(error.message ?? 'Não foi possível alterar o e-mail.'); return }
     setEmailFeedback('Enviamos um link de confirmação para seu e-mail atual.')

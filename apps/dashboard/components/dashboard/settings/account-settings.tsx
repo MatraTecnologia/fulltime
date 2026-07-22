@@ -38,7 +38,7 @@ export const AccountSettings = () => {
   const handleChangeEmail = async () => {
     if (!newEmail) return
     setChangingEmail(true)
-    const { error } = await authClient.changeEmail({ newEmail, callbackURL: "/" })
+    const { error } = await authClient.changeEmail({ newEmail, callbackURL: `${window.location.origin}/` })
     setChangingEmail(false)
     if (error) {
       toast.error(error.message ?? "Não foi possível alterar o e-mail.")

@@ -10,7 +10,7 @@ export const ForgotPasswordForm = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    await authClient.requestPasswordReset({ email, redirectTo: '/redefinir-senha' })
+    await authClient.requestPasswordReset({ email, redirectTo: `${window.location.origin}/redefinir-senha` })
     setLoading(false)
     setSent(true)
   }

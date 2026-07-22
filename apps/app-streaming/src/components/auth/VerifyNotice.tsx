@@ -11,7 +11,7 @@ export const VerifyNotice = () => {
   const onResend = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true); setError(''); setNotice('')
-    const { error } = await authClient.sendVerificationEmail({ email, callbackURL: '/' })
+    const { error } = await authClient.sendVerificationEmail({ email, callbackURL: `${window.location.origin}/` })
     setLoading(false)
     if (error) {
       setError('Não foi possível reenviar agora. Tente novamente em instantes.')

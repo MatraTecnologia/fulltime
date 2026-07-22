@@ -54,7 +54,7 @@ export const LoginForm = () => {
 
   const onResend = async () => {
     setResending(true)
-    const { error } = await authClient.sendVerificationEmail({ email, callbackURL: "/" })
+    const { error } = await authClient.sendVerificationEmail({ email, callbackURL: `${window.location.origin}/` })
     setResending(false)
     if (error) {
       setError("Não foi possível reenviar agora. Tente novamente em instantes.")
