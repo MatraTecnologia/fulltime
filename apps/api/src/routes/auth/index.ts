@@ -1,8 +1,16 @@
 import type { FastifyInstance } from 'fastify'
 import { fromNodeHeaders } from 'better-auth/node'
 import { auth } from '../../lib/auth.js'
+import { prisma } from '../../lib/prisma.js'
 
 export default async function authRoutes(app: FastifyInstance) {
+  app.get<{ Querystring: { email?: string } }>('/auth/email-available', { schema: { tags: ['auth'], hide: true } }, async (request, reply) => {
+    const email = request.query.email?.trim().toLowerCase()
+    if (!email) return reply.status(400).send({ error: 'E-mail obrigatório.' })
+    const user = await prisma.user.findUnique({ where: { email }, select: { id: true } })
+    return reply.send({ available: !user })
+  })
+
   app.route({
     method: ['GET', 'POST'],
     url: '/auth/*',

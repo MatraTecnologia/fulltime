@@ -2,7 +2,7 @@ import { defineMiddleware } from 'astro:middleware'
 import { apiServer } from './lib/api'
 
 // Telas de autenticação: usuário logado é redirecionado para fora delas.
-const AUTH_PATHS = ['/login', '/cadastro', '/recuperar-senha', '/redefinir-senha', '/verificar', '/verificar-codigo']
+const AUTH_PATHS = ['/login', '/cadastro', '/recuperar-senha', '/redefinir-senha', '/verificar']
 // Rotas abertas a todos (logados ou não), sem redirecionar.
 const OPEN_PATHS = ['/blog', '/acesso-negado', '/manutencao', '/preview-player', '/preview-profile']
 

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { signUp } from '@/lib/auth-client'
+import { apiClient } from '@/lib/api'
 import { PasswordField, TextField, FormAlert, Spinner, GoogleButton, Divider, primaryBtnCls, linkCls } from './ui'
 
 export const SignupForm = () => {
@@ -13,6 +14,12 @@ export const SignupForm = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true); setError('')
+    const { available } = await apiClient<{ available: boolean }>(`/auth/email-available?email=${encodeURIComponent(email)}`)
+    if (!available) {
+      setLoading(false)
+      setError('Este e-mail já está cadastrado. Faça login ou recupere sua senha.')
+      return
+    }
     const { error } = await signUp.email({ name, email, password, callbackURL: `${window.location.origin}/` })
     setLoading(false)
     if (error) { setError(error.message ?? 'Não foi possível criar a conta.'); return }
