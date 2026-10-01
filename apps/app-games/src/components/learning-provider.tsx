@@ -4,9 +4,25 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useSyncExternalStore,
 } from "react";
 import { games, type GameId } from "@/lib/games";
+
+function preferredVoice(voices: SpeechSynthesisVoice[]) {
+  const score = (voice: SpeechSynthesisVoice) => {
+    const language = voice.lang.replaceAll("_", "-").toLowerCase();
+    const natural = /natural|neural|enhanced|premium/i.test(voice.name);
+    return (
+      (language === "pt-br" ? 10 : 0) +
+      (natural ? 4 : /google/i.test(voice.name) ? 2 : 0) +
+      (voice.default ? 1 : 0)
+    );
+  };
+  return voices
+    .filter((voice) => /^pt(?:[-_]|$)/i.test(voice.lang))
+    .sort((a, b) => score(b) - score(a))[0];
+}
 
 type Settings = { sound: boolean; calm: boolean; largeText: boolean };
 type Session = { gameId: GameId; date: string; stars: number };
@@ -98,14 +114,22 @@ const LearningContext = createContext<LearningContextValue | null>(null);
 
 export function LearningProvider({ children }: { children: React.ReactNode }) {
   const current = useSyncExternalStore(subscribe, getSnapshot, () => initial);
+  useEffect(() => {
+    // Start loading device voices before the first request to listen.
+    if ("speechSynthesis" in window) window.speechSynthesis.getVoices();
+  }, []);
   const speak = useCallback(
     (text: string, force = false) => {
       if ((!current.settings.sound && !force) || !("speechSynthesis" in window))
         return;
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "pt-BR";
-      utterance.rate = 0.85;
+      const voice = preferredVoice(window.speechSynthesis.getVoices());
+      if (voice) utterance.voice = voice;
+      utterance.lang = voice?.lang || "pt-BR";
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+      utterance.volume = 0.8;
       window.speechSynthesis.speak(utterance);
     },
     [current.settings.sound],

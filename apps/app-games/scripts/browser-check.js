@@ -35,10 +35,10 @@
     await until(() => document.querySelector(".playground"), `Game failed to load: ${id}`);
   }
   async function next() {
-    await click("Próxima descoberta");
+    await click("Próxima");
   }
   async function finish(id) {
-    await click("Concluir aventura");
+    await click("Concluir");
     assert(document.querySelector(".completion-screen"), `Completion missing: ${id}`);
     checks.push(`${id}: completed`);
   }
@@ -47,10 +47,10 @@
   await click("GATO");
   assert(document.querySelector(".feedback").textContent.includes("tentar de novo"), "Wrong-answer feedback missing");
   assert(!document.querySelector(".completion-screen"), "Wrong answer completed game");
-  await click("Fazer uma pausa");
+  await click("Pausar");
   assert(document.querySelector('[role="dialog"]'), "Pause dialog missing");
   await click("Continuar a aventura");
-  await click("Quero uma dica");
+  await click("Dica");
   assert(document.querySelector(".hint-box"), "Hint missing");
   await click("LEÃO"); await next(); await click("MAÇÃ"); await next(); await click("BICICLETA");
   await finish("quiz-emojis");
