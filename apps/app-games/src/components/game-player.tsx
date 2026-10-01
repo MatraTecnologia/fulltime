@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import {
-  ArrowLeft,
   ArrowRight,
   Check,
   Lightbulb,
@@ -234,13 +233,8 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
   };
   return (
     <>
-      <Link className="back-link" href="/games">
-        <ArrowLeft size={17} />
-        Voltar para os jogos
-      </Link>
       <div className="player-heading">
         <div>
-          <span className="eyebrow">{game.skill}</span>
           <h1>{game.title}</h1>
         </div>
         <Button
@@ -251,7 +245,7 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
           }}
         >
           <Pause size={16} />
-          Fazer uma pausa
+          Pausar
         </Button>
       </div>
       <div className="round-progress">
@@ -260,7 +254,7 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
           aria-label={`${round} de ${totalRounds} etapas concluídas`}
         />
         <span>
-          Descoberta {round + 1} de {totalRounds}
+          Etapa {round + 1} de {totalRounds}
         </span>
         <span>
           <Star size={16} /> Sem tempo marcado
@@ -311,13 +305,13 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
             aria-expanded={hint}
           >
             <Lightbulb size={18} />
-            {hint ? "Fechar dica" : "Quero uma dica"}
+            {hint ? "Fechar dica" : "Dica"}
           </Button>
           {feedback === "correct" && (
             <Button onClick={next}>
               {round + 1 === totalRounds
-                ? "Concluir aventura"
-                : "Próxima descoberta"}
+                ? "Concluir"
+                : "Próxima"}
               <ArrowRight size={18} />
             </Button>
           )}

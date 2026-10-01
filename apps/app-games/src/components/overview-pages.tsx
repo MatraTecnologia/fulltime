@@ -5,12 +5,9 @@ import { useState } from "react";
 import {
   ArrowRight,
   Check,
-  Gamepad2,
-  Heart,
   Leaf,
   Sparkles,
   Star,
-  Trophy,
   Volume2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,93 +17,44 @@ import { Switch } from "@/components/ui/switch";
 import { games } from "@/lib/games";
 import { useLearning } from "./learning-provider";
 import { GameCard } from "./game-catalog";
-import { OwlCompanion } from "./owl-companion";
+import { GameArt } from "./illustrations";
 
 export function HomeOverview() {
   const { name, sessions } = useLearning();
-  const last = sessions.at(-1);
   const nextGame =
     games.find((g) => !sessions.some((s) => s.gameId === g.id)) || games[0];
+  const suggestions = games.filter((game) => game.id !== nextGame.id).slice(0, 2);
+  const stars = sessions.reduce((total, session) => total + session.stars, 0);
   return (
     <>
-      <div className="breadcrumb">
-        <strong>Meu cantinho</strong>
+      <div className="simple-page-heading home-greeting">
+        <p>Que bom ter você aqui!</p>
+        <h1>Olá, {name} <span aria-hidden="true">👋</span></h1>
+        <p>Vamos brincar um pouquinho?</p>
       </div>
-      <section className="catalog-hero home-hero">
-        <div className="hero-copy">
-          <span className="eyebrow">
-            <Sparkles size={15} /> QUE BOM TER VOCÊ POR AQUI
-          </span>
-          <h1>
-            Olá, {name}!<br />
-            <span>Vamos descobrir algo novo?</span>
-          </h1>
-          <p>
-            Um pouquinho de curiosidade e um montão de possibilidades.
-            <br />A próxima aventura começa com você.
-          </p>
-          <Button asChild className="hero-cta">
-            <Link href="/games">
-              Escolher uma aventura <ArrowRight size={18} />
-            </Link>
-          </Button>
-        </div>
-        <div className="hero-illustration">
-          <OwlCompanion />
-        </div>
-      </section>
-      <div className="overview-stats">
-        <Card>
-          <span className="stat-icon yellow">
-            <Star fill="currentColor" />
-          </span>
-          <div>
-            <strong>{sessions.length * 3}</strong>
-            <span>estrelas conquistadas</span>
+      <section aria-labelledby="suggested-title" className="suggested-section">
+        <Link href={`/games/${nextGame.id}`} className="suggested-game">
+          <div className={`suggested-game-art ${nextGame.color}`} aria-hidden="true"><GameArt type={nextGame.icon} /></div>
+          <div className="suggested-game-copy">
+            <span className="suggested-label">{sessions.length ? "Sua próxima descoberta" : "Um jogo para começar"}</span>
+            <h2 id="suggested-title">{nextGame.title}</h2>
+            <p>{nextGame.description}</p>
+            <span className="suggested-play">Brincar agora <ArrowRight size={20} aria-hidden="true" /></span>
           </div>
-        </Card>
-        <Card>
-          <span className="stat-icon mint">
-            <Gamepad2 />
-          </span>
-          <div>
-            <strong>{new Set(sessions.map((s) => s.gameId)).size} de 8</strong>
-            <span>aventuras descobertas</span>
-          </div>
-        </Card>
-        <Card>
-          <span className="stat-icon lavender">
-            <Heart />
-          </span>
-          <div>
-            <strong>No seu ritmo</strong>
-            <span>cada tentativa vale a pena</span>
-          </div>
-        </Card>
-      </div>
-      <div className="section-heading">
-        <div>
-          <span className="eyebrow">
-            UM PEQUENO PASSO PARA UMA GRANDE DESCOBERTA
-          </span>
-          <h2>{last ? "Sua próxima aventura" : "Que tal começar por aqui?"}</h2>
-        </div>
-        <Link href="/games" className="text-link">
-          Ver todos os jogos <ArrowRight size={16} />
         </Link>
-      </div>
-      <div className="home-recommendations">
-        <GameCard game={nextGame} />
-        <Card className="discovery-note">
-          <Leaf size={32} />
-          <h3>Aprender também é tentar.</h3>
-          <p>
-            Você pode repetir um jogo quantas vezes quiser, pedir uma dica ou
-            fazer uma pausa. O caminho é seu!
-          </p>
-          <span>Vamos juntos, uma descoberta de cada vez. ♡</span>
-        </Card>
-      </div>
+        <Button asChild variant="outline" className="all-games-button">
+          <Link href="/games">Escolher outro jogo <ArrowRight size={18} /></Link>
+        </Button>
+      </section>
+      <section className="more-games" aria-labelledby="more-games-title">
+        <h2 id="more-games-title">Mais brincadeiras</h2>
+        <div className="game-grid">{suggestions.map((game) => <GameCard key={game.id} game={game} />)}</div>
+      </section>
+      <Link href="/conquistas" className="home-progress-link">
+        <Star size={21} fill="currentColor" aria-hidden="true" />
+        <span>{stars ? `${stars} estrelas conquistadas` : "Cada brincadeira rende estrelas"}</span>
+        <ArrowRight size={18} aria-hidden="true" />
+      </Link>
     </>
   );
 }
@@ -116,14 +64,9 @@ export function AchievementsOverview() {
   const unique = new Set(sessions.map((s) => s.gameId));
   return (
     <>
-      <div className="page-heading">
-        <span className="eyebrow">
-          <Trophy size={15} /> CADA PASSO MERECE CARINHO
-        </span>
-        <h1>
-          Suas descobertas, {name} <span>✨</span>
-        </h1>
-        <p>Olha quanta coisa você está aprendendo!</p>
+      <div className="simple-page-heading">
+        <h1>Suas estrelas <span aria-hidden="true">✨</span></h1>
+        <p>Cada descoberta conta, {name}.</p>
       </div>
       <Card className="achievement-summary">
         <span className="big-star">⭐</span>
@@ -233,12 +176,9 @@ export function AdultSettings() {
   ];
   return (
     <>
-      <div className="page-heading">
-        <span className="eyebrow">
-          <Heart size={15} /> ACOLHER, DESENVOLVER, INCLUIR
-        </span>
-        <h1>Um cantinho para quem acompanha</h1>
-        <p>Adapte a experiência ao jeito de aprender da criança.</p>
+      <div className="simple-page-heading">
+        <h1>Ajustes</h1>
+        <p>Para quem acompanha a criança.</p>
       </div>
       <div className="settings-layout">
         <div>

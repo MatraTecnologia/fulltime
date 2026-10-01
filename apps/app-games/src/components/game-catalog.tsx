@@ -2,21 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import {
-  ArrowRight,
-  Clock3,
-  Gamepad2,
-  Search,
-  Sparkles,
-  Star,
-} from "lucide-react";
+import { ArrowRight, Search, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { categories, games, type Game } from "@/lib/games";
 import { cn } from "@/lib/utils";
 import { GameArt } from "./illustrations";
-import { OwlCompanion } from "./owl-companion";
 import { useLearning } from "./learning-provider";
 
 export function GameCard({ game }: { game: Game }) {
@@ -26,9 +17,6 @@ export function GameCard({ game }: { game: Game }) {
     <Card className="game-card">
       <Link href={`/games/${game.id}`} className="game-card-link">
         <div className={cn("game-card-image", game.color)}>
-          <Badge className="game-tag" variant="secondary">
-            {game.tag}
-          </Badge>
           <GameArt type={game.icon} />
           {completed && (
             <span className="completed-mark" aria-label="Já concluído">
@@ -37,14 +25,11 @@ export function GameCard({ game }: { game: Game }) {
           )}
         </div>
         <div className="game-card-body">
-          <span className="game-category">{game.skill}</span>
           <h3>{game.title}</h3>
           <p>{game.description}</p>
           <div className="game-card-footer">
             <span>
-              <Clock3 size={14} />
-              {game.duration}
-              <span className="time-note"> · sem pressa</span>
+              Brincar
             </span>
             <span className="play-circle">
               <ArrowRight size={19} />
@@ -75,51 +60,13 @@ export function GameCatalog() {
   );
   return (
     <>
-      <div className="breadcrumb">
-        <span>Meu cantinho</span>
-        <span>/</span>
-        <strong>Vamos brincar</strong>
+      <div className="simple-page-heading">
+        <h1>Vamos brincar?</h1>
+        <p>Escolha um jogo e comece.</p>
       </div>
-      <section className="catalog-hero">
-        <div className="hero-copy">
-          <span className="eyebrow">
-            <Sparkles size={15} /> APRENDER PODE SER UMA AVENTURA
-          </span>
-          <h1>
-            Vamos brincar
-            <br />e <span>descobrir juntos?</span>
-          </h1>
-          <p>
-            Um mundo de jogos para aprender no seu ritmo.
-            <br className="desktop-break" /> Escolha uma aventura. Cada
-            tentativa é uma conquista!
-          </p>
-          <div className="hero-chips">
-            <span>
-              <Gamepad2 size={16} />8 aventuras para explorar
-            </span>
-            <span>
-              <HeartIcon />
-              Do seu jeitinho
-            </span>
-          </div>
-        </div>
-        <div className="hero-illustration">
-          <span className="floating-letter floating-a">A</span>
-          <span className="floating-letter floating-b">B</span>
-          <OwlCompanion />
-          <span className="hero-doodle doodle-one">✦</span>
-          <span className="hero-doodle doodle-two">✧</span>
-        </div>
-      </section>
       <section className="catalog-section" aria-labelledby="catalog-title">
         <div className="section-heading">
-          <div>
-            <span className="eyebrow">PEQUENAS DESCOBERTAS, TODOS OS DIAS</span>
-            <h2 id="catalog-title">
-              Qual vai ser a aventura de hoje? <span>✨</span>
-            </h2>
-          </div>
+          <h2 id="catalog-title" className="sr-only">Escolha um jogo</h2>
           <label className="search-field">
             <Search size={18} />
             <input
@@ -131,7 +78,7 @@ export function GameCatalog() {
           </label>
         </div>
         <div className="filter-row" aria-label="Filtrar jogos">
-          {["Todos os jogos", ...categories].map((item, i) => (
+          {["Todos os jogos", ...categories].map((item) => (
             <Button
               key={item}
               variant={category === item ? "default" : "ghost"}
@@ -139,9 +86,7 @@ export function GameCatalog() {
               aria-pressed={category === item}
               onClick={() => setCategory(item)}
             >
-              {i === 0 && <Gamepad2 size={16} />}
-              {item}
-              {i === 0 && <span>{games.length}</span>}
+              {item === "Todos os jogos" ? "Todos" : item}
             </Button>
           ))}
         </div>
@@ -166,27 +111,6 @@ export function GameCatalog() {
           </div>
         )}
       </section>
-      <div className="gentle-banner">
-        <span className="gentle-icon">🌈</span>
-        <div>
-          <strong>Aqui, aprender é para todo mundo.</strong>
-          <p>
-            Sem tempo marcado, sem comparação. Com carinho, curiosidade e muitas
-            possibilidades.
-          </p>
-        </div>
-        <Link href="/responsaveis">
-          Conheça os ajustes <ArrowRight size={16} />
-        </Link>
-      </div>
     </>
-  );
-}
-
-function HeartIcon() {
-  return (
-    <span aria-hidden="true" className="tiny-heart">
-      ♡
-    </span>
   );
 }
