@@ -1,12 +1,20 @@
 import { cn } from "@/lib/utils";
 
-export function Owl({ className }: { className?: string }) {
+export function Owl({
+  className,
+  sleeping = false,
+  happy = false,
+}: {
+  className?: string;
+  sleeping?: boolean;
+  happy?: boolean;
+}) {
   return (
     <svg
       viewBox="0 0 280 280"
       fill="none"
       aria-hidden="true"
-      className={cn("owl", className)}
+      className={cn("owl", sleeping && "owl-sleeping", happy && "owl-happy", className)}
     >
       <ellipse cx="143" cy="254" rx="77" ry="10" fill="#DAD2EC" />
       <path
@@ -19,17 +27,22 @@ export function Owl({ className }: { className?: string }) {
       />
       <ellipse cx="104" cy="116" rx="43" ry="47" fill="#FFF9EC" />
       <ellipse cx="179" cy="116" rx="43" ry="47" fill="#FFF9EC" />
-      <ellipse cx="111" cy="122" rx="18" ry="23" fill="#3B2C56" />
-      <ellipse cx="174" cy="122" rx="18" ry="23" fill="#3B2C56" />
-      <circle cx="117" cy="115" r="6" fill="white" />
-      <circle cx="180" cy="115" r="6" fill="white" />
+      <g className="owl-eyes">
+        <g className="owl-gaze">
+          <ellipse cx="111" cy="122" rx="18" ry="23" fill="#3B2C56" />
+          <ellipse cx="174" cy="122" rx="18" ry="23" fill="#3B2C56" />
+          <circle cx="117" cy="115" r="6" fill="white" />
+          <circle cx="180" cy="115" r="6" fill="white" />
+        </g>
+      </g>
+      <g className="owl-closed-eyes" stroke="#3B2C56" strokeWidth="6" strokeLinecap="round">
+        <path d={happy ? "M95 128q16-23 32 0M158 128q16-23 32 0" : "M95 122q16 18 32 0M158 122q16 18 32 0"} />
+      </g>
       <path d="m130 149 12 17 13-17c-8-8-17-8-25 0Z" fill="#F6BB60" />
       <ellipse cx="82" cy="148" rx="12" ry="7" fill="#E8A5B1" />
       <ellipse cx="203" cy="148" rx="12" ry="7" fill="#E8A5B1" />
-      <path
-        d="M65 155c-28 17-28 65 1 66l24-49M218 153c36-14 32-46 22-57-15 22-24 28-35 31"
-        fill="#7955A8"
-      />
+      <path className="owl-wing-left" d="M65 155c-28 17-28 65 1 66l24-49" fill="#7955A8" />
+      <path className="owl-wing-right" d="M218 153c36-14 32-46 22-57-15 22-24 28-35 31" fill="#7955A8" />
       <path
         d="m123 186 7 7m25-7 7 7m-30 12 7 7"
         stroke="#A78BC9"

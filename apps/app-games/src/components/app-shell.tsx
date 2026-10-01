@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BookOpen,
+  Bird,
   Gamepad2,
   Heart,
   Home,
@@ -22,6 +23,7 @@ import { cn } from "@/lib/utils";
 const navigation = [
   { href: "/home", label: "Meu cantinho", icon: Home },
   { href: "/games", label: "Vamos brincar", icon: Gamepad2 },
+  { href: "/corujinha", label: "Minha corujinha", icon: Bird },
   { href: "/conquistas", label: "Minhas conquistas", icon: Trophy },
   { href: "/responsaveis", label: "Para responsáveis", icon: Heart },
 ];

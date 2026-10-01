@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./owl-corner.css";
 
 @theme inline {
   --color-background: var(--background);
@@ -376,6 +377,37 @@ button:disabled {
 .owl {
   width: 255px;
   position: relative;
+}
+.owl-eyes {
+  transform-origin: 142px 122px;
+  animation: owl-blink 6s infinite;
+}
+.owl-gaze {
+  transform: translate(var(--look-x, 0px), var(--look-y, 0px));
+  transition: transform 0.16s ease-out;
+}
+.owl-closed-eyes { display: none; }
+.owl-sleeping .owl-eyes, .owl-happy .owl-eyes { display: none; }
+.owl-sleeping .owl-closed-eyes, .owl-happy .owl-closed-eyes { display: block; }
+.owl-companion { position: relative; display: block; border-radius: 50%; }
+.companion-body { display: block; animation: owl-breathe 4s ease-in-out infinite; }
+.owl-companion:hover .companion-body { animation: owl-hop 0.65s ease-in-out; }
+.owl-companion .owl-bubble { white-space: nowrap; bottom: -1px; transition: transform 0.2s; }
+.owl-companion:hover .owl-bubble { transform: rotate(0); }
+.owl-companion .companion-arrow { color: #7954b6; margin-left: 10px; }
+@keyframes owl-blink {
+  0%, 42%, 46%, 100% { transform: scaleY(1); }
+  44% { transform: scaleY(0.06); }
+}
+@keyframes owl-breathe {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-5px) rotate(1deg); }
+}
+@keyframes owl-hop {
+  0%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(3px) scale(1.04, 0.96); }
+  55% { transform: translateY(-18px) scale(0.97, 1.03); }
+  80% { transform: translateY(0) scale(1.03, 0.97); }
 }
 .owl-bubble {
   position: absolute;
@@ -1769,7 +1801,7 @@ button:disabled {
   }
   .sidebar nav {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 3px;
   }
   .nav-item {

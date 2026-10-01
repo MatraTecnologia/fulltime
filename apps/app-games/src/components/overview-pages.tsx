@@ -20,7 +20,7 @@ import { Switch } from "@/components/ui/switch";
 import { games } from "@/lib/games";
 import { useLearning } from "./learning-provider";
 import { GameCard } from "./game-catalog";
-import { Owl } from "./illustrations";
+import { OwlCompanion } from "./owl-companion";
 
 export function HomeOverview() {
   const { name, sessions } = useLearning();
@@ -52,8 +52,7 @@ export function HomeOverview() {
           </Button>
         </div>
         <div className="hero-illustration">
-          <Owl />
-          <span className="owl-bubble">Seu ritmo é especial. ♡</span>
+          <OwlCompanion />
         </div>
       </section>
       <div className="overview-stats">

@@ -1,4 +1,9 @@
 import type { NextConfig } from "next";
+import { fileURLToPath } from "node:url";
 
-const nextConfig: NextConfig = { devIndicators: false };
+const nextConfig: NextConfig = {
+  devIndicators: false,
+  output: "standalone",
+  outputFileTracingRoot: fileURLToPath(new URL("../../", import.meta.url)),
+};
 export default nextConfig;

@@ -13,6 +13,29 @@ pnpm --filter app-games dev
 
 Abra http://localhost:3002. A raiz direciona para `/home`.
 
+## Deploy no Easypanel
+
+Configure o serviço `game` com o contexto de build na raiz do monorepo:
+
+| Campo | Valor |
+| --- | --- |
+| Dockerfile Path | `apps/app-games/Dockerfile` |
+| Build Context | `.` |
+| Porta interna / destino do domínio | `3000` |
+
+O Dockerfile instala as dependências com o lockfile do workspace e gera o servidor standalone do Next.js. A imagem executa como usuário `node`, escutando em `0.0.0.0:3000`.
+
+O build arg `NEXT_PUBLIC_API_URL` é aceito para a integração com a API. Nesta versão, os jogos usam armazenamento local e não fazem chamadas à API.
+
+Para reproduzir o build na raiz do repositório:
+
+```powershell
+docker build -f apps/app-games/Dockerfile -t fulltime-game .
+docker run --rm -p 3000:3000 fulltime-game
+```
+
+Envie o Dockerfile e a configuração do Next.js para a branch usada pelo Easypanel antes de iniciar um novo deploy.
+
 ## Páginas e atividades
 
 - `/home`: cantinho da criança, resumo e sugestão de atividade.

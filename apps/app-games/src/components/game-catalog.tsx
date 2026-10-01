@@ -15,7 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { categories, games, type Game } from "@/lib/games";
 import { cn } from "@/lib/utils";
-import { GameArt, Owl } from "./illustrations";
+import { GameArt } from "./illustrations";
+import { OwlCompanion } from "./owl-companion";
 import { useLearning } from "./learning-provider";
 
 export function GameCard({ game }: { game: Game }) {
@@ -106,10 +107,7 @@ export function GameCatalog() {
         <div className="hero-illustration">
           <span className="floating-letter floating-a">A</span>
           <span className="floating-letter floating-b">B</span>
-          <Owl />
-          <span className="owl-bubble">
-            Oi! Vamos aprender? <span>♡</span>
-          </span>
+          <OwlCompanion />
           <span className="hero-doodle doodle-one">✦</span>
           <span className="hero-doodle doodle-two">✧</span>
         </div>
