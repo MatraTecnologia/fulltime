@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "./owl-corner.css";
 @import "./mobile-layout.css";
+@import "./learning-mascot.css";
 
 @theme inline {
   --color-background: var(--background);

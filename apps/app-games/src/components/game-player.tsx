@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { Game } from "@/lib/games";
+import { games, type Game } from "@/lib/games";
 import {
   letterPaths,
   selectedWord,
@@ -31,7 +31,8 @@ import {
 } from "@/lib/game-logic";
 import { cn } from "@/lib/utils";
 import { useLearning } from "./learning-provider";
-import { Owl } from "./illustrations";
+import { LearningMascot, RewardStars } from "./learning-mascot";
+import { useOwlPet } from "./use-owl-pet";
 
 type RoundProps = {
   round: number;
@@ -166,9 +167,19 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
   const [paused, setPaused] = useState(false);
   const [finished, setFinished] = useState(false);
   const completed = useRef(false);
-  const { completeGame, speak } = useLearning();
+  const { completeGame, speak, name, sessions } = useLearning();
+  const { pet } = useOwlPet();
   const totalRounds = game.id === "memoria" ? 1 : 3;
   const instruction = roundInstruction(game, round);
+  const nextAdventure = games.find((candidate) => candidate.id !== game.id && !sessions.some((session) => session.gameId === candidate.id))
+    || games[(games.findIndex((candidate) => candidate.id === game.id) + 1) % games.length];
+  const encouragement = feedback === "correct"
+    ? [`Muito bem, ${name}! Você fez uma nova descoberta!`, `Que legal, ${name}! Mais um passo na nossa aventura!`, `Você conseguiu, ${name}! Vamos guardar suas estrelinhas?`][round]
+    : feedback === "retry"
+      ? `Vamos tentar de novo, ${name}? Estou aqui com você. Você pode pedir uma dica!`
+      : hint
+        ? `Vamos descobrir juntos? ${roundHint(game, round)}`
+        : `Estou com você, ${name}! ${round === 0 ? "Explore com calma. Você consegue!" : "Vamos para a próxima descoberta!"}`;
   useEffect(
     () => () => {
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
@@ -179,8 +190,8 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
     setFeedback(correct ? "correct" : "retry");
     speak(
       correct
-        ? "Muito bem! Você fez uma nova descoberta."
-        : "Vamos tentar de novo? Você pode pedir uma dica.",
+        ? `Muito bem, ${name}! Você fez uma nova descoberta!`
+        : `Vamos tentar de novo, ${name}? Estou aqui com você. Você pode pedir uma dica.`,
     );
   }
   function next() {
@@ -190,7 +201,7 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
         completeGame(game.id);
       }
       setFinished(true);
-      speak("Você conseguiu! Três estrelas para a sua aventura!");
+      speak(`Parabéns, ${name}! Você conseguiu! Três estrelas para a nossa aventura!`);
     } else {
       setRound((r) => r + 1);
       setFeedback(null);
@@ -200,11 +211,9 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
   if (finished)
     return (
       <div className="completion-screen">
-        <Owl />
-        <span className="completion-stars" aria-label="3 estrelas">
-          ★ ★ ★
-        </span>
-        <h1>Olha só o que você descobriu!</h1>
+        <LearningMascot mascotName={pet.name} mood="celebrate" message={`Parabéns, ${name}! Adorei brincar com você. Olha as estrelinhas que você conquistou!`} />
+        <RewardStars />
+        <h1>Parabéns, {name}!</h1>
         <p>
           Você concluiu {game.title.toLowerCase()} e ganhou 3 estrelas.
           <br />
@@ -216,14 +225,15 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
             Brincar de novo
           </Button>
           <Button asChild variant="outline">
-            <Link href="/games">
-              Escolher outra aventura <ArrowRight size={17} />
+            <Link href={`/games/${nextAdventure.id}`}>
+              Continuar com {pet.name} <ArrowRight size={17} />
             </Link>
           </Button>
         </div>
         <Link href="/conquistas" className="text-link">
           Ver minhas conquistas
         </Link>
+        <Link href="/home" className="text-link">Voltar para minha trilha</Link>
       </div>
     );
   const props: RoundProps = {
@@ -282,21 +292,8 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
             <ChoiceGame {...props} game={game} />
           )}
         </div>
-        <div
-          className={cn("feedback", feedback === "correct" && "positive")}
-          role="status"
-          aria-live="polite"
-        >
-          {feedback === "correct" ? (
-            <>
-              <Check size={19} />
-              Muito bem! Você fez uma nova descoberta.
-            </>
-          ) : feedback === "retry" ? (
-            <>Vamos tentar de novo? Você pode pedir uma dica. ♡</>
-          ) : (
-            <span>Explore com calma. Você consegue!</span>
-          )}
+        <div className={cn("feedback mascot-feedback", feedback === "correct" && "positive")}>
+          <LearningMascot key={`${round}-${feedback}`} mascotName={pet.name} mood={feedback === "correct" ? "celebrate" : feedback === "retry" ? "encourage" : "guide"} message={encouragement} />
         </div>
         <div className="player-controls">
           <Button
@@ -316,7 +313,7 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
             </Button>
           )}
         </div>
-        {hint && <p className="hint-box">💡 {roundHint(game, round)}</p>}
+        {hint && <p className="hint-box">💡 Dica de {pet.name}: {roundHint(game, round)}</p>}
       </Card>
       <p className="player-note">
         Você pode fazer uma pausa, pedir ajuda e tentar quantas vezes quiser. ♡

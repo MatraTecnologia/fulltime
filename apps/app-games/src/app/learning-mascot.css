@@ -1,0 +1,91 @@
+.learning-mascot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 24px;
+  margin-bottom: 22px;
+  border: 1px solid #e4d9f1;
+  border-radius: 24px;
+  background: linear-gradient(125deg, #f1e9fc, #fffaf0);
+  text-align: left;
+}
+.mascot-character { position: relative; flex: 0 0 120px; }
+.mascot-character .owl { display: block; width: 100%; }
+.mascot-speech { flex: 1; min-width: 0; }
+.mascot-name { display: block; color: #79549e; font-size: 12px; font-weight: 800; margin-bottom: 5px; }
+.mascot-message { color: #4d3866; font-size: 17px; font-weight: 700; line-height: 1.6; margin: 0; }
+.mascot-listen { flex-shrink: 0; width: 44px; height: 44px; color: #79549e; }
+.mascot-start { margin-top: 14px; min-height: 44px; }
+.mascot-celebrate { background: linear-gradient(125deg, #fff3d0, #fffaf0); border-color: #f0dca5; }
+.mascot-encourage { background: #edf5f0; border-color: #d2e6d8; }
+.mascot-celebrate .mascot-character { animation: mascot-cheer 700ms ease-out; }
+.mascot-sparkles { position: absolute; inset: 0; pointer-events: none; color: #bb8520; }
+.mascot-sparkles span { position: absolute; top: 4%; left: 5%; font-size: 24px; animation: mascot-star 850ms ease-out; }
+.mascot-sparkles span:nth-child(2) { left: auto; right: 0; top: 12%; animation-delay: 100ms; }
+.mascot-sparkles span:nth-child(3) { top: 62%; left: 0; font-size: 17px; animation-delay: 200ms; }
+.feedback.mascot-feedback { display: block; padding: 0; background: transparent; }
+.mascot-feedback .learning-mascot { margin: 0; padding: 12px 16px; gap: 12px; }
+.mascot-feedback .mascot-character { flex-basis: 82px; }
+.mascot-feedback .mascot-message { font-size: 15px; }
+.completion-screen .learning-mascot { flex-direction: column; max-width: 530px; text-align: center; gap: 8px; margin: 0; padding: 26px; }
+.completion-screen .mascot-character { flex-basis: auto; width: 180px; }
+.completion-screen .mascot-character .owl { width: 100%; }
+.completion-screen .mascot-listen { position: absolute; top: 12px; right: 12px; }
+.completion-screen > .learning-mascot { margin: 0 0 15px; }
+.reward-stars { display: flex; justify-content: center; gap: 14px; margin: 12px 0; font-size: 48px; color: #b98522; }
+.reward-stars > span { display: inline-block; animation: mascot-star 650ms ease-out both; }
+.adventure-trail { margin: 28px 0 32px; }
+.trail-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.trail-heading p { color: #887396; font-size: 12px; margin: 0 0 5px; }
+.trail-heading h2 { color: #4d3866; font-size: 23px; font-weight: 800; line-height: 1.3; }
+.trail-count { display: inline-flex; align-items: center; gap: 6px; background: #fff2d3; color: #926319; padding: 8px 12px; border-radius: 20px; font-size: 13px; font-weight: 800; white-space: nowrap; }
+.trail-description { color: #84758f; font-size: 13px; line-height: 1.7; margin: 10px 0 22px; }
+.trail-stops { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px 16px; list-style: none; margin: 0; padding: 0; }
+.trail-stop { position: relative; min-width: 0; }
+.trail-link { position: relative; display: flex; flex-direction: column; align-items: center; height: 100%; gap: 10px; background: #fff; border: 2px solid #ebe3f2; border-radius: 22px; padding: 18px 10px 15px; text-align: center; transition: transform 160ms ease; }
+.trail-link:hover { transform: translateY(-3px); }
+.trail-link:focus-visible { outline: 3px solid #7954b6; outline-offset: 4px; }
+.trail-number { position: absolute; z-index: 1; top: -12px; left: 14px; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #eee7f8; color: #7954b6; font-size: 13px; font-weight: 800; }
+.trail-art { display: block; position: relative; overflow: hidden; width: 100%; height: 98px; border-radius: 14px; }
+.trail-art .game-art { height: 100%; transform: scale(0.7); }
+.trail-title { color: #5c4374; font-size: 15px; font-weight: 800; }
+.trail-caption { color: #84758f; font-size: 11px; font-weight: 700; margin-top: auto; }
+.trail-caption > span { color: #a9771b; }
+.trail-done .trail-link { border-color: #d4e6d8; background: #fbfefb; }
+.trail-done .trail-number { color: #497451; background: #dcedde; }
+.trail-next .trail-link { border-color: #a885cf; box-shadow: 0 4px 0 #e6d8f5; }
+.trail-next .trail-number { background: #7954b6; color: white; }
+.trail-next .trail-caption { color: #7954b6; }
+.trail-finished { margin-top: 20px; padding: 16px; border-radius: 16px; color: #785822; background: #fff4d8; font-size: 14px; text-align: center; }
+.large-text .mascot-message, .large-text .mascot-feedback .mascot-message { font-size: 20px; }
+.large-text .trail-title { font-size: 19px; }
+@keyframes mascot-cheer { 30% { transform: translateY(-12px) rotate(-5deg); } 60% { transform: translateY(-5px) rotate(5deg); } }
+@keyframes mascot-star { 0% { opacity: 0; transform: scale(0.3) rotate(-25deg); } 65% { opacity: 1; transform: scale(1.2) rotate(8deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+@media (max-width: 600px) {
+  .learning-mascot { gap: 12px; padding: 16px 12px; border-radius: 20px; }
+  .mascot-character { flex-basis: 86px; }
+  .mascot-message { font-size: 14px; }
+  .mascot-name { font-size: 10px; }
+  .home-mascot .learning-mascot { padding-right: 45px; }
+  .home-mascot .mascot-listen { position: absolute; top: 8px; right: 3px; }
+  .mascot-start { font-size: 12px; }
+  .trail-heading h2 { font-size: 20px; }
+  .trail-stops { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 12px; }
+  .trail-link { padding: 16px 9px 13px; }
+  .trail-art { height: 92px; }
+  .trail-title { font-size: 13px; }
+  .mascot-feedback .mascot-character { flex-basis: 60px; }
+  .mascot-feedback .learning-mascot { gap: 8px; padding: 10px 8px; }
+  .mascot-feedback .mascot-message { font-size: 13px; }
+}
+@media (max-width: 360px) {
+  .home-mascot .mascot-character { flex-basis: 65px; }
+  .mascot-feedback .mascot-character { flex-basis: 48px; }
+}
+.calm-mode .mascot-character, .calm-mode .mascot-sparkles span, .calm-mode .reward-stars > span { animation: none; }
+.calm-mode .trail-link:hover { transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .mascot-character, .mascot-sparkles span, .reward-stars > span { animation: none; }
+  .trail-link:hover { transform: none; }
+}

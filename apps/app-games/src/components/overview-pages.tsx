@@ -18,9 +18,13 @@ import { games } from "@/lib/games";
 import { useLearning } from "./learning-provider";
 import { GameCard } from "./game-catalog";
 import { GameArt } from "./illustrations";
+import { LearningMascot } from "./learning-mascot";
+import { AdventureTrail } from "./adventure-trail";
+import { useOwlPet } from "./use-owl-pet";
 
 export function HomeOverview() {
   const { name, sessions } = useLearning();
+  const { pet } = useOwlPet();
   const nextGame =
     games.find((g) => !sessions.some((s) => s.gameId === g.id)) || games[0];
   const suggestions = games.filter((game) => game.id !== nextGame.id).slice(0, 2);
@@ -32,6 +36,12 @@ export function HomeOverview() {
         <h1>Olá, {name} <span aria-hidden="true">👋</span></h1>
         <p>Vamos brincar um pouquinho?</p>
       </div>
+      <div className="home-mascot">
+        <LearningMascot mascotName={pet.name} message={`Olá, ${name}! Eu sou ${pet.name}. Vamos descobrir coisas novas e colecionar estrelinhas juntos?`}>
+          <Button asChild className="mascot-start"><Link href={`/games/${nextGame.id}`}>Vamos brincar <ArrowRight size={17} aria-hidden="true" /></Link></Button>
+        </LearningMascot>
+      </div>
+      <AdventureTrail mascotName={pet.name} />
       <section aria-labelledby="suggested-title" className="suggested-section">
         <Link href={`/games/${nextGame.id}`} className="suggested-game">
           <div className={`suggested-game-art ${nextGame.color}`} aria-hidden="true"><GameArt type={nextGame.icon} /></div>
@@ -61,6 +71,7 @@ export function HomeOverview() {
 
 export function AchievementsOverview() {
   const { sessions, name } = useLearning();
+  const { pet } = useOwlPet();
   const unique = new Set(sessions.map((s) => s.gameId));
   return (
     <>
@@ -68,6 +79,7 @@ export function AchievementsOverview() {
         <h1>Suas estrelas <span aria-hidden="true">✨</span></h1>
         <p>Cada descoberta conta, {name}.</p>
       </div>
+      <LearningMascot mascotName={pet.name} mood={sessions.length ? "celebrate" : "guide"} message={sessions.length ? `Parabéns, ${name}! Cada uma dessas ${sessions.length * 3} estrelinhas conta uma descoberta nossa!` : `Nossa coleção começa com uma brincadeira, ${name}. Vamos conquistar as primeiras estrelinhas?`} />
       <Card className="achievement-summary">
         <span className="big-star">⭐</span>
         <div>
