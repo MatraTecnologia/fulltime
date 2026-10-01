@@ -16,6 +16,8 @@
 .mascot-name { display: block; color: #79549e; font-size: 12px; font-weight: 800; margin-bottom: 5px; }
 .mascot-message { color: #4d3866; font-size: 17px; font-weight: 700; line-height: 1.6; margin: 0; }
 .mascot-listen { flex-shrink: 0; width: 44px; height: 44px; color: #79549e; }
+.mascot-speaking .mascot-character { animation: mascot-chat 600ms ease-in-out infinite alternate; }
+.mascot-speaking .mascot-listen { background: #e9ddf7; }
 .mascot-start { margin-top: 14px; min-height: 44px; }
 .mascot-celebrate { background: linear-gradient(125deg, #fff3d0, #fffaf0); border-color: #f0dca5; }
 .mascot-encourage { background: #edf5f0; border-color: #d2e6d8; }
@@ -61,6 +63,7 @@
 .large-text .mascot-message, .large-text .mascot-feedback .mascot-message { font-size: 20px; }
 .large-text .trail-title { font-size: 19px; }
 @keyframes mascot-cheer { 30% { transform: translateY(-12px) rotate(-5deg); } 60% { transform: translateY(-5px) rotate(5deg); } }
+@keyframes mascot-chat { to { transform: translateY(-3px) rotate(2deg); } }
 @keyframes mascot-star { 0% { opacity: 0; transform: scale(0.3) rotate(-25deg); } 65% { opacity: 1; transform: scale(1.2) rotate(8deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
 @media (max-width: 600px) {
   .learning-mascot { gap: 12px; padding: 16px 12px; border-radius: 20px; }

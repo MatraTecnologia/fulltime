@@ -33,6 +33,7 @@ import { cn } from "@/lib/utils";
 import { useLearning } from "./learning-provider";
 import { LearningMascot, RewardStars } from "./learning-mascot";
 import { useOwlPet } from "./use-owl-pet";
+import { gameVoiceClip } from "@/lib/voice-clips";
 
 type RoundProps = {
   round: number;
@@ -167,7 +168,7 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
   const [paused, setPaused] = useState(false);
   const [finished, setFinished] = useState(false);
   const completed = useRef(false);
-  const { completeGame, speak, name, sessions } = useLearning();
+  const { completeGame, speak, stopSpeaking, name, sessions } = useLearning();
   const { pet } = useOwlPet();
   const totalRounds = game.id === "memoria" ? 1 : 3;
   const instruction = roundInstruction(game, round);
@@ -180,19 +181,17 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
       : hint
         ? `Vamos descobrir juntos? ${roundHint(game, round)}`
         : `Estou com você, ${name}! ${round === 0 ? "Explore com calma. Você consegue!" : "Vamos para a próxima descoberta!"}`;
+  const successClip = (["correct-0", "correct-1", "correct-2"] as const)[round];
+  const companionClip = feedback === "correct" ? successClip : feedback === "retry" ? "retry" : hint ? gameVoiceClip(game.id, round, "hint") : round ? "next" : "guide";
   useEffect(
     () => () => {
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      stopSpeaking();
     },
-    [],
+    [stopSpeaking],
   );
   function answer(correct: boolean) {
     setFeedback(correct ? "correct" : "retry");
-    speak(
-      correct
-        ? `Muito bem, ${name}! Você fez uma nova descoberta!`
-        : `Vamos tentar de novo, ${name}? Estou aqui com você. Você pode pedir uma dica.`,
-    );
+    speak(correct ? successClip : "retry");
   }
   function next() {
     if (round + 1 === totalRounds) {
@@ -201,17 +200,18 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
         completeGame(game.id);
       }
       setFinished(true);
-      speak(`Parabéns, ${name}! Você conseguiu! Três estrelas para a nossa aventura!`);
+      speak("complete");
     } else {
       setRound((r) => r + 1);
       setFeedback(null);
       setHint(false);
+      stopSpeaking();
     }
   }
   if (finished)
     return (
       <div className="completion-screen">
-        <LearningMascot mascotName={pet.name} mood="celebrate" message={`Parabéns, ${name}! Adorei brincar com você. Olha as estrelinhas que você conquistou!`} />
+        <LearningMascot mascotName={pet.name} voiceClip="complete" mood="celebrate" message={`Parabéns, ${name}! Adorei brincar com você. Olha as estrelinhas que você conquistou!`} />
         <RewardStars />
         <h1>Parabéns, {name}!</h1>
         <p>
@@ -251,7 +251,7 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
           variant="outline"
           onClick={() => {
             setPaused(true);
-            if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+            stopSpeaking();
           }}
         >
           <Pause size={16} />
@@ -275,7 +275,7 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
           <h2>{instruction}</h2>
           <Button
             variant="outline"
-            onClick={() => speak(instruction, true)}
+            onClick={() => speak(gameVoiceClip(game.id, round, "instruction"), true)}
             aria-label="Ouvir instrução"
           >
             <Volume2 size={19} />
@@ -293,12 +293,15 @@ function GameSession({ game, restart }: { game: Game; restart: () => void }) {
           )}
         </div>
         <div className={cn("feedback mascot-feedback", feedback === "correct" && "positive")}>
-          <LearningMascot key={`${round}-${feedback}`} mascotName={pet.name} mood={feedback === "correct" ? "celebrate" : feedback === "retry" ? "encourage" : "guide"} message={encouragement} />
+          <LearningMascot key={`${round}-${feedback}`} mascotName={pet.name} voiceClip={companionClip} mood={feedback === "correct" ? "celebrate" : feedback === "retry" ? "encourage" : "guide"} message={encouragement} />
         </div>
         <div className="player-controls">
           <Button
             variant="ghost"
-            onClick={() => setHint((h) => !h)}
+            onClick={() => {
+              setHint((h) => !h);
+              if (!hint) speak(gameVoiceClip(game.id, round, "hint"));
+            }}
             aria-expanded={hint}
           >
             <Lightbulb size={18} />

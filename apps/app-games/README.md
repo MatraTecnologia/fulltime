@@ -38,7 +38,7 @@ Envie o Dockerfile e a configuração do Next.js para a branch usada pelo Easypa
 
 ## Páginas e atividades
 
-- `/home`: cantinho da criança, resumo e sugestão de atividade.
+- `/home`: boas-vindas da corujinha, trilha dos oito jogos, progresso e sugestão de atividade.
 - `/games`: catálogo com busca e filtros por habilidade.
 - `/games/[slug]`: caça letras, junta sílabas, caça palavras, desenhe a letra, quiz de emojis, memória, números e cores.
 - `/conquistas`: estrelas, álbum e atividades recentes.
@@ -46,7 +46,21 @@ Envie o Dockerfile e a configuração do Next.js para a branch usada pelo Easypa
 
 Os jogos não têm cronômetro nem punição por erro. Oferecem dicas, novas tentativas e pausa. A atividade de desenho aceita mouse e toque, verifica a cobertura de cada traço e oferece uma alternativa de reconhecimento por teclado. Essa alternativa trabalha reconhecimento de letras, enquanto o desenho trabalha o traçado. As atividades têm um conjunto inicial fixo de desafios; ainda não há progressão adaptativa de dificuldade.
 
-O apelido, os ajustes e as últimas 100 conclusões ficam no `localStorage`, na chave `fulltime-brincar-v1`. Cada conclusão concede três estrelas. Os totais exibidos consideram esse histórico de até 100 atividades. Há validação dos dados carregados e aviso quando o navegador bloqueia o armazenamento. A voz usa a Web Speech API com `pt-BR` e depende das vozes disponíveis no dispositivo.
+O apelido, os ajustes e as últimas 100 conclusões ficam no `localStorage`, na chave `fulltime-brincar-v1`. Cada conclusão concede três estrelas. Os totais exibidos consideram esse histórico de até 100 atividades. Há validação dos dados carregados e aviso quando o navegador bloqueia o armazenamento.
+
+A corujinha acompanha a criança na trilha e nas atividades, incentiva novas tentativas e comemora acertos e conclusões. A trilha sugere o primeiro jogo ainda não concluído, mas todos os jogos continuam disponíveis. As animações respeitam o modo tranquilo e a preferência de movimentos reduzidos. O nome personalizado da corujinha também aparece nas mensagens dos jogos.
+
+A narração usa arquivos MP3 de voz neural brasileira em `public/audio/luna/v1`, reproduzidos com HTML Audio. Não usa o sintetizador de voz nativo do navegador nem faz chamadas a um serviço de voz durante os jogos. Os textos visuais usam o apelido da criança; os áudios são falas gerais pré-geradas, sem enviar dados da criança para gerar voz. Desligar o som, pausar ou trocar de página interrompe a reprodução; o botão Ouvir continua disponível com os incentivos automáticos desligados.
+
+Os roteiros estão em `src/lib/voice-clips.json`. Para gerar novamente a narração, com Python e acesso à internet:
+
+```powershell
+py -m pip install --target .voice-tools edge-tts
+$env:PYTHONPATH = (Resolve-Path .voice-tools).Path
+py apps/app-games/scripts/generate-voice.py --overwrite
+```
+
+O gerador usa `pt-BR-FranciscaNeural`, com ritmo e entonação diferentes nas celebrações e nas mensagens de incentivo. `--only preview` gera uma amostra; `--voice` escolhe outra voz. Revise os áudios ao alterar os roteiros e inclua os MP3 no deploy. Python e o gerador não são dependências do app em produção.
 
 Esta versão não exige login, não envia informações da criança à API e ainda não sincroniza progresso entre dispositivos ou com o módulo de crianças do EAD. Essa integração precisa de autenticação e autorização do responsável/profissional.
 

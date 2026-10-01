@@ -5,24 +5,12 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
+  useState,
   useSyncExternalStore,
 } from "react";
 import { games, type GameId } from "@/lib/games";
-
-function preferredVoice(voices: SpeechSynthesisVoice[]) {
-  const score = (voice: SpeechSynthesisVoice) => {
-    const language = voice.lang.replaceAll("_", "-").toLowerCase();
-    const natural = /natural|neural|enhanced|premium/i.test(voice.name);
-    return (
-      (language === "pt-br" ? 10 : 0) +
-      (natural ? 4 : /google/i.test(voice.name) ? 2 : 0) +
-      (voice.default ? 1 : 0)
-    );
-  };
-  return voices
-    .filter((voice) => /^pt(?:[-_]|$)/i.test(voice.lang))
-    .sort((a, b) => score(b) - score(a))[0];
-}
+import { voiceClipUrl, type VoiceClipId } from "@/lib/voice-clips";
 
 type Settings = { sound: boolean; calm: boolean; largeText: boolean };
 type Session = { gameId: GameId; date: string; stars: number };
@@ -108,31 +96,53 @@ type LearningContextValue = LearningState & {
   setName: (name: string) => void;
   setSettings: (settings: Partial<Settings>) => void;
   completeGame: (id: GameId) => void;
-  speak: (text: string, force?: boolean) => void;
+  speak: (clip: VoiceClipId, force?: boolean) => void;
+  stopSpeaking: () => void;
+  speakingClip: VoiceClipId | null;
+  voiceError: string | null;
 };
 const LearningContext = createContext<LearningContextValue | null>(null);
 
 export function LearningProvider({ children }: { children: React.ReactNode }) {
   const current = useSyncExternalStore(subscribe, getSnapshot, () => initial);
-  useEffect(() => {
-    // Start loading device voices before the first request to listen.
-    if ("speechSynthesis" in window) window.speechSynthesis.getVoices();
+  const player = useRef<HTMLAudioElement | null>(null);
+  const playback = useRef(0);
+  const [speakingClip, setSpeakingClip] = useState<VoiceClipId | null>(null);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const stopSpeaking = useCallback(() => {
+    playback.current += 1;
+    if (player.current) {
+      player.current.pause();
+      player.current.removeAttribute("src");
+      player.current.load();
+    }
+    setSpeakingClip(null);
   }, []);
+  useEffect(() => () => { player.current?.pause(); }, []);
   const speak = useCallback(
-    (text: string, force = false) => {
-      if ((!current.settings.sound && !force) || !("speechSynthesis" in window))
-        return;
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      const voice = preferredVoice(window.speechSynthesis.getVoices());
-      if (voice) utterance.voice = voice;
-      utterance.lang = voice?.lang || "pt-BR";
-      utterance.rate = current.settings.calm ? 0.9 : 1.02;
-      utterance.pitch = current.settings.calm ? 1 : 1.08;
-      utterance.volume = 0.85;
-      window.speechSynthesis.speak(utterance);
+    (clip: VoiceClipId, force = false) => {
+      if (!current.settings.sound && !force) return;
+      stopSpeaking();
+      const request = playback.current;
+      const audio = new Audio(voiceClipUrl(clip));
+      setVoiceError(null);
+      audio.volume = 0.85;
+      audio.playbackRate = current.settings.calm ? 0.9 : 1;
+      audio.onplaying = () => { if (request === playback.current) setSpeakingClip(clip); };
+      audio.onended = () => { if (request === playback.current) setSpeakingClip(null); };
+      const failed = () => {
+        if (request !== playback.current) return;
+        setSpeakingClip(null);
+        setVoiceError("Não consegui tocar a voz agora. Toque em Ouvir para tentar de novo.");
+      };
+      audio.onerror = failed;
+      player.current = audio;
+      void audio.play().catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        failed();
+      });
     },
-    [current.settings.sound, current.settings.calm],
+    [current.settings.sound, current.settings.calm, stopSpeaking],
   );
   return (
     <LearningContext.Provider
@@ -155,6 +165,9 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
             ].slice(-100),
           })),
         speak,
+        stopSpeaking,
+        speakingClip,
+        voiceError,
       }}
     >
       {children}

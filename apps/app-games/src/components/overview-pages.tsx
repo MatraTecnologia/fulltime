@@ -37,7 +37,7 @@ export function HomeOverview() {
         <p>Vamos brincar um pouquinho?</p>
       </div>
       <div className="home-mascot">
-        <LearningMascot mascotName={pet.name} message={`Olá, ${name}! Eu sou ${pet.name}. Vamos descobrir coisas novas e colecionar estrelinhas juntos?`}>
+        <LearningMascot mascotName={pet.name} voiceClip="welcome" message={`Olá, ${name}! Eu sou ${pet.name}. Vamos descobrir coisas novas e colecionar estrelinhas juntos?`}>
           <Button asChild className="mascot-start"><Link href={`/games/${nextGame.id}`}>Vamos brincar <ArrowRight size={17} aria-hidden="true" /></Link></Button>
         </LearningMascot>
       </div>
@@ -79,7 +79,7 @@ export function AchievementsOverview() {
         <h1>Suas estrelas <span aria-hidden="true">✨</span></h1>
         <p>Cada descoberta conta, {name}.</p>
       </div>
-      <LearningMascot mascotName={pet.name} mood={sessions.length ? "celebrate" : "guide"} message={sessions.length ? `Parabéns, ${name}! Cada uma dessas ${sessions.length * 3} estrelinhas conta uma descoberta nossa!` : `Nossa coleção começa com uma brincadeira, ${name}. Vamos conquistar as primeiras estrelinhas?`} />
+      <LearningMascot mascotName={pet.name} voiceClip={sessions.length ? "achievements" : "first-stars"} mood={sessions.length ? "celebrate" : "guide"} message={sessions.length ? `Parabéns, ${name}! Cada uma dessas ${sessions.length * 3} estrelinhas conta uma descoberta nossa!` : `Nossa coleção começa com uma brincadeira, ${name}. Vamos conquistar as primeiras estrelinhas?`} />
       <Card className="achievement-summary">
         <span className="big-star">⭐</span>
         <div>
@@ -162,7 +162,7 @@ export function AchievementsOverview() {
 }
 
 export function AdultSettings() {
-  const { name, setName, settings, setSettings, sessions, speak } =
+  const { name, setName, settings, setSettings, sessions, speak, stopSpeaking } =
     useLearning();
   const [draft, setDraft] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -236,12 +236,7 @@ export function AdultSettings() {
                   checked={settings[key]}
                   onCheckedChange={(checked) => {
                     setSettings({ [key]: checked });
-                    if (
-                      key === "sound" &&
-                      !checked &&
-                      "speechSynthesis" in window
-                    )
-                      window.speechSynthesis.cancel();
+                    if (key === "sound" && !checked) stopSpeaking();
                   }}
                   aria-describedby={`${key}-help`}
                 />
@@ -250,15 +245,14 @@ export function AdultSettings() {
             <Button
               variant="outline"
               onClick={() =>
-                speak("Oi! Que bom ter você aqui! Vamos brincar? Uau, uma nova descoberta! Parabéns! Essas estrelinhas são suas!", true)
+                speak("preview", true)
               }
             >
               <Volume2 size={17} />
               Experimentar a voz
             </Button>
             <p className="small-note">
-              A voz depende do suporte e das vozes em português disponíveis no
-              navegador.
+              Narração em português do Brasil, com falas animadas da corujinha.
             </p>
           </Card>
         </div>

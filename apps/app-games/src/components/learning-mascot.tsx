@@ -5,21 +5,24 @@ import { Button } from "./ui/button";
 import { Owl } from "./illustrations";
 import { useLearning } from "./learning-provider";
 import { cn } from "@/lib/utils";
+import type { VoiceClipId } from "@/lib/voice-clips";
 
 export function LearningMascot({
   mascotName,
   message,
   mood = "guide",
+  voiceClip,
   children,
 }: {
   mascotName: string;
   message: string;
   mood?: "guide" | "celebrate" | "encourage";
+  voiceClip: VoiceClipId;
   children?: React.ReactNode;
 }) {
-  const { speak } = useLearning();
+  const { speak, speakingClip } = useLearning();
   return (
-    <div className={cn("learning-mascot", `mascot-${mood}`)}>
+    <div className={cn("learning-mascot", `mascot-${mood}`, speakingClip === voiceClip && "mascot-speaking")}>
       <div className="mascot-character" aria-hidden="true">
         <Owl happy={mood === "celebrate"} />
         {mood === "celebrate" && (
@@ -31,7 +34,7 @@ export function LearningMascot({
         <p className="mascot-message" role="status" aria-live="polite" aria-atomic="true">{message}</p>
         {children}
       </div>
-      <Button variant="ghost" size="icon" className="mascot-listen" onClick={() => speak(message, true)} aria-label={`Ouvir ${mascotName}`}>
+      <Button variant="ghost" size="icon" className="mascot-listen" onClick={() => speak(voiceClip, true)} aria-label={`Ouvir ${mascotName}`}>
         <Volume2 size={20} aria-hidden="true" />
       </Button>
     </div>

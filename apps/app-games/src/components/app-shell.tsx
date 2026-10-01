@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { ArrowLeft, Bird, BookOpen, Gamepad2, Home, Settings2, Star, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLearning } from "./learning-provider";
@@ -16,8 +17,9 @@ const navigation = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { settings, setSettings, storageAvailable } = useLearning();
+  const { settings, setSettings, storageAvailable, stopSpeaking, voiceError } = useLearning();
   const playing = pathname.startsWith("/games/");
+  useEffect(() => () => stopSpeaking(), [pathname, stopSpeaking]);
 
   return (
     <div className={cn("app-layout mobile-first", settings.calm && "calm-mode", settings.largeText && "large-text")}>
@@ -42,7 +44,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 aria-pressed={settings.sound}
                 onClick={() => {
                   setSettings({ sound: !settings.sound });
-                  if (settings.sound && "speechSynthesis" in window) window.speechSynthesis.cancel();
+                  if (settings.sound) stopSpeaking();
                 }}
               >
                 {settings.sound ? <Volume2 /> : <VolumeX />}
@@ -56,6 +58,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {!storageAvailable && (
           <p className="storage-notice" role="status">O navegador não permitiu salvar o progresso. Suas descobertas ficam disponíveis nesta sessão.</p>
         )}
+        {voiceError && <p className="storage-notice" role="status">{voiceError}</p>}
         <main id="conteudo" className="page-content" tabIndex={-1}>{children}</main>
         <footer className="mobile-footer">No seu ritmo, uma descoberta de cada vez.</footer>
       </div>

@@ -52,7 +52,7 @@ export function OwlCorner() {
     setReaction(action);
     const text = action === "sleep" && pet.sleeping ? "Bom dia! Já estava com saudade!" : reactions[action];
     setMessage(text);
-    speak(text);
+    speak(action === "sleep" && pet.sleeping ? "pet-wake" : `pet-${action}`);
   }
 
   function catchStar() {
