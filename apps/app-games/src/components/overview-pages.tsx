@@ -250,7 +250,7 @@ export function AdultSettings() {
             <Button
               variant="outline"
               onClick={() =>
-                speak("Olá! Vamos aprender juntos, no seu ritmo.", true)
+                speak("Oi! Que bom ter você aqui! Vamos brincar? Uau, uma nova descoberta! Parabéns! Essas estrelinhas são suas!", true)
               }
             >
               <Volume2 size={17} />

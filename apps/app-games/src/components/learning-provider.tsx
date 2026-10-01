@@ -127,12 +127,12 @@ export function LearningProvider({ children }: { children: React.ReactNode }) {
       const voice = preferredVoice(window.speechSynthesis.getVoices());
       if (voice) utterance.voice = voice;
       utterance.lang = voice?.lang || "pt-BR";
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      utterance.volume = 0.8;
+      utterance.rate = current.settings.calm ? 0.9 : 1.02;
+      utterance.pitch = current.settings.calm ? 1 : 1.08;
+      utterance.volume = 0.85;
       window.speechSynthesis.speak(utterance);
     },
-    [current.settings.sound],
+    [current.settings.sound, current.settings.calm],
   );
   return (
     <LearningContext.Provider
